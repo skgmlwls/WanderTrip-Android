@@ -2,6 +2,7 @@ package com.lion.a02_boardcloneproject.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Visibility
@@ -55,7 +56,9 @@ fun CustomOutlinedTextField(
     // 에러 표시
     isError:MutableState<Boolean> = mutableStateOf(false),
     // 만약 입력에 대한 검사를 체크하는 기능이 필요하다면
-    isCheckValue:MutableState<Boolean>? = null
+    isCheckValue:MutableState<Boolean>? = null,
+    // 텍스트 필드 너비
+    width: Dp? = null // 너비를 입력받는 파라미터
 ) {
 
     // 비밀번호가 보이는지...
@@ -64,7 +67,15 @@ fun CustomOutlinedTextField(
     }
 
     // Modify 생성
-    var modifier = Modifier.fillMaxWidth().padding(top = paddingTop)
+    var modifier = Modifier.padding(top = paddingTop)
+
+// 너비가 지정되었으면, 지정된 너비로 설정하고, 아니면 fillMaxWidth로 설정
+    modifier = if (width != null) {
+        modifier.width(width) // width가 있으면 지정된 너비로 설정
+    } else {
+        modifier.fillMaxWidth() // 없으면 fillMaxWidth로 설정
+    }
+
     if(focusRequest != null){
         modifier = modifier.focusRequester(focusRequest.value)
     }
