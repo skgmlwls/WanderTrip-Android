@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
-fun IconButton(
+fun CustomIconButton(
     icon:ImageVector,
     iconButtonOnClick : () -> Unit = {},
 ) {

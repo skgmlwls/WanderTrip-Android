@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MultiSegmentedButton(
+fun CustomMultiSegmentedButton(
     // 버튼에 표시할 문자열
     labelList:List<String>,
     // 각 버튼의 체크 여부 값

@@ -4,24 +4,27 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.lion.wandertrip.presentation.main_page.MainScreen
+import com.lion.wandertrip.presentation.start_page.StartScreen
+import com.lion.wandertrip.presentation.user_login_page.UserLoginScreen
 import com.lion.wandertrip.ui.theme.WanderTripTheme
+import com.lion.wandertrip.util.BotNavScreenName
+import com.lion.wandertrip.util.MainScreenName
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             WanderTripTheme {
-                TripMain()
+                MyApp()
             }
         }
     }
@@ -31,7 +34,7 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun TripMain() {
+fun MyApp() {
 
     // 충돌해라
     // 네비게이션 객체
@@ -43,6 +46,16 @@ fun TripMain() {
     val tripApplication = LocalContext.current.applicationContext as TripApplication
     tripApplication.navHostController = rememberNavHostController
 
+    NavHost(
+        navController = rememberNavHostController,
+        startDestination = MainScreenName.MAIN_SCREEN_START.name
+    ) {
+        composable(MainScreenName.MAIN_SCREEN_START.name) { StartScreen() }
+        composable(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) { UserLoginScreen()}
+        composable(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) { MainScreen(navController = rememberNavHostController) }
+
+
+    }
 }
 
 

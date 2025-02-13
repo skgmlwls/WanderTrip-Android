@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 
 @Composable
-fun AlertDialog(
+fun CustomAlertDialog(
     // 다이얼로그를 보여주는 상태
     showDialogState : MutableState<Boolean>,
     confirmButtonTitle : String = "확인",
