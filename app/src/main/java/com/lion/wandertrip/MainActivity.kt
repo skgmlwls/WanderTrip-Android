@@ -27,8 +27,13 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+
+
+
 @Composable
 fun TripMain() {
+
+    // 충돌해라
     // 네비게이션 객체
     // Composable 함수가 재구성(recompose)되더라도 NavController의 인스턴스가 유지됨 (즉, 화면 회전이나 재구성이 발생해도 동일한 인스턴스를 사용).
     val rememberNavHostController = rememberNavController()
