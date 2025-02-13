@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun CheckBox(
+fun CustomCheckBox(
     text:String = "CheckBox",
     checkedValue: MutableState<Boolean> = mutableStateOf(false),
     paddingTop:Dp = 0.dp,

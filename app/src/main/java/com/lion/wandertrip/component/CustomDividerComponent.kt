@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun DividerComponent(
+fun CustomDividerComponent(
     paddingTop:Dp = 0.dp,
     color:Color = Color.LightGray)
 {

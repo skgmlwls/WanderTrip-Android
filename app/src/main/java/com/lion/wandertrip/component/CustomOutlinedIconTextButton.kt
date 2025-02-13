@@ -12,7 +12,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun OutlinedIconTextButton(
+fun CustomOutlinedIconTextButton(
     buttonOnClick:() -> Unit = {},
     leadingIcon:ImageVector? = null,
     buttonTitle:String = "",

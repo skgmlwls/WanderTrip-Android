@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppBar(
+fun CustomTopAppBar(
     title:String = "",
     navigationIconImage:ImageVector? = null,
     navigationIconOnClick:() -> Unit = {},
