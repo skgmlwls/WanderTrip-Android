@@ -38,9 +38,6 @@ fun TripMain() {
     // Composable 함수가 재구성(recompose)되더라도 NavController의 인스턴스가 유지됨 (즉, 화면 회전이나 재구성이 발생해도 동일한 인스턴스를 사용).
     val rememberNavHostController = rememberNavController()
     // Appilcation 객체에 담는다.
-    val rememberNavHostController1 = rememberNavController()
-    val rememberNavHostController2 = rememberNavController()
-    val rememberNavHostController3 = rememberNavController()
     // Jetpack Compose에서 LocalContext.current는 현재 Composable 함수가 실행되는 컨텍스트(Context)를 가져오는 방법입니다.
     // applicationContext의 기본 타입은 Context이므로, 우리가 만든 TripApplication 클래스의 인스턴스로 사용하려면 형변환이 필요합니다.
     val tripApplication = LocalContext.current.applicationContext as TripApplication
