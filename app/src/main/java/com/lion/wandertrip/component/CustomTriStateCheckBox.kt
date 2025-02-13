@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun TriStateCheckBox(
+fun CustomTriStateCheckBox(
     stateValue:MutableState<ToggleableState> = mutableStateOf(ToggleableState.Off),
     onClick: () -> Unit = {},
     text: String = "",

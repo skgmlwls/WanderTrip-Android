@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import kotlinx.coroutines.launch
 
 @Composable
-fun NavigationDrawer(
+fun CustomNavigationDrawer(
     // 상단 헤더 Composable
     headerComposable: @Composable () -> Unit = {},
     // 메뉴 항목들

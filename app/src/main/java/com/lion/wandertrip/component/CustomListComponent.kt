@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 
 
 @Composable
-fun ListComponent(
+fun CustomListComponent(
     dataList: SnapshotStateList<Map<String, *>>,
     rowComposable: @Composable (Map<String, *>) -> Unit,
     onRowClick:() -> Unit = {},

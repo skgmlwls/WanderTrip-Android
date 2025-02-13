@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SingleSegmentedButton(
+fun CustomSingleSegmentedButton(
     // 버튼에 표시할 문자열
     labelList:List<String>,
     // 선택한 버튼의 순서값

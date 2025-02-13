@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun OutlinedTextField(
+fun CustomOutlinedTextField(
     // 입력값에 대한 상태관리 변수
     textFieldValue: MutableState<String> = mutableStateOf(""),
     // hint

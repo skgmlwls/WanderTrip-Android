@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun OutlinedButton(
+fun CustomOutlinedButton(
     text:String = "OutlinedButton",
     paddingTop:Dp = 0.dp,
     onClick:() -> Unit = {}
