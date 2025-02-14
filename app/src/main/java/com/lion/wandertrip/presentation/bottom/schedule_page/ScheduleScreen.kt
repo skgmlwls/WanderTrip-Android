@@ -1,6 +1,8 @@
 package com.lion.wandertrip.presentation.bottom.schedule_page
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.rememberNavController
 import com.lion.a02_boardcloneproject.component.CustomDividerComponent
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.wandertrip.R
@@ -26,11 +29,13 @@ import com.lion.wandertrip.presentation.bottom.schedule_page.component.ScheduleI
 import com.lion.wandertrip.ui.theme.NanumSquareRound
 import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ScheduleScreen(
     scheduleViewModel: ScheduleViewModel = hiltViewModel(),
 ) {
 
+    // 일정 데이터 가져 오는 메소드 호출
     scheduleViewModel.gettingTripScheduleData()
 
     Scaffold(
@@ -51,16 +56,23 @@ fun ScheduleScreen(
                     modifier = Modifier.padding(end = 5.dp)
                         .weight(1f)
                 )
+
+                // 일정 추가 화면으로 이동하는 아이콘
                 ScheduleIconButton(
                     icon = Icons.Filled.Add,
-                    size = 30
+                    size = 30,
+                    iconButtonOnClick = { scheduleViewModel.addIconButtonEvent() }
                 )
             }
 
             CustomDividerComponent()
 
             // 일정 목록 표시
-            ScheduleItemList(scheduleViewModel.tripScheduleList)
+            ScheduleItemList(
+                dataList = scheduleViewModel.tripScheduleList,
+                viewModel = scheduleViewModel,
+                onRowClick = {}
+            )
         }
     }
 }

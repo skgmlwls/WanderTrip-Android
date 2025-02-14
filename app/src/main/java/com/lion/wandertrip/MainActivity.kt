@@ -1,9 +1,11 @@
 package com.lion.wandertrip
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
@@ -12,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import com.lion.wandertrip.presentation.trip_note_detail_page.TripNoteDetailScreen
 import com.lion.wandertrip.presentation.trip_note_write_page.TripNoteWriteScreen
 import com.lion.wandertrip.presentation.main_page.MainScreen
+import com.lion.wandertrip.presentation.schedule_add.ScheduleAddScreen
 import com.lion.wandertrip.presentation.start_page.StartScreen
 import com.lion.wandertrip.presentation.user_login_page.UserLoginScreen
 import com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step1_page.UserSignUpStep1Screen
@@ -19,6 +22,7 @@ import com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step2_page.Use
 import com.lion.wandertrip.ui.theme.WanderTripTheme
 import com.lion.wandertrip.util.BotNavScreenName
 import com.lion.wandertrip.util.MainScreenName
+import com.lion.wandertrip.util.ScheduleScreenName
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -34,6 +38,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MyApp() {
     // 네비게이션 객체
@@ -47,17 +52,24 @@ fun MyApp() {
 
     NavHost(
         navController = rememberNavHostController,
-        startDestination = BotNavScreenName.BOT_NAV_SCREEN_HOME.name
+        startDestination = MainScreenName.MAIN_SCREEN_USER_LOGIN.name
     ) {
         composable(MainScreenName.MAIN_SCREEN_START.name) { StartScreen() }
+        // 일정 메인 화면
         composable(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) { UserLoginScreen()}
         composable(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) { MainScreen(navController = rememberNavHostController) }
         composable(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP1.name) { UserSignUpStep1Screen() }
         composable(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP2.name) { UserSignUpStep2Screen() }
         composable(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP3.name) { UserSignUpStep1Screen() }
+
         composable(BotNavScreenName.BOT_NAV_SCREEN_TRIP_NOTE.name) { MainScreen(navController = rememberNavHostController) }
         composable(MainScreenName.TRIP_NOTE_DETAIL.name) { TripNoteDetailScreen() }
         composable(MainScreenName.TRIP_NOTE_WRITE.name) { TripNoteWriteScreen() }
+
+
+        // 일정 추가 화면
+        composable(ScheduleScreenName.SCHEDULE_ADD_SCREEN.name) { ScheduleAddScreen() }
+
     }
 }
 

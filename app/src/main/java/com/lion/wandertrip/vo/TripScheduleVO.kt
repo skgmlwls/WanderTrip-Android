@@ -9,9 +9,9 @@ class TripScheduleVO {
     var userID: String = ""
     var userNickName: String = ""
     var scheduleTitle: String = ""
-    var scheduleStartDate: String = ""
+    var scheduleStartDate: Timestamp = Timestamp.now()
     var scheduleCity: String = ""
-    var scheduleEndDate: String = ""
+    var scheduleEndDate: Timestamp = Timestamp.now()
     var scheduleInviteList: List<String> = emptyList()
     var scheduleDateList: List<Timestamp> = emptyList()
     var scheduleTimeStamp: Timestamp = Timestamp.now()
