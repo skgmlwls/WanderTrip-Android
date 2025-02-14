@@ -45,7 +45,7 @@ fun MyApp() {
 
     NavHost(
         navController = rememberNavHostController,
-        startDestination = MainScreenName.MAIN_SCREEN_START.name
+        startDestination = BotNavScreenName.BOT_NAV_SCREEN_HOME.name
     ) {
         composable(MainScreenName.MAIN_SCREEN_START.name) { StartScreen() }
         composable(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) { UserLoginScreen()}
