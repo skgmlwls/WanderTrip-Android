@@ -12,6 +12,8 @@ import androidx.navigation.compose.rememberNavController
 import com.lion.wandertrip.presentation.main_page.MainScreen
 import com.lion.wandertrip.presentation.start_page.StartScreen
 import com.lion.wandertrip.presentation.user_login_page.UserLoginScreen
+import com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step1_page.UserSignUpStep1Screen
+import com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step2_page.UserSignUpStep2Screen
 import com.lion.wandertrip.ui.theme.WanderTripTheme
 import com.lion.wandertrip.util.BotNavScreenName
 import com.lion.wandertrip.util.MainScreenName
@@ -30,13 +32,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-
-
 @Composable
 fun MyApp() {
-
-    // 충돌해라
     // 네비게이션 객체
     // Composable 함수가 재구성(recompose)되더라도 NavController의 인스턴스가 유지됨 (즉, 화면 회전이나 재구성이 발생해도 동일한 인스턴스를 사용).
     val rememberNavHostController = rememberNavController()
@@ -53,7 +50,9 @@ fun MyApp() {
         composable(MainScreenName.MAIN_SCREEN_START.name) { StartScreen() }
         composable(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) { UserLoginScreen()}
         composable(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) { MainScreen(navController = rememberNavHostController) }
-
+        composable(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP1.name) { UserSignUpStep1Screen() }
+        composable(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP2.name) { UserSignUpStep2Screen() }
+        composable(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP3.name) { UserSignUpStep1Screen() }
 
     }
 }
