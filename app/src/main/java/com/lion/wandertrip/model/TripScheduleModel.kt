@@ -9,9 +9,9 @@ class TripScheduleModel(
     var userID: String = "",                  // 유저 ID
     var userNickName: String = "",            // 유저 닉네임
     var scheduleTitle: String = "",           // 일정 제목
-    var scheduleStartDate: String = "",       // 일정 시작 날짜
+    var scheduleStartDate: Timestamp = Timestamp.now(),       // 일정 시작 날짜
     var scheduleCity: String = "",            // 일정 도시
-    var scheduleEndDate: String = "",         // 일정 끝 날짜
+    var scheduleEndDate: Timestamp = Timestamp.now(),         // 일정 끝 날짜
     var scheduleInviteList: List<String> = emptyList(), // 함께하는 유저 문서 ID 리스트
     var scheduleDateList: List<Timestamp> = emptyList(), // 일정 날짜 목록
     var scheduleTimeStamp: Timestamp = Timestamp.now(), // 데이터가 들어온 시간

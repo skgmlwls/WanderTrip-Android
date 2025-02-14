@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.lion.wandertrip.presentation.main_page.MainScreen
 import com.lion.wandertrip.presentation.start_page.StartScreen
+import com.lion.wandertrip.presentation.user_info_page.UserInfoScreen
 import com.lion.wandertrip.presentation.user_login_page.UserLoginScreen
 import com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step1_page.UserSignUpStep1Screen
 import com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step2_page.UserSignUpStep2Screen
@@ -45,15 +46,15 @@ fun MyApp() {
 
     NavHost(
         navController = rememberNavHostController,
-        startDestination = BotNavScreenName.BOT_NAV_SCREEN_HOME.name
+        startDestination = MainScreenName.MAIN_SCREEN_START.name
     ) {
         composable(MainScreenName.MAIN_SCREEN_START.name) { StartScreen() }
         composable(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) { UserLoginScreen()}
-        composable(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) { MainScreen(navController = rememberNavHostController) }
+        composable(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) { MainScreen() }
         composable(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP1.name) { UserSignUpStep1Screen() }
         composable(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP2.name) { UserSignUpStep2Screen() }
         composable(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP3.name) { UserSignUpStep1Screen() }
-
+        composable(MainScreenName.MAIN_SCREEN_USER_INFO.name) {UserInfoScreen()}
     }
 }
 

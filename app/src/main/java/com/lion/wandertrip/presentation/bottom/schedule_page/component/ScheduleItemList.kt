@@ -26,6 +26,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.Timestamp
 import com.lion.a02_boardcloneproject.component.CustomIconButton
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.ui.theme.NanumSquareRound
@@ -101,7 +102,7 @@ fun ScheduleItemList(
 
                             // 일정 날짜
                             Text(
-                                text = dataList[index].scheduleStartDate + " ~ " + dataList[index].scheduleEndDate,
+                                text = "${  " ~ " + dataList[index].scheduleEndDate}",
                                 fontFamily = NanumSquareRoundRegular,
                                 fontSize = 12.sp,
                                 modifier = Modifier
@@ -126,15 +127,15 @@ fun PreviewItemListScreen() {
     val dataList : List<TripScheduleModel> = listOf(
         TripScheduleModel(
             scheduleTitle = "제주 힐링여행",
-            scheduleStartDate = "2025.03.01",
+            scheduleStartDate = Timestamp.now(),
             scheduleCity = "서울",
-            scheduleEndDate = "2025.03.05",
+            scheduleEndDate = Timestamp.now(),
         ),
         TripScheduleModel(
             scheduleTitle = "서울 힐링여행",
-            scheduleStartDate = "2025.03.06",
+            scheduleStartDate = Timestamp.now(),
             scheduleCity = "서울",
-            scheduleEndDate = "2025.03.11",
+            scheduleEndDate = Timestamp.now(),
         )
     )
 

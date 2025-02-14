@@ -273,6 +273,8 @@ enum class MainScreenName{
     MAIN_SCREEN_SEARCH,
     //검색 결과 화면
     MAIN_SCREEN_SEARCH_RESULT,
+    // 프로필 편집 화면
+    MAIN_SCREEN_USER_INFO,
 }
 
 enum class BotNavScreenName{
