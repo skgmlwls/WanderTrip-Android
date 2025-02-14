@@ -264,11 +264,11 @@ enum class MainScreenName{
     // 로그인 화면
     MAIN_SCREEN_USER_LOGIN,
     // 회원 가입 1 화면, 회원 정보 입력 받기
-    MAIN_SCREEN_USER_Sign_Up_STEP1,
+    MAIN_SCREEN_USER_SIGN_UP_STEP1,
     // 회원 가입 2 화면, 프로필 이미지 입력 받기
-    MAIN_SCREEN_USER_Sign_Up_STEP2,
+    MAIN_SCREEN_USER_SIGN_UP_STEP2,
     // 회원 가입 3 화면, 카톡 가입 후 닉네임 받는 화면
-    MAIN_SCREEN_USER_Sign_Up_STEP3,
+    MAIN_SCREEN_USER_SIGN_UP_STEP3,
     // 검색 화면
     MAIN_SCREEN_SEARCH,
     //검색 결과 화면
@@ -279,6 +279,15 @@ enum class MainScreenName{
     TRIP_NOTE_DETAIL,
     // 여행기 작성 화면
     TRIP_NOTE_WRITE,
+    // 내 여행 화면
+    MAIN_SCREEN_MY_TRIP,
+    // 내 저장 화면
+    MAIN_SCREEN_MY_INTERESTING,
+    // 내 리뷰 화면
+    MAIN_SCREEN_MY_REVIEW,
+    // 내 여행기
+    MAIN_SCREEN_MY_TRIP_NOTE,
+
 }
 
 enum class BotNavScreenName{
