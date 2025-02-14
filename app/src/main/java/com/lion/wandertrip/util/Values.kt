@@ -258,30 +258,30 @@ enum class UserState(val number:Int, val str:String){
     // 탈퇴
     USER_STATE_SIGN_OUT(2, "탈퇴")
 }
-
 enum class MainScreenName{
     // 시작 화면
     MAIN_SCREEN_START,
     // 로그인 화면
     MAIN_SCREEN_USER_LOGIN,
     // 회원 가입 1 화면, 회원 정보 입력 받기
-    MAIN_SCREEN_USER_JOIN_STEP1,
+    MAIN_SCREEN_USER_Sign_Up_STEP1,
     // 회원 가입 2 화면, 프로필 이미지 입력 받기
-    MAIN_SCREEN_USER_JOIN_STEP2,
+    MAIN_SCREEN_USER_Sign_Up_STEP2,
     // 회원 가입 3 화면, 카톡 가입 후 닉네임 받는 화면
-    MAIN_SCREEN_USER_JOIN_STEP3,
-    // 홈 화면
-    MAIN_SCREEN_HOME,
+    MAIN_SCREEN_USER_Sign_Up_STEP3,
     // 검색 화면
     MAIN_SCREEN_SEARCH,
     //검색 결과 화면
     MAIN_SCREEN_SEARCH_RESULT,
+}
+
+enum class BotNavScreenName{
+    // 홈 화면
+    BOT_NAV_SCREEN_HOME,
     // 일정 화면
-    MAIN_SCREEN_SCHEDULE,
+    BOT_NAV_SCREEN_SCHEDULE,
     // 여행기 화면
-    MAIN_SCREEN_TRIP_NOTE,
+    BOT_NAV_SCREEN_TRIP_NOTE,
     // 내정보
-    MAIN_SCREEN_MY_INFO,
-
-
+    BOT_NAV_SCREEN_MY_INFO,
 }

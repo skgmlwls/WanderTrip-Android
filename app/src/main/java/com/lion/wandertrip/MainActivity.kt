@@ -4,36 +4,36 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.lion.wandertrip.presentation.main_page.MainScreen
+import com.lion.wandertrip.presentation.start_page.StartScreen
+import com.lion.wandertrip.presentation.user_login_page.UserLoginScreen
+import com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step1_page.UserSignUpStep1Screen
+import com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step2_page.UserSignUpStep2Screen
 import com.lion.wandertrip.ui.theme.WanderTripTheme
+import com.lion.wandertrip.util.BotNavScreenName
+import com.lion.wandertrip.util.MainScreenName
+import dagger.hilt.android.AndroidEntryPoint
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             WanderTripTheme {
-                TripMain()
+                MyApp()
             }
         }
     }
 }
 
-
-
-
 @Composable
-fun TripMain() {
-
-    // 충돌해라
+fun MyApp() {
     // 네비게이션 객체
     // Composable 함수가 재구성(recompose)되더라도 NavController의 인스턴스가 유지됨 (즉, 화면 회전이나 재구성이 발생해도 동일한 인스턴스를 사용).
     val rememberNavHostController = rememberNavController()
@@ -43,6 +43,18 @@ fun TripMain() {
     val tripApplication = LocalContext.current.applicationContext as TripApplication
     tripApplication.navHostController = rememberNavHostController
 
+    NavHost(
+        navController = rememberNavHostController,
+        startDestination = BotNavScreenName.BOT_NAV_SCREEN_HOME.name
+    ) {
+        composable(MainScreenName.MAIN_SCREEN_START.name) { StartScreen() }
+        composable(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) { UserLoginScreen()}
+        composable(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) { MainScreen(navController = rememberNavHostController) }
+        composable(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP1.name) { UserSignUpStep1Screen() }
+        composable(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP2.name) { UserSignUpStep2Screen() }
+        composable(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP3.name) { UserSignUpStep1Screen() }
+
+    }
 }
 
 
