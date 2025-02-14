@@ -264,11 +264,11 @@ enum class MainScreenName{
     // 로그인 화면
     MAIN_SCREEN_USER_LOGIN,
     // 회원 가입 1 화면, 회원 정보 입력 받기
-    MAIN_SCREEN_USER_JOIN_STEP1,
+    MAIN_SCREEN_USER_Sign_Up_STEP1,
     // 회원 가입 2 화면, 프로필 이미지 입력 받기
-    MAIN_SCREEN_USER_JOIN_STEP2,
+    MAIN_SCREEN_USER_Sign_Up_STEP2,
     // 회원 가입 3 화면, 카톡 가입 후 닉네임 받는 화면
-    MAIN_SCREEN_USER_JOIN_STEP3,
+    MAIN_SCREEN_USER_Sign_Up_STEP3,
     // 검색 화면
     MAIN_SCREEN_SEARCH,
     //검색 결과 화면

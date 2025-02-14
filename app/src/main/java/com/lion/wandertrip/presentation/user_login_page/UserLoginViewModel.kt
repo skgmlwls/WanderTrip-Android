@@ -1,22 +1,35 @@
 package com.lion.wandertrip.presentation.user_login_page
 
 import android.content.Context
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.focus.FocusRequester
 import androidx.lifecycle.ViewModel
+import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.common.model.ClientError
+import com.kakao.sdk.common.model.ClientErrorCause
+import com.kakao.sdk.user.UserApiClient
 import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.service.UserService
 import com.lion.wandertrip.util.BotNavScreenName
-import com.lion.wandertrip.util.LoginResult
 import com.lion.wandertrip.util.MainScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineStart
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+import javax.inject.Inject
+import kotlin.io.encoding.ExperimentalEncodingApi
+import android.util.Base64
+import com.lion.wandertrip.util.LoginResult
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+
 
 @HiltViewModel
 class UserLoginViewModel @Inject constructor(
@@ -51,7 +64,7 @@ class UserLoginViewModel @Inject constructor(
 
     // 회원 가입 버튼 click
     fun buttonUserJoinClick(){
-        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_JOIN_STEP1.name)
+        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP1.name)
     }
 
     // 로그인 버튼 click
@@ -60,7 +73,7 @@ class UserLoginViewModel @Inject constructor(
         tripApplication.navHostController.popBackStack(MainScreenName.MAIN_SCREEN_USER_LOGIN.name, true)
         tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name)
 
-      /*  if(textFieldUserLoginIdValue.value.isEmpty()){
+        if(textFieldUserLoginIdValue.value.isEmpty()){
             alertDialogUserIdState.value = true
             return
         }
@@ -116,6 +129,79 @@ class UserLoginViewModel @Inject constructor(
                     tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name)
                 }
             }
-        }*/
+        }
     }
+
+    // 카카오 로그인 버튼 눌렀을 때
+    fun onClickButtonKakaoLogin() {
+        // 키해시 값 불러오기
+        // getHashKey()
+        createKakaoToken()
+    }
+
+    // 카카오 로그인 토큰 받아오기
+    fun createKakaoToken() {
+        // 로그인 조합 예제
+        // 카카오계정으로 로그인 공통 callback 구성
+        // 카카오톡으로 로그인 할 수 없어 카카오계정으로 로그인할 경우 사용됨
+        // 카카오 로그인이든, 카카오 계정 로그인이든 사용할 콜백함수
+        val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
+            // 에러가 없어야 카카오 켸정으로 로그인 성공함
+            if (error != null) {
+                Log.e("test100", "카카오계정으로 로그인 실패", error)
+            } else if (token != null) {
+                Log.i("test100", "카카오계정으로 로그인 성공 ${token.accessToken}")
+            }
+        }
+
+        // 카카오톡이 설치되어 있으면 카카오톡으로 로그인, 아니면 카카오계정으로 로그인
+        if (UserApiClient.instance.isKakaoTalkLoginAvailable(tripApplication)) {
+            UserApiClient.instance.loginWithKakaoTalk(tripApplication) { token, error ->
+                if (error != null) {
+                    Log.e("test100", "카카오톡으로 로그인 실패", error)
+
+                    // 사용자가 카카오톡 설치 후 디바이스 권한 요청 화면에서 로그인을 취소한 경우,
+                    // 의도적인 로그인 취소로 보고 카카오계정으로 로그인 시도 없이 로그인 취소로 처리 (예: 뒤로 가기)
+                    if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
+                        return@loginWithKakaoTalk
+                    }
+
+                    // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인 시도
+                    UserApiClient.instance.loginWithKakaoAccount(tripApplication, callback = callback)
+                } else if (token != null) {
+                    Log.i("test100", "카카오톡으로 로그인 성공 ${token.accessToken}")
+                }
+            }
+        } else {
+            // 카카오 계정으로 로그인
+            UserApiClient.instance.loginWithKakaoAccount(tripApplication, callback = callback)
+        }
+    }
+
+    // 키해시 받아오는 메서드
+    @OptIn(ExperimentalEncodingApi::class)
+    private fun getHashKey() {
+        var packageInfo: PackageInfo? = null
+        try {
+            packageInfo = tripApplication.packageManager.getPackageInfo(tripApplication.packageName, PackageManager.GET_SIGNATURES)
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+
+        if (packageInfo == null) {
+            Log.e("KeyHash", "KeyHash:null")
+            return
+        }
+
+        for (signature in packageInfo.signatures!!) {
+            try {
+                val md: MessageDigest = MessageDigest.getInstance("SHA")
+                md.update(signature.toByteArray())
+                Log.d("KeyHash", Base64.encodeToString(md.digest(), Base64.DEFAULT))  // 수정된 부분
+            } catch (e: NoSuchAlgorithmException) {
+                Log.d("test100", "Unable to get MessageDigest. signature=$signature")
+            }
+        }
+    }
+
 }

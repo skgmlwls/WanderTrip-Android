@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import com.lion.wandertrip.presentation.bottom_menu_page.BottomMenuScreen
 
-@Composable
 // 컨트롤러 받아서 쓰지말고, viewModel 만들고 viewModel 에서 아래처럼 써야 할 거같아요 일단 컨트롤러 받는거 두겠습니다.
 
 // @HiltViewModel
@@ -13,7 +12,7 @@ import com.lion.wandertrip.presentation.bottom_menu_page.BottomMenuScreen
 //    val userService: UserService,
 //) : ViewModel()
 
-
+@Composable
 fun MainScreen(navController: NavController) {
     BottomMenuScreen(navController = navController)
 }

@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,10 +21,13 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -57,14 +62,27 @@ fun UserLoginScreen(userLoginViewModel: UserLoginViewModel = hiltViewModel()) {
                 horizontalAlignment = Alignment.CenterHorizontally // 수평 가운데 정렬
             ) {
                 // 아이디 입력란 위에 이미지
-                Image(
-                    painter = painterResource(id = R.drawable.img_plane),
-                    contentDescription = null,
+                Box(
                     modifier = Modifier
-                        .size(300.dp)
+                        .size(300.dp) // Box 크기 설정
                         .align(Alignment.CenterHorizontally)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.img_plane),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxWidth() // 이미지의 너비를 꽉 채움
+                            .heightIn(300.dp) // 최소 높이 300dp로 설정
+                            .align(Alignment.Center) // 이미지를 중앙에 배치
+                            .offset(y = (80).dp) // 이미지를 위로 50dp만큼 이동시켜서 하단 자르기
+                    )
+                }
+                Text(
+                    text = "WanderTrip",
+                    fontWeight = FontWeight.Bold, // 진한 글씨로 설정
+                    color = Color(0xFF0077B6), // 파란색으로 설정
+                    style = TextStyle(fontSize = 35.sp, fontFamily = CustomFont.customFontBold) // 필요에 따라 글자 크기 설정
                 )
-                Text("WanderTrip")
 
                 // 빈공간
                 Box(modifier = Modifier.height(130.dp))
@@ -134,7 +152,9 @@ fun UserLoginScreen(userLoginViewModel: UserLoginViewModel = hiltViewModel()) {
 
                 KakaoButton(
                     paddingTop = 5.dp,
-                    onClick = {}
+                    onClick = {
+                        userLoginViewModel.onClickButtonKakaoLogin()
+                    }
                 )
 
 

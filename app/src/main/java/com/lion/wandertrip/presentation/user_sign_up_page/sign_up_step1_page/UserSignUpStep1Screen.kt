@@ -1,0 +1,135 @@
+package com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step1_page
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.lion.a02_boardcloneproject.component.CustomOutlinedTextField
+import com.lion.a02_boardcloneproject.component.CustomTopAppBar
+import com.lion.a02_boardcloneproject.component.LikeLionOutlinedTextFieldEndIconMode
+import com.lion.a02_boardcloneproject.component.LikeLionOutlinedTextFieldInputType
+import com.lion.wandertrip.R
+import com.lion.wandertrip.component.BlueButton
+
+@Composable
+fun UserSignUpStep1Screen(userSignUpStep1ViewModel: UserSignUpStep1ViewModel = hiltViewModel()) {
+    Scaffold(
+        topBar = {
+            CustomTopAppBar(
+                title = "회원 가입",
+                navigationIconImage = Icons.AutoMirrored.Filled.ArrowBack,
+                navigationIconOnClick = {
+                    userSignUpStep1ViewModel.navigationIconOnClick()
+                },
+            )
+        }
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(it).padding(start = 30.dp, end = 30.dp),
+            verticalArrangement = Arrangement.SpaceEvenly
+        ) {
+
+            Column(
+            ) {
+
+                // 아이디 입력 요소
+                CustomOutlinedTextField(
+                    textFieldValue = userSignUpStep1ViewModel.textFieldUserJoinStep1IdValue,
+                    label = "아이디",
+                    placeHolder = "아이디를 입력해주세요",
+                    inputCondition = "[^a-zA-Z0-9_]",
+                    leadingIcon = ImageVector.vectorResource(R.drawable.ic_person_24px),
+                    trailingIconMode = LikeLionOutlinedTextFieldEndIconMode.TEXT,
+                    singleLine = true,
+                    supportText = userSignUpStep1ViewModel.textFieldUserJoinStep1IdErrorText,
+                    isError = userSignUpStep1ViewModel.textFieldUserJoinStep1IdIsError,
+                    isCheckValue = userSignUpStep1ViewModel.isCheckUserId,
+
+                    )
+
+                // 중복 확인 버튼
+                BlueButton(
+                    text = "아이디 중복 확인",
+                    paddingTop = 10.dp,
+                    onClick = {
+                        userSignUpStep1ViewModel.buttonCheckUserIdOnClick()
+                    }
+                )
+
+                // 비밀번호 입력 1 요소
+                CustomOutlinedTextField(
+                    textFieldValue = userSignUpStep1ViewModel.textFieldUserJoinStep1Password1Value,
+                    label = "비밀번호",
+                    placeHolder = "비밀번호를 입력해주세요",
+                    inputCondition = "[^a-zA-Z0-9_]",
+                    leadingIcon = ImageVector.vectorResource(R.drawable.ic_key_24px),
+                    trailingIconMode = LikeLionOutlinedTextFieldEndIconMode.PASSWORD,
+                    singleLine = true,
+                    paddingTop = 10.dp,
+                    inputType = LikeLionOutlinedTextFieldInputType.PASSWORD,
+                    supportText = userSignUpStep1ViewModel.textFieldUserJoinStep1Password1ErrorText,
+                    isError = userSignUpStep1ViewModel.textFieldUserJoinStep1Password1IsError,
+                )
+
+                // 비밀번호 입력 2 요소
+                CustomOutlinedTextField(
+                    textFieldValue = userSignUpStep1ViewModel.textFieldUserJoinStep1Password2Value,
+                    label = "비밀번호 확인",
+                    placeHolder = "비밀번호를 입력해주세요",
+                    inputCondition = "[^a-zA-Z0-9_]",
+                    leadingIcon = ImageVector.vectorResource(R.drawable.ic_key_24px),
+                    trailingIconMode = LikeLionOutlinedTextFieldEndIconMode.PASSWORD,
+                    singleLine = true,
+                    paddingTop = 10.dp,
+                    inputType = LikeLionOutlinedTextFieldInputType.PASSWORD,
+                    supportText = userSignUpStep1ViewModel.textFieldUserJoinStep1Password2ErrorText,
+                    isError = userSignUpStep1ViewModel.textFieldUserJoinStep1Password2IsError,
+                )
+
+                // 닉네임 요소
+                CustomOutlinedTextField(
+                    textFieldValue = userSignUpStep1ViewModel.textFieldUserJoinStep1NickNameValue,
+                    label = "닉네임",
+                    placeHolder = "닉네임을 입력해주세요",
+                    inputCondition = "[^가-힣a-zA-Z0-9_]",
+                    trailingIconMode = LikeLionOutlinedTextFieldEndIconMode.PASSWORD,
+                    singleLine = true,
+                    paddingTop = 10.dp,
+                    inputType = LikeLionOutlinedTextFieldInputType.TEXT,
+                    supportText = userSignUpStep1ViewModel.textFieldUserJoinStep1Password2ErrorText,
+                    isError = userSignUpStep1ViewModel.textFieldUserJoinStep1Password2IsError,
+                )
+
+
+                // 닉네임 중복 확인 버튼
+                BlueButton(
+                    text = "닉네임 중복 확인",
+                    paddingTop = 10.dp,
+                    onClick = {
+
+                    }
+                )
+            }
+
+
+
+            // 회원가입 완료
+            BlueButton(
+                text = "회원가입 완료",
+                paddingTop = 10.dp,
+                onClick = {
+                    userSignUpStep1ViewModel.onClickButtonSignUp()
+                }
+            )
+        }
+    }
+}
