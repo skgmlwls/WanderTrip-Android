@@ -285,3 +285,9 @@ enum class BotNavScreenName{
     // 내정보
     BOT_NAV_SCREEN_MY_INFO,
 }
+
+enum class ScheduleScreenName{
+    // 일정 추가 화면
+    SCHEDULE_ADD_SCREEN,
+    
+}
