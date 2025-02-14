@@ -1,6 +1,10 @@
 package com.lion.wandertrip
 
 import android.app.Application
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import com.kakao.sdk.common.KakaoSdk
 import com.lion.wandertrip.model.UserModel
@@ -21,4 +25,6 @@ class TripApplication : Application() {
     lateinit var loginUserModel: UserModel
     // 네비게이션
     lateinit var navHostController: NavHostController
+
+    var selectedItem =  mutableStateOf(0)
 }

@@ -13,8 +13,14 @@ import android.provider.MediaStore
 import android.widget.ImageView
 import androidx.compose.runtime.MutableState
 import androidx.core.content.FileProvider
+import com.google.firebase.Timestamp
 import java.io.File
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
+import java.util.TimeZone
+import java.util.concurrent.TimeUnit
 
 class Tools {
     companion object{
@@ -125,6 +131,27 @@ class Tools {
             }
         }
 
+        fun takeAlbumDataList(context: Context, previewUri: Uri?, previewBitmap: MutableList<Bitmap?>) {
+            // 가져온 사진이 있다면
+            if (previewUri != null) {
+                val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    val source = ImageDecoder.createSource(context.contentResolver, previewUri)
+                    ImageDecoder.decodeBitmap(source)
+                } else {
+                    val cursor = context.contentResolver.query(previewUri, null, null, null, null)
+                    cursor?.moveToNext()
+                    val idx = cursor?.getColumnIndex(MediaStore.Images.Media.DATA)
+                    val source = cursor?.getString(idx!!)
+
+                    BitmapFactory.decodeFile(source)
+                }
+
+                val resizeBitmap = resizeBitmap(1024, bitmap)
+                previewBitmap.add(resizeBitmap)  // 리스트에 추가
+            }
+        }
+
+
         // 이미지 뷰에 있는 이미지를 파일로 저장한다.
         fun saveBitmap(context: Context, bitmap: Bitmap){
             // 외부 저장소의 경로를 가져온다.
@@ -136,6 +163,61 @@ class Tools {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
             fileOutputStream.flush()
             fileOutputStream.close()
+        }
+         // timeStamp -> String 변환
+             private fun convertToDate(timeStamp: Timestamp): String {
+                 // Firestore Timestamp를 Date 객체로 변환
+                 val date = timeStamp.toDate()
+
+                 // 한국 시간대 (Asia/Seoul)로 설정
+                 val dateFormat = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA)
+                 dateFormat.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+
+                 return dateFormat.format(date)
+             }
+
+         // 날짜 타입 변경 String-> Timestamp
+             // DB에 넣을때 오후 12시로 넣기위해, kst(한국시간 오후 12시) -> utc(세계기준시간 으로 변환)
+             // 시간 기준이 달라서 31일을 저장해도 30일로 저장되는 문제를 해결
+             // 아마 00시면 분단위로 짤려서 날짜가 조정됨 그래서 안전하게 오후 12시로 저장함
+             fun convertToTimestamp(dueDate: String): Timestamp {
+                 // 날짜 포맷터 생성
+                 val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.KOREAN)
+                 dateFormatter.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+
+                 return try {
+                     // 문자열을 Date 객체로 변환
+                     val parsedDate = dateFormatter.parse(dueDate)
+
+                     if (parsedDate != null) {
+                         // 시간을 오후 12시(정오)로 설정
+                         val calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Seoul"))
+                         calendar.time = parsedDate
+                         calendar.set(Calendar.HOUR_OF_DAY, 12)
+                         calendar.set(Calendar.MINUTE, 0)
+                         calendar.set(Calendar.SECOND, 0)
+                         calendar.set(Calendar.MILLISECOND, 0)
+
+                         // 변경된 시간을 UTC로 변환하여 Timestamp 객체 생성
+                         val utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                         utcCalendar.timeInMillis = calendar.timeInMillis
+                         Timestamp(utcCalendar.time)
+                     } else {
+                         Timestamp.now()  // 날짜가 잘못된 경우 현재 시간을 반환
+                     }
+                 } catch (e: Exception) {
+                     e.printStackTrace()
+                     Timestamp.now()  // 예외 발생 시 현재 시간 반환
+                 }
+             }
+
+        // 남은 일정 가져오기
+        fun getRemainingDays(targetDate: Timestamp): Int {
+            val now = System.currentTimeMillis() // 현재 시간 (밀리초)
+            val target = targetDate.toDate().time // Timestamp -> Date 변환 후 밀리초 값 가져오기
+
+            val difference = target - now // 남은 시간 (밀리초)
+            return TimeUnit.MILLISECONDS.toDays(difference).toInt() // 밀리초 -> 일(day) 변환
         }
     }
 }

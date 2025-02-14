@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- 특정 도메인에 대해 cleartext(HTTP) 트래픽을 허용하는 설정 -->
+    <domain-config cleartextTrafficPermitted="true">
+        <!-- 'tong.visitkorea.or.kr' 도메인 및 그 하위 도메인에 대해 HTTP 트래픽을 허용 -->
+        <domain includeSubdomains="true">tong.visitkorea.or.kr</domain>
+    </domain-config>
+</network-security-config>

@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.lion.wandertrip.R
 
@@ -33,7 +34,7 @@ import com.lion.wandertrip.presentation.bottom.trip_note_page.TripNoteScreen
 import com.lion.wandertrip.util.NavigationData
 
 @Composable
-fun BottomMenuScreen(navController: NavController) {
+fun BottomMenuScreen(bottomMenuViewModel: BottomMenuViewModel = hiltViewModel()) {
     val navMenus = listOf(
         NavigationData("홈", R.drawable.ic_home_24px),
         NavigationData("일정", R.drawable.ic_calendar_month_24px),
@@ -41,7 +42,8 @@ fun BottomMenuScreen(navController: NavController) {
         NavigationData("My", R.drawable.ic_person_24px)
     )
 
-    var selectedItem by remember { mutableStateOf(0) }
+
+    /*var selectedItem by remember { mutableStateOf(0) }*/
 
     Scaffold(
         bottomBar = {
@@ -55,7 +57,7 @@ fun BottomMenuScreen(navController: NavController) {
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier
                                 .padding(8.dp)
-                                .clickable { selectedItem = index }
+                                .clickable { bottomMenuViewModel.tripApplication.selectedItem.value =  index }
                         ) {
                             // 🔹 drawable 리소스 아이콘 표시
                             Image(
@@ -63,7 +65,7 @@ fun BottomMenuScreen(navController: NavController) {
                                 contentDescription = menu.title,
                                 modifier = Modifier.size(24.dp),
                                 colorFilter = ColorFilter.tint(
-                                    if (selectedItem == index) Color(0xFF0077B6) // 클릭시 파란색
+                                    if (bottomMenuViewModel.tripApplication.selectedItem.value == index) Color(0xFF0077B6) // 클릭시 파란색
                                     else Color.Gray // 기본값 회색
                                 )
                             )
@@ -72,7 +74,7 @@ fun BottomMenuScreen(navController: NavController) {
 
                             Text(
                                 text = menu.title,
-                                color = if (selectedItem == index) Color.Black else Color.Gray
+                                color = if (bottomMenuViewModel.tripApplication.selectedItem.value == index) Color.Black else Color.Gray
                             )
                         }
                     }
@@ -87,7 +89,7 @@ fun BottomMenuScreen(navController: NavController) {
             modifier = Modifier.padding(paddingValues),
             contentAlignment = Alignment.Center
         ) {
-            when (selectedItem) {
+            when (bottomMenuViewModel.tripApplication.selectedItem.value) {
                 0 -> HomeScreen()
                 1 -> ScheduleScreen()
                 2 -> TripNoteScreen()
