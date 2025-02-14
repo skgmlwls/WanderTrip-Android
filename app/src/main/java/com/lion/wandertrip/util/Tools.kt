@@ -125,6 +125,27 @@ class Tools {
             }
         }
 
+        fun takeAlbumDataList(context: Context, previewUri: Uri?, previewBitmap: MutableList<Bitmap?>) {
+            // 가져온 사진이 있다면
+            if (previewUri != null) {
+                val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    val source = ImageDecoder.createSource(context.contentResolver, previewUri)
+                    ImageDecoder.decodeBitmap(source)
+                } else {
+                    val cursor = context.contentResolver.query(previewUri, null, null, null, null)
+                    cursor?.moveToNext()
+                    val idx = cursor?.getColumnIndex(MediaStore.Images.Media.DATA)
+                    val source = cursor?.getString(idx!!)
+
+                    BitmapFactory.decodeFile(source)
+                }
+
+                val resizeBitmap = resizeBitmap(1024, bitmap)
+                previewBitmap.add(resizeBitmap)  // 리스트에 추가
+            }
+        }
+
+
         // 이미지 뷰에 있는 이미지를 파일로 저장한다.
         fun saveBitmap(context: Context, bitmap: Bitmap){
             // 외부 저장소의 경로를 가져온다.
