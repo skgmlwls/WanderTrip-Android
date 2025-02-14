@@ -98,7 +98,7 @@ fun ScheduleItemList(
                                     .size(12.5.dp)  // ✅ 크기 조절
                             )
 
-                            // 일정 지역
+                            // 일정  지역
                             Text(
                                 text = dataList[index].scheduleCity,
                                 fontFamily = NanumSquareRoundRegular,
