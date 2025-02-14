@@ -69,7 +69,7 @@ fun CustomOutlinedTextField(
     // Modify 생성
     var modifier = Modifier.padding(top = paddingTop)
 
-// 너비가 지정되었으면, 지정된 너비로 설정하고, 아니면 fillMaxWidth로 설정
+    // 너비가 지정되었으면, 지정된 너비로 설정하고, 아니면 fillMaxWidth로 설정
     modifier = if (width != null) {
         modifier.width(width) // width가 있으면 지정된 너비로 설정
     } else {

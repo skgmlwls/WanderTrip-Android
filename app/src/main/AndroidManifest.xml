@@ -15,7 +15,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WanderTrip"
         tools:targetApi="31"
-        android:name=".TripApplication">
+        android:name=".TripApplication"
+        android:usesCleartextTraffic="true">
 
         <activity
             android:name=".MainActivity"

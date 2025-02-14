@@ -1,5 +1,7 @@
 package com.lion.wandertrip.presentation.bottom.schedule_page.component
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,15 +29,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.Timestamp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.a02_boardcloneproject.component.CustomIconButton
 import com.lion.wandertrip.model.TripScheduleModel
+import com.lion.wandertrip.presentation.bottom.schedule_page.ScheduleViewModel
 import com.lion.wandertrip.ui.theme.NanumSquareRound
 import com.lion.wandertrip.ui.theme.NanumSquareRoundLight
 import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ScheduleItemList(
     dataList: List<TripScheduleModel>,
+    viewModel: ScheduleViewModel = hiltViewModel(),
     onRowClick: (TripScheduleModel) -> Unit = {}, // 클릭 이벤트 추가
 ) {
     LazyColumn(
@@ -102,7 +108,9 @@ fun ScheduleItemList(
 
                             // 일정 날짜
                             Text(
-                                text = "${  " ~ " + dataList[index].scheduleEndDate}",
+                                text = "${viewModel.formatTimestampToDateString(dataList[index].scheduleStartDate)} " +
+                                        "~" +
+                                        " ${viewModel.formatTimestampToDateString(dataList[index].scheduleEndDate)}",
                                 fontFamily = NanumSquareRoundRegular,
                                 fontSize = 12.sp,
                                 modifier = Modifier
@@ -127,15 +135,15 @@ fun PreviewItemListScreen() {
     val dataList : List<TripScheduleModel> = listOf(
         TripScheduleModel(
             scheduleTitle = "제주 힐링여행",
-            scheduleStartDate = Timestamp.now(),
+            // scheduleStartDate = "2025.03.01",
             scheduleCity = "서울",
-            scheduleEndDate = Timestamp.now(),
+            // scheduleEndDate = "2025.03.05",
         ),
         TripScheduleModel(
             scheduleTitle = "서울 힐링여행",
-            scheduleStartDate = Timestamp.now(),
+            // scheduleStartDate = "2025.03.06",
             scheduleCity = "서울",
-            scheduleEndDate = Timestamp.now(),
+            // scheduleEndDate = "2025.03.11",
         )
     )
 

@@ -275,6 +275,10 @@ enum class MainScreenName{
     MAIN_SCREEN_SEARCH_RESULT,
     // 프로필 편집 화면
     MAIN_SCREEN_USER_INFO,
+    // 여행기 상세 화면
+    TRIP_NOTE_DETAIL,
+    // 여행기 작성 화면
+    TRIP_NOTE_WRITE,
 }
 
 enum class BotNavScreenName{
@@ -286,4 +290,10 @@ enum class BotNavScreenName{
     BOT_NAV_SCREEN_TRIP_NOTE,
     // 내정보
     BOT_NAV_SCREEN_MY_INFO,
+}
+
+enum class ScheduleScreenName{
+    // 일정 추가 화면
+    SCHEDULE_ADD_SCREEN,
+    
 }
