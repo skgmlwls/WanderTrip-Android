@@ -24,7 +24,7 @@ class TripScheduleVO {
         tripScheduleModel.userID = userID
         tripScheduleModel.userNickName = userNickName
         tripScheduleModel.scheduleTitle = scheduleTitle
-        tripScheduleModel.scheduleStartDate = scheduleStartDate
+        tripScheduleModel.scheduleStartDate =Timestamp.now()
         tripScheduleModel.scheduleCity = scheduleCity
         tripScheduleModel.scheduleEndDate = scheduleEndDate
         tripScheduleModel.scheduleInviteList = scheduleInviteList

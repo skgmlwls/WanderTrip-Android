@@ -76,8 +76,12 @@ dependencies {
     implementation ("androidx.navigation:navigation-runtime-ktx:2.7.7")
     implementation("com.kakao.sdk:v2-user:2.20.1")
 
+    implementation("com.github.skydoves:landscapist-glide:1.4.7")
+
+
 
     implementation ("com.github.bumptech.glide:compose:1.0.0-alpha.3")
+
 
 
 
