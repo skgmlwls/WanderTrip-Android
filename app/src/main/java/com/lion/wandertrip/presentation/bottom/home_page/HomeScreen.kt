@@ -299,7 +299,7 @@ fun TripImageGrid(images: List<String>) {
 @Composable
 fun CalendarIcon() {
     Image(
-        painter = painterResource(id = R.drawable.calendar_add_on_24px), // ✅ XML 아이콘 적용
+        painter = painterResource(id = R.drawable.ic_calendar_add_on_24px), // ✅ XML 아이콘 적용
         contentDescription = "Calendar",
         modifier = Modifier.size(24.dp)
     )
