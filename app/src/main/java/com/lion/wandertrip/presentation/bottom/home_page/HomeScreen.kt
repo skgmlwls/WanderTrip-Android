@@ -22,7 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import coil.compose.rememberImagePainter
 import com.lion.wandertrip.R
 
 data class TravelSpot(val rank: Int, val title: String, val location: String, val imageUrl: String)
