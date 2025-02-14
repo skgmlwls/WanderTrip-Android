@@ -17,10 +17,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
+import com.lion.wandertrip.R
 
 data class TravelSpot(val rank: Int, val title: String, val location: String, val imageUrl: String)
 
@@ -84,8 +87,8 @@ fun TravelSpotItem(spot: TravelSpot) {
             .background(Color.White)
             .clickable { }
     ) {
-        Image(
-            painter = rememberImagePainter(spot.imageUrl),
+        AsyncImage(
+            model = spot.imageUrl,  // 네트워크 이미지 URL
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
@@ -113,7 +116,7 @@ fun PopularTripSection() {
         Spacer(modifier = Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = rememberImagePainter("sample_image.xml"),
+                painter = painterResource(id = R.drawable.img_plane), // XML 리소스 로드
                 contentDescription = null,
                 modifier = Modifier
                     .size(40.dp)
