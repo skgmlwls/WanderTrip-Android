@@ -15,7 +15,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.wandertrip.R
+import com.lion.wandertrip.presentation.my_trip_note.components.VerticalTripNoteList
 import com.lion.wandertrip.presentation.my_trip_page.MyTripViewModel
+import com.lion.wandertrip.presentation.my_trip_page.components.VerticalTripItemList
 
 
 @Composable
@@ -35,13 +37,7 @@ fun MyTripNoteScreen(myTripViewModel: MyTripViewModel = hiltViewModel()) {
         Column (
             modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 10.dp)
         ){
-            Box(
-                Modifier.background(color = Color.Cyan)
-            ){
-
-            }
-
-
+            VerticalTripNoteList()
         }
 
     }
