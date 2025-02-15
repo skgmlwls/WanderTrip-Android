@@ -20,6 +20,7 @@ import com.lion.wandertrip.presentation.my_trip_page.used_dummy_data.ComeAndPast
 
 @Composable
 fun MyTripScreen(myTripViewModel: MyTripViewModel = hiltViewModel()) {
+    myTripViewModel.getTripList()
     Scaffold(
         topBar = {
             CustomTopAppBar(
@@ -35,7 +36,7 @@ fun MyTripScreen(myTripViewModel: MyTripViewModel = hiltViewModel()) {
         Column (
             modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 10.dp)
         ){
-            VerticalTripItemList(ComeAndPastScheduleDummyData.scheduleDummyDataList)
+            VerticalTripItemList(myTripViewModel)
         }
 
     }
