@@ -15,15 +15,17 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.wandertrip.R
+import com.lion.wandertrip.presentation.my_review_page.components.VerticalReviewList
 import com.lion.wandertrip.presentation.my_trip_page.MyTripViewModel
 
 @Composable
-fun MyReviewScreen(myTripViewModel: MyTripViewModel = hiltViewModel()) {
+fun MyReviewScreen(myReviewViewModel: MyReviewViewModel= hiltViewModel()) {
+    myReviewViewModel.getReviewList()
     Scaffold(
         topBar = {
             CustomTopAppBar(
                 navigationIconOnClick = {
-                    myTripViewModel.onClickNavIconBack()
+                    myReviewViewModel.onClickNavIconBack()
                 },
                 navigationIconImage = ImageVector.vectorResource(R.drawable.ic_arrow_back_24px),
                 title = "내 리뷰",
@@ -34,13 +36,7 @@ fun MyReviewScreen(myTripViewModel: MyTripViewModel = hiltViewModel()) {
         Column (
             modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 10.dp)
         ){
-            Box(
-                Modifier.background(color = Color.Green)
-            ){
-
-            }
-
-
+            VerticalReviewList(myReviewViewModel)
         }
 
     }
