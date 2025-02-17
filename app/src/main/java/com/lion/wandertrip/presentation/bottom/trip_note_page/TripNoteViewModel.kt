@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.util.MainScreenName
+import com.lion.wandertrip.util.TripNoteScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -27,13 +28,13 @@ class TripNoteViewModel @Inject constructor(
     // + 버튼(fab 버튼)을 눌렀을 때
     fun addButtonOnClick(){
         // 여행기 추가하는 화면으로 이동
-        tripApplication.navHostController.navigate(MainScreenName.TRIP_NOTE_WRITE.name)
+        tripApplication.navHostController.navigate(TripNoteScreenName.TRIP_NOTE_WRITE.name)
     }
 
     // 각 항목을 눌렀을 때
     fun listItemOnClick(){
         // 여행기 상세보기 화면으로 이동 (각 항목의 문서 id를 전달... 추후에)
-        tripApplication.navHostController.navigate(MainScreenName.TRIP_NOTE_DETAIL.name)
+        tripApplication.navHostController.navigate(TripNoteScreenName.TRIP_NOTE_DETAIL.name)
     }
 
     // 임시 데이터를 리사이클러뷰에 띄움

@@ -40,6 +40,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.wandertrip.model.TripNoteModel
+import com.lion.wandertrip.presentation.bottom.schedule_page.component.ScheduleIconButton
 import com.lion.wandertrip.ui.theme.NanumSquareRound
 import kotlinx.coroutines.launch
 
@@ -55,38 +56,57 @@ fun TripNoteScreen(
 
 
     Scaffold(
-        topBar = {
-            CustomTopAppBar(
-                title = tripNoteViewModel.topAppBarTitle.value,
-            )
-        },
-
-        // fab 버튼
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { tripNoteViewModel.addButtonOnClick() },
-                // modifier = Modifier.padding(bottom = 0.dp),
-                modifier = Modifier
-                    .padding(top = 160.dp)
-                    .absoluteOffset(y = 49.dp),
+                modifier = Modifier.padding(bottom = 16.dp).
+                padding(top = 160.dp)
+                    .absoluteOffset(y = 50.dp),
                 content = {
                     Icon(imageVector = Icons.Default.Add, contentDescription = "+")
                 }
             )
         }
     ) { padding ->
-        // 리사이클러뷰
-        LazyColumn(
-            contentPadding = padding,
-            modifier = Modifier.fillMaxSize()
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
         ) {
-            items(tripNoteViewModel.tripNoteList) { tripNote ->
-                TripNoteItem(tripNote = tripNote,
-                    onClick = { tripNoteViewModel.listItemOnClick() })
+            // 최상단 중앙에 텍스트 배치
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+            ) {
+                Text(
+                    text = " 추천 여행기",
+                    fontFamily = NanumSquareRound,
+                    fontSize = 22.sp,
+                    modifier = Modifier
+                        .padding(end = 5.dp)
+                        .weight(1f, fill = false) // 가중치 설정
+                )
+            }
+
+            // 리사이클러뷰
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 10.dp)
+            ) {
+                items(tripNoteViewModel.tripNoteList) { tripNote ->
+                    TripNoteItem(
+                        tripNote = tripNote,
+                        onClick = { tripNoteViewModel.listItemOnClick() }
+                    )
+                }
             }
         }
     }
 }
+
+
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable

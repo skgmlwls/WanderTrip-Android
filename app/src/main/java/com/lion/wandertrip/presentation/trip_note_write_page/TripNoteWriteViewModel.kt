@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.util.BotNavScreenName
 import com.lion.wandertrip.util.MainScreenName
+import com.lion.wandertrip.util.TripNoteScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -41,7 +42,7 @@ class TripNoteWriteViewModel @Inject constructor(
     // 일정 추가 버튼
     fun addTripScheduleClick(){
         // 일정 선택 화면으로 이동
-        tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_TRIP_NOTE.name)
+        tripApplication.navHostController.navigate(TripNoteScreenName.TRIP_NOTE_SCHEDULE.name)
     }
 
     // 사진 삭제
@@ -59,8 +60,9 @@ class TripNoteWriteViewModel @Inject constructor(
         // 서버에 저장
 
 
-        // 여행기 작성 화면으로 이동
-        tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_TRIP_NOTE.name)
+        // 여행기 리스트 화면으로 이동
+        tripApplication.navHostController.popBackStack()
+
     }
 
 }
