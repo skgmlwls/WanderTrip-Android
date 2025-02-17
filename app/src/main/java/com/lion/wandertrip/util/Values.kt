@@ -285,6 +285,8 @@ enum class MainScreenName{
     MAIN_SCREEN_MY_TRIP_NOTE,
     // 상세 화면
     MAIN_SCREEN_DETAIL,
+    // 구글 지도 화면
+    MAIN_SCREEN_GOOGLE_MAP
 
 }
 

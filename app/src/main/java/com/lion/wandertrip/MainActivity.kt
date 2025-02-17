@@ -16,6 +16,7 @@ import com.lion.wandertrip.presentation.bottom.trip_note_page.TripNoteScreen
 import androidx.navigation.navArgument
 import com.google.firebase.Timestamp
 import com.lion.wandertrip.presentation.detail_page.DetailScreen
+import com.lion.wandertrip.presentation.google_map_page.GoogleMapScreen
 import com.lion.wandertrip.presentation.trip_note_detail_page.TripNoteDetailScreen
 import com.lion.wandertrip.presentation.trip_note_write_page.TripNoteWriteScreen
 import com.lion.wandertrip.presentation.main_page.MainScreen
@@ -106,6 +107,8 @@ fun MyApp() {
             val contentId = backStackEntry.arguments?.getString("contentId") ?: "default_id"
             DetailScreen(contentId)
         }
+        // 구글 맵 화면
+        composable(MainScreenName.MAIN_SCREEN_GOOGLE_MAP.name) { GoogleMapScreen() }
 
 
 
