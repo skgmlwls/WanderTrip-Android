@@ -11,14 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -98,7 +93,7 @@ fun UserInterestingItem(interestingItem: UserInterestingModel) {
             }
 
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.heart_filled_24px),
+                imageVector = ImageVector.vectorResource(R.drawable.ic_heart_filled_24px),
                 contentDescription = "Save",
                 tint = Color.Red,
                 modifier = Modifier

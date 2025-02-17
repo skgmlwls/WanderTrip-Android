@@ -39,6 +39,7 @@ fun VerticalTripItemList(myTripViewModel: MyTripViewModel) {
     Column(modifier = Modifier.fillMaxSize()
         .verticalScroll(rememberScrollState()) // 스크롤 가능하게 설정
         .padding(16.dp)) {
+
         // 다가오는 여행
         if(myTripViewModel.upComingTripList.size!=0)
         Column  {

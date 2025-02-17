@@ -15,6 +15,7 @@ import androidx.navigation.compose.rememberNavController
 import com.lion.wandertrip.presentation.bottom.trip_note_page.TripNoteScreen
 import androidx.navigation.navArgument
 import com.google.firebase.Timestamp
+import com.lion.wandertrip.presentation.detail_page.DetailScreen
 import com.lion.wandertrip.presentation.trip_note_detail_page.TripNoteDetailScreen
 import com.lion.wandertrip.presentation.trip_note_write_page.TripNoteWriteScreen
 import com.lion.wandertrip.presentation.main_page.MainScreen
@@ -99,6 +100,14 @@ fun MyApp() {
         composable(MainScreenName.MAIN_SCREEN_MY_REVIEW.name) { MyReviewScreen() }
         // 내 여행기 화면
         composable(MainScreenName.MAIN_SCREEN_MY_TRIP_NOTE.name) { MyTripNoteScreen() }
+        // 상세 화면
+        // ✅ contentId를 받도록 설정
+        composable("${MainScreenName.MAIN_SCREEN_DETAIL.name}/{contentId}") { backStackEntry ->
+            val contentId = backStackEntry.arguments?.getString("contentId") ?: "default_id"
+            DetailScreen(contentId)
+        }
+
+
 
 
 
