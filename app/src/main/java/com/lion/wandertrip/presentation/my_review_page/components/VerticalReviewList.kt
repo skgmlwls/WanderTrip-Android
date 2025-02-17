@@ -1,7 +1,5 @@
 package com.lion.wandertrip.presentation.my_review_page.components
 
-import android.widget.RatingBar
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,11 +12,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ChatBubble
-import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lion.a02_boardcloneproject.component.CustomIconButton
 import com.lion.wandertrip.R
+import com.lion.wandertrip.component.CustomRatingBar
 import com.lion.wandertrip.model.ReviewModel
 import com.lion.wandertrip.presentation.my_review_page.MyReviewViewModel
 import com.lion.wandertrip.util.CustomFont

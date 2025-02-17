@@ -13,6 +13,7 @@ class TripItemModel(
     var mapLong: Double = 0.0,       // 경도(X)
     var tel: String = "",            // 전화번호
     var title: String = ""           // 제목
+    // 큰 이미지도 가져와야 함
 ) {
     fun toTripItemVO(): TripItemVO {
         val tripItemVO = TripItemVO()

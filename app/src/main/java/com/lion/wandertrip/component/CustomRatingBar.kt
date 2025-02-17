@@ -1,4 +1,4 @@
-package com.lion.wandertrip.presentation.my_review_page.components
+package com.lion.wandertrip.component
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
@@ -26,11 +26,12 @@ fun CustomRatingBar(rating: Float) {
         // 완전 채워진 별
         repeat(fullStars) {
             Image(
-                painter = painterResource(id = R.drawable.ic_star_full_24px), // 완전 채워진 별 이미지
+                painter = painterResource(id = R.drawable.ic_star_full_24px), // 별 이미지
                 contentDescription = "Full star",
                 modifier = Modifier.size(24.dp),
-                colorFilter = ColorFilter.tint(Color.Yellow) // 노란색으로 변경
+                colorFilter = ColorFilter.tint(Color(0xFFFFD700)) // 진한 금색 계열
             )
+
         }
 
         // 반별 (0.75 이상일 때)
@@ -39,7 +40,7 @@ fun CustomRatingBar(rating: Float) {
                 painter = painterResource(id = R.drawable.ic_half_star_24px), // 반별 이미지
                 contentDescription = "Half star",
                 modifier = Modifier.size(24.dp),
-                colorFilter = ColorFilter.tint(Color.Yellow) // 노란색으로 변경
+                colorFilter = ColorFilter.tint(Color(0xFFFFD700)) // 진한 금색 계열
 
             )
         }
@@ -49,7 +50,7 @@ fun CustomRatingBar(rating: Float) {
                 painter = painterResource(id = R.drawable.ic_qurter_star_24px), // 1/4 채운 별 이미지
                 contentDescription = "Quarter star",
                 modifier = Modifier.size(24.dp),
-                colorFilter = ColorFilter.tint(Color.Yellow) // 노란색으로 변경
+                colorFilter = ColorFilter.tint(Color(0xFFFFD700)) // 진한 금색 계열
 
             )
         }
@@ -60,7 +61,7 @@ fun CustomRatingBar(rating: Float) {
                 painter = painterResource(id = R.drawable.ic_star_24px), // 비어있는 별 이미지
                 contentDescription = "Empty star",
                 modifier = Modifier.size(24.dp),
-                colorFilter = ColorFilter.tint(Color.Yellow) // 노란색으로 변경
+                colorFilter = ColorFilter.tint(Color(0xFFFFD700)) // 진한 금색 계열
 
             )
         }
