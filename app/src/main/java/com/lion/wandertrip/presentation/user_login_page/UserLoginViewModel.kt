@@ -64,7 +64,7 @@ class UserLoginViewModel @Inject constructor(
 
     // 회원 가입 버튼 click
     fun buttonUserJoinClick(){
-        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP1.name)
+        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP1.name)
     }
 
     // 로그인 버튼 click

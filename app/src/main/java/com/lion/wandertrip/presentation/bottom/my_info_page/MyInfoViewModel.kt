@@ -18,8 +18,34 @@ class MyInfoViewModel @Inject constructor(
 
     val tripApplication = context as TripApplication
 
+    // 프로필 편집
     fun onClickTextUserInfoModify() {
         tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_INFO.name)
     }
+
+    // 내 여행 화면 전환
+    fun onClickIconMyTrip() {
+        Log.d("test100"," 내여행")
+        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_MY_TRIP.name)
+    }
+    // 내 저장 화면 전환
+    fun onClickIconMyInteresting() {
+        Log.d("test100"," 내저장")
+
+        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_MY_INTERESTING.name)
+    }
+    // 내 리뷰 화면 전환
+    fun onClickIconMyReview() {
+        Log.d("test100"," 내리부")
+
+        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_MY_REVIEW.name)
+    }
+    // 내 여행기 화면 전환
+    fun onClickIconTripNote() {
+        Log.d("test100"," 내 여행기")
+
+        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_MY_TRIP_NOTE.name)
+    }
+
 
 }

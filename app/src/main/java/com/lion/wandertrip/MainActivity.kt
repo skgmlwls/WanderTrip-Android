@@ -14,6 +14,10 @@ import androidx.navigation.compose.rememberNavController
 import com.lion.wandertrip.presentation.trip_note_detail_page.TripNoteDetailScreen
 import com.lion.wandertrip.presentation.trip_note_write_page.TripNoteWriteScreen
 import com.lion.wandertrip.presentation.main_page.MainScreen
+import com.lion.wandertrip.presentation.my_interesting_page.MyInterestingScreen
+import com.lion.wandertrip.presentation.my_review_page.MyReviewScreen
+import com.lion.wandertrip.presentation.my_trip_note.MyTripNoteScreen
+import com.lion.wandertrip.presentation.my_trip_page.MyTripScreen
 import com.lion.wandertrip.presentation.schedule_add.ScheduleAddScreen
 import com.lion.wandertrip.presentation.start_page.StartScreen
 import com.lion.wandertrip.presentation.user_info_page.UserInfoScreen
@@ -59,9 +63,9 @@ fun MyApp() {
         // 일정 메인 화면
         composable(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) { UserLoginScreen()}
         composable(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) { MainScreen() }
-        composable(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP1.name) { UserSignUpStep1Screen() }
-        composable(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP2.name) { UserSignUpStep2Screen() }
-        composable(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP3.name) { UserSignUpStep1Screen() }
+        composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP1.name) { UserSignUpStep1Screen() }
+        composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name) { UserSignUpStep2Screen() }
+        composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name) { UserSignUpStep1Screen() }
         
         composable(MainScreenName.MAIN_SCREEN_USER_INFO.name) {UserInfoScreen()}
 
@@ -71,6 +75,16 @@ fun MyApp() {
 
         // 일정 추가 화면
         composable(ScheduleScreenName.SCHEDULE_ADD_SCREEN.name) { ScheduleAddScreen() }
+        // 내 여행 화면
+        composable(MainScreenName.MAIN_SCREEN_MY_TRIP.name) { MyTripScreen() }
+        // 내 저장 화면
+        composable(MainScreenName.MAIN_SCREEN_MY_INTERESTING.name) { MyInterestingScreen() }
+        // 내 리뷰 화면
+        composable(MainScreenName.MAIN_SCREEN_MY_REVIEW.name) { MyReviewScreen() }
+        // 내 여행기 화면
+        composable(MainScreenName.MAIN_SCREEN_MY_TRIP_NOTE.name) { MyTripNoteScreen() }
+
+
 
     }
 }

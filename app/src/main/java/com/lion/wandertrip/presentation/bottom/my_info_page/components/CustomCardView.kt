@@ -122,19 +122,22 @@ fun ProfileCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                ProfileMenuItem(Icons.Default.FlightTakeoff, "내 여행")
-                ProfileMenuItem(Icons.Default.Bookmark, "내 저장")
-                ProfileMenuItem(Icons.Default.Star, "내 리뷰")
-                ProfileMenuItem(Icons.Default.Edit, "내 여행기")
+                ProfileMenuItem(Icons.Default.FlightTakeoff, "내 여행", {viewModel.onClickIconMyTrip()})
+                ProfileMenuItem(Icons.Default.Bookmark, "내 저장", {viewModel.onClickIconMyInteresting()})
+                ProfileMenuItem(Icons.Default.Star, "내 리뷰",{viewModel.onClickIconMyReview()})
+                ProfileMenuItem(Icons.Default.Edit, "내 여행기",{viewModel.onClickIconTripNote()})
             }
         }
     }
 }
 
 @Composable
-fun ProfileMenuItem(icon: ImageVector, text: String) {
+fun ProfileMenuItem(icon: ImageVector, text: String, onClick: () -> Unit = {}  ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable {
+            onClick()
+        }
     ) {
         Icon(imageVector = icon, contentDescription = text, modifier = Modifier.size(24.dp))
         Text(
