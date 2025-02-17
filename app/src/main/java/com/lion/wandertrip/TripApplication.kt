@@ -1,6 +1,7 @@
 package com.lion.wandertrip
 
 import android.app.Application
+import android.content.res.Resources
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,6 +20,9 @@ class TripApplication : Application() {
 
         // 카카오 SDK 초기화
         KakaoSdk.init(this, "50cccb7489355d937a3b7ca086b508c3")
+
+        // 화면 크기 초기화
+        initScreenSize()
     }
 
     // 로그인한 사용자 객체
@@ -27,4 +31,15 @@ class TripApplication : Application() {
     lateinit var navHostController: NavHostController
 
     var selectedItem =  mutableStateOf(0)
+
+    var screenWidth = 0
+    var screenHeight = 0
+    var screenRatio = 0f
+
+    private fun initScreenSize() {
+        val metrics = Resources.getSystem().displayMetrics
+        screenWidth = metrics.widthPixels
+        screenHeight = metrics.heightPixels
+        screenRatio = screenWidth.toFloat() / screenHeight.toFloat()
+    }
 }

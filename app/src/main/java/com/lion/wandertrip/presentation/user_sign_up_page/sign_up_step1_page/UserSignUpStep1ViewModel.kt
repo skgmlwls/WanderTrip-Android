@@ -99,7 +99,7 @@ class UserSignUpStep1ViewModel @Inject constructor(
             // TODO 유저 정보 등록
 
             // 닉네임 설정 화면으로 이동
-            tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_Sign_Up_STEP2.name)
+            tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name)
         }
     }
 

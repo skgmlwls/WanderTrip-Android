@@ -22,14 +22,14 @@ enum class AreaCode(val areaCode: Int, val areaName: String) {
     GWANGJU(5, "광주"),
     BUSAN(6, "부산"),
     ULSAN(7, "울산"),
-    SEJONG(8, "세종특별자치시"),
+    SEJONG(8, "세종시"),
     GYEONGGI(31, "경기도"),
-    GANGWON(32, "강원특별자치도"),
+    GANGWON(32, "강원도"),
     CHUNGBUK(33, "충청북도"),
     CHUNGNAM(34, "충청남도"),
     GYEONGBUK(35, "경상북도"),
     GYEONGNAM(36, "경상남도"),
-    JEONBUK(37, "전북특별자치도"),
+    JEONBUK(37, "전라북도"),
     JEONNAM(38, "전라남도"),
     JEJU(39, "제주도")
 }
@@ -264,17 +264,26 @@ enum class MainScreenName{
     // 로그인 화면
     MAIN_SCREEN_USER_LOGIN,
     // 회원 가입 1 화면, 회원 정보 입력 받기
-    MAIN_SCREEN_USER_Sign_Up_STEP1,
+    MAIN_SCREEN_USER_SIGN_UP_STEP1,
     // 회원 가입 2 화면, 프로필 이미지 입력 받기
-    MAIN_SCREEN_USER_Sign_Up_STEP2,
+    MAIN_SCREEN_USER_SIGN_UP_STEP2,
     // 회원 가입 3 화면, 카톡 가입 후 닉네임 받는 화면
-    MAIN_SCREEN_USER_Sign_Up_STEP3,
+    MAIN_SCREEN_USER_SIGN_UP_STEP3,
     // 검색 화면
     MAIN_SCREEN_SEARCH,
     //검색 결과 화면
     MAIN_SCREEN_SEARCH_RESULT,
     // 프로필 편집 화면
     MAIN_SCREEN_USER_INFO,
+    // 내 여행 화면
+    MAIN_SCREEN_MY_TRIP,
+    // 내 저장 화면
+    MAIN_SCREEN_MY_INTERESTING,
+    // 내 리뷰 화면
+    MAIN_SCREEN_MY_REVIEW,
+    // 내 여행기
+    MAIN_SCREEN_MY_TRIP_NOTE,
+
 }
 
 enum class BotNavScreenName{
@@ -291,7 +300,10 @@ enum class BotNavScreenName{
 enum class ScheduleScreenName{
     // 일정 추가 화면
     SCHEDULE_ADD_SCREEN,
-    
+    // 일정 지역 선택 화면
+    SCHEDULE_CITY_SELECT_SCREEN,
+    // 일정 상세 화면
+    SCHEDULE_DETAIL_SCREEN,
 }
 
 enum class TripNoteScreenName{
@@ -303,3 +315,12 @@ enum class TripNoteScreenName{
     TRIP_NOTE_SCHEDULE,
 }
 
+
+
+enum class RouletteScreenName{
+    ROULETTE_GRAPH, // ✅ 추가된 네비게이션 그래프 이름
+    // 도시 룰렛 화면
+    ROULETTE_CITY_SCREEN,
+    // 룰렛 도시 항목 추가 화면
+    ROULETTE_CITY_SELECT_SCREEN,
+}
