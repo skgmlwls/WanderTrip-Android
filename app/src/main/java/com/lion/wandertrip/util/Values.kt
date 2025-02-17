@@ -275,10 +275,6 @@ enum class MainScreenName{
     MAIN_SCREEN_SEARCH_RESULT,
     // 프로필 편집 화면
     MAIN_SCREEN_USER_INFO,
-    // 여행기 상세 화면
-    TRIP_NOTE_DETAIL,
-    // 여행기 작성 화면
-    TRIP_NOTE_WRITE,
     // 내 여행 화면
     MAIN_SCREEN_MY_TRIP,
     // 내 저장 화면
@@ -309,6 +305,17 @@ enum class ScheduleScreenName{
     // 일정 상세 화면
     SCHEDULE_DETAIL_SCREEN,
 }
+
+enum class TripNoteScreenName{
+    // 여행기 상세 화면
+    TRIP_NOTE_DETAIL,
+    // 여행기 작성 화면
+    TRIP_NOTE_WRITE,
+    // 여행기 일정 불러오기 화면
+    TRIP_NOTE_SCHEDULE,
+}
+
+
 
 enum class RouletteScreenName{
     ROULETTE_GRAPH, // ✅ 추가된 네비게이션 그래프 이름
