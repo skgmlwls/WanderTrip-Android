@@ -1,13 +1,13 @@
 package com.lion.wandertrip.presentation.my_review_page.used_dummy_data
 
 import com.google.firebase.Timestamp
-import com.lion.wandertrip.model.ReviewItem
+import com.lion.wandertrip.model.ReviewModel
 import java.util.Calendar
 
 class ReviewDummyData {
   companion object{
-      val dummyDataList = mutableListOf<ReviewItem>(
-          ReviewItem(
+      val dummyDataList = mutableListOf<ReviewModel>(
+          ReviewModel(
               reviewTitle = "사려니 숲길",
               reviewRatingScore = 0.0f,
               reviewContent = "리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@",
@@ -20,7 +20,7 @@ class ReviewDummyData {
               }.time),
               reviewState = 1 // 정상상태
           ),
-          ReviewItem(
+          ReviewModel(
               reviewTitle = "사려니 숲길",
               reviewRatingScore = 0.2f,
               reviewContent = "리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@",
@@ -33,7 +33,7 @@ class ReviewDummyData {
               }.time),
               reviewState = 2 // 삭제됨 상태
           ),
-          ReviewItem(
+          ReviewModel(
               reviewTitle = "첨성대",
               reviewRatingScore = 0.3f,
               reviewContent = "첨성대 입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@",
@@ -45,7 +45,7 @@ class ReviewDummyData {
               }.time),
               reviewState = 1 // 정상상태
           ),
-          ReviewItem(
+          ReviewModel(
               reviewTitle = "불국사",
               reviewRatingScore = 0.7f,
               reviewContent = "불국사입니다. 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@",
@@ -57,7 +57,7 @@ class ReviewDummyData {
               }.time),
               reviewState = 1 // 정상상태
           ),
-          ReviewItem(
+          ReviewModel(
               reviewTitle = "창덕궁",
               reviewRatingScore = 0.8f,
               reviewContent = "창덕궁. 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@",
@@ -69,7 +69,7 @@ class ReviewDummyData {
               }.time),
               reviewState = 1 // 정상상태
           ),
-          ReviewItem(
+          ReviewModel(
               reviewTitle = "경복궁",
               reviewRatingScore = 1.0f,
               reviewContent = "경복궁. 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@리뷰 내용입니다@@",
