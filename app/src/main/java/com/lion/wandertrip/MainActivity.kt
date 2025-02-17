@@ -8,9 +8,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.google.firebase.Timestamp
 import com.lion.wandertrip.presentation.trip_note_detail_page.TripNoteDetailScreen
 import com.lion.wandertrip.presentation.trip_note_write_page.TripNoteWriteScreen
 import com.lion.wandertrip.presentation.main_page.MainScreen
@@ -19,6 +22,10 @@ import com.lion.wandertrip.presentation.my_review_page.MyReviewScreen
 import com.lion.wandertrip.presentation.my_trip_note.MyTripNoteScreen
 import com.lion.wandertrip.presentation.my_trip_page.MyTripScreen
 import com.lion.wandertrip.presentation.schedule_add.ScheduleAddScreen
+import com.lion.wandertrip.presentation.schedule_city_select.ScheduleCitySelectScreen
+import com.lion.wandertrip.presentation.schedule_city_select.city_roulette.RouletteCityScreen
+import com.lion.wandertrip.presentation.schedule_city_select.city_roulette.roulette_city_select.RouletteCitySelectScreen
+import com.lion.wandertrip.presentation.schedule_detail_page.ScheduleDetailScreen
 import com.lion.wandertrip.presentation.start_page.StartScreen
 import com.lion.wandertrip.presentation.user_info_page.UserInfoScreen
 import com.lion.wandertrip.presentation.user_login_page.UserLoginScreen
@@ -27,11 +34,13 @@ import com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step2_page.Use
 import com.lion.wandertrip.ui.theme.WanderTripTheme
 import com.lion.wandertrip.util.BotNavScreenName
 import com.lion.wandertrip.util.MainScreenName
+import com.lion.wandertrip.util.RouletteScreenName
 import com.lion.wandertrip.util.ScheduleScreenName
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -57,10 +66,9 @@ fun MyApp() {
 
     NavHost(
         navController = rememberNavHostController,
-        startDestination = MainScreenName.MAIN_SCREEN_START.name
+        startDestination = "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?areaName=서울&areaCode=1"
     ) {
         composable(MainScreenName.MAIN_SCREEN_START.name) { StartScreen() }
-        // 일정 메인 화면
         composable(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) { UserLoginScreen()}
         composable(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) { MainScreen() }
         composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP1.name) { UserSignUpStep1Screen() }
@@ -68,12 +76,15 @@ fun MyApp() {
         composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name) { UserSignUpStep1Screen() }
         
         composable(MainScreenName.MAIN_SCREEN_USER_INFO.name) {UserInfoScreen()}
-
         composable(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) { MainScreen() }
+
         composable(MainScreenName.TRIP_NOTE_DETAIL.name) { TripNoteDetailScreen() }
         composable(MainScreenName.TRIP_NOTE_WRITE.name) { TripNoteWriteScreen() }
 
-        // 일정 추가 화면
+
+        // 일정 화면 ////////////////////////////////////////////////////////////////////////////
+        
+        // 일정 제목, 날짜 입력 화면
         composable(ScheduleScreenName.SCHEDULE_ADD_SCREEN.name) { ScheduleAddScreen() }
         // 내 여행 화면
         composable(MainScreenName.MAIN_SCREEN_MY_TRIP.name) { MyTripScreen() }
@@ -85,6 +96,77 @@ fun MyApp() {
         composable(MainScreenName.MAIN_SCREEN_MY_TRIP_NOTE.name) { MyTripNoteScreen() }
 
 
+
+        // 일정 도시 선택 화면
+        composable(
+            route = "${ScheduleScreenName.SCHEDULE_CITY_SELECT_SCREEN.name}?" +
+                    "scheduleTitle={scheduleTitle}&scheduleStartDate={scheduleStartDate}&scheduleEndDate={scheduleEndDate}",
+            arguments = listOf(
+                navArgument("scheduleTitle") { type = NavType.StringType },
+                navArgument("scheduleStartDate") { type = NavType.LongType },
+                navArgument("scheduleEndDate") { type = NavType.LongType }
+            )
+        ) { backStackEntry ->
+            val scheduleTitle = backStackEntry.arguments?.getString("scheduleTitle") ?: ""
+            val startTimestamp = backStackEntry.arguments?.getLong("scheduleStartDate") ?: 0L
+            val endTimestamp = backStackEntry.arguments?.getLong("scheduleEndDate") ?: 0L
+
+            val startDate = Timestamp(startTimestamp, 0)
+            val endDate = Timestamp(endTimestamp, 0)
+
+            ScheduleCitySelectScreen(scheduleTitle, startDate, endDate)
+        }
+
+//        composable(ScheduleScreenName.SCHEDULE_CITY_SELECT_SCREEN.name) {
+//            val defaultTitle = "기본 일정"
+//            val defaultStartDate = Timestamp.now()
+//            val defaultEndDate = Timestamp.now()
+//
+//            ScheduleCitySelectScreen(defaultTitle, defaultStartDate, defaultEndDate)
+//        }
+
+        // 일정 상세 화면
+        composable(
+            route = "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?areaName={areaName}&areaCode={areaCode}",
+            arguments = listOf(
+                navArgument("areaName") { type = NavType.StringType },
+                navArgument("areaCode") { type = NavType.IntType }
+            )
+        ) {
+            val areaName = it.arguments?.getString("areaName") ?: ""
+            val areaCode = it.arguments?.getInt("areaCode") ?: 0
+            ScheduleDetailScreen(areaName, areaCode)
+        }
+
+        /////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        // 룰렛 화면 /////////////////////////////////////////////////////////////////////////////////
+
+        // 도시 룰렛 메인 화면
+        composable(
+            route = "${RouletteScreenName.ROULETTE_CITY_SCREEN.name}?" +
+                    "scheduleTitle={scheduleTitle}&scheduleStartDate={scheduleStartDate}&scheduleEndDate={scheduleEndDate}",
+            arguments = listOf(
+                navArgument("scheduleTitle") { type = NavType.StringType },
+                navArgument("scheduleStartDate") { type = NavType.LongType },
+                navArgument("scheduleEndDate") { type = NavType.LongType }
+            )
+        ) {
+            val scheduleTitle = it.arguments?.getString("scheduleTitle") ?: ""
+            val startTimestamp = it.arguments?.getLong("scheduleStartDate") ?: 0L
+            val endTimestamp = it.arguments?.getLong("scheduleEndDate") ?: 0L
+
+            val startDate = Timestamp(startTimestamp, 0)
+            val endDate = Timestamp(endTimestamp, 0)
+
+            RouletteCityScreen(scheduleTitle, startDate, endDate)
+        }
+
+        // 룰렛 도시 항목 추가 화면
+        composable(RouletteScreenName.ROULETTE_CITY_SELECT_SCREEN.name) { RouletteCitySelectScreen(navController = rememberNavHostController) }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
     }
 }

@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Timestamp
 import com.lion.wandertrip.TripApplication
+import com.lion.wandertrip.util.ScheduleScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Instant
@@ -37,6 +38,19 @@ class ScheduleAddViewModel @Inject constructor(
 
         val formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd") // ✅ 년-월-일 포맷 적용
         return localDate.format(formatter)
+    }
+
+    fun moveToScheduleCitySelectScreen() {
+        val formattedTitle = scheduleTitle.value
+        val startTimestamp = scheduleStartDate.value.seconds // 🔹 Timestamp -> Long 변환
+        val endTimestamp = scheduleEndDate.value.seconds // 🔹 Timestamp -> Long 변환
+
+        application.navHostController.navigate(
+            "${ScheduleScreenName.SCHEDULE_CITY_SELECT_SCREEN.name}?" +
+                    "scheduleTitle=$formattedTitle" +
+                    "&scheduleStartDate=$startTimestamp" +
+                    "&scheduleEndDate=$endTimestamp"
+        )
     }
 
 }
