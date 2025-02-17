@@ -49,7 +49,7 @@ class MyInterestingViewModel @Inject constructor(
 
 
     // 필터로 리스트 가져오기
-    fun getInterestingFilterByCityList(cityName : String) {
+    fun getInterestingFilter(cityName : String) {
         Log.d("test100","getInterestingFilterByCityList-> cityName : $cityName")
         when(cityName){
             "0"->{
@@ -105,22 +105,19 @@ class MyInterestingViewModel @Inject constructor(
     // 관광지 클릭 리스너
     fun onClickButtonAttraction() {
         isCheckAttraction.value = !isCheckAttraction.value
-        Log.d("test100","filterList : ${interestingListFilterByCity}")
-        getInterestingFilterByCityList(filteredCityName.value)
+        getInterestingFilter(filteredCityName.value)
     }
 
     // 식당 클릭 리스너
     fun onClickButtonRestaurant() {
         isCheckRestaurant.value = !isCheckRestaurant.value
-        Log.d("test100","filterList : ${interestingListFilterByCity}")
-        getInterestingFilterByCityList(filteredCityName.value)
+        getInterestingFilter(filteredCityName.value)
 
     }
     // 숙소 클릭 리스너
     fun onClickButtonAccommodation() {
         isCheckAccommodation.value = !isCheckAccommodation.value
-        Log.d("test100","filterList : ${interestingListFilterByCity}")
-        getInterestingFilterByCityList(filteredCityName.value)
+        getInterestingFilter(filteredCityName.value)
 
     }
 
