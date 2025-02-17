@@ -1,26 +1,9 @@
 package com.lion.wandertrip.vo
 
 import com.google.firebase.Timestamp
-import com.lion.wandertrip.model.DetailReviewModel
-import com.lion.wandertrip.model.ReviewItem
+import com.lion.wandertrip.model.ReviewModel
 
-class DetailReviewVO {
-    var contentDocId: String = ""
-    var contentId: String = ""
-    var ratingScore: String = ""
-    var reviewList: List<ReviewItemVO> = emptyList()
-
-    fun toDetailReviewModel(): DetailReviewModel {
-        val detailReviewModel = DetailReviewModel()
-        detailReviewModel.contentDocId = contentDocId
-        detailReviewModel.contentId = contentId
-        detailReviewModel.ratingScore = ratingScore
-        detailReviewModel.reviewList = reviewList.map { it.toReviewItemModel() }
-        return detailReviewModel
-    }
-}
-
-class ReviewItemVO {
+class ReviewVO {
     var reviewDocId: String = ""
     var contentDocId: String = ""
     var reviewWriterNickname: String = ""
@@ -32,8 +15,8 @@ class ReviewItemVO {
     var reviewState : Int = 1 // 리뷰 상태 1: 노출 , 2: 삭제됨
 
 
-    fun toReviewItemModel(): ReviewItem {
-        val reviewItemModel = ReviewItem()
+    fun toReviewItemModel(): ReviewModel {
+        val reviewItemModel = ReviewModel()
         reviewItemModel.reviewDocId = reviewDocId
         reviewItemModel.contentDocId = contentDocId
         reviewItemModel.reviewWriterNickname = reviewWriterNickname

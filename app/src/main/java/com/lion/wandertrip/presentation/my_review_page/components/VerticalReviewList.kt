@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lion.a02_boardcloneproject.component.CustomIconButton
 import com.lion.wandertrip.R
-import com.lion.wandertrip.model.ReviewItem
+import com.lion.wandertrip.model.ReviewModel
 import com.lion.wandertrip.presentation.my_review_page.MyReviewViewModel
 import com.lion.wandertrip.util.CustomFont
 import com.skydoves.landscapist.CircularReveal
@@ -53,7 +53,7 @@ fun VerticalReviewList(myReviewViewModel: MyReviewViewModel) {
 
 
 @Composable
-fun ReviewItem(review: ReviewItem, pos: Int, myReviewViewModel: MyReviewViewModel) {
+fun ReviewItem(review: ReviewModel, pos: Int, myReviewViewModel: MyReviewViewModel) {
     // 글자 줄이기
     val shortedContent = if (review.reviewContent.length > 20) {
         review.reviewContent.take(20) + "..."

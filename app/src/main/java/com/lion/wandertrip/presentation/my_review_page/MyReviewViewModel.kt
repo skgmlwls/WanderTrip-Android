@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor
 import com.google.firebase.Timestamp
 import com.lion.wandertrip.TripApplication
-import com.lion.wandertrip.model.ReviewItem
+import com.lion.wandertrip.model.ReviewModel
 import com.lion.wandertrip.presentation.my_review_page.used_dummy_data.ReviewDummyData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,7 +20,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MyReviewViewModel @Inject constructor(@ApplicationContext context: Context) : ViewModel(){
-    val reviewList = mutableStateListOf<ReviewItem>()
+    val reviewList = mutableStateListOf<ReviewModel>()
 
     // 인덱스별 메뉴 상태를 관리할 맵
     val menuStateMap = mutableStateMapOf<Int, Boolean>()
