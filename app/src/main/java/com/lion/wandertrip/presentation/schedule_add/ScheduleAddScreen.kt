@@ -3,14 +3,12 @@ package com.lion.wandertrip.presentation.schedule_add
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
@@ -27,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
-import com.lion.wandertrip.component.BlueButton
 import com.lion.wandertrip.component.CustomBlueButton
 import com.lion.wandertrip.presentation.schedule_add.component.ScheduleAddCalendar
 import com.lion.wandertrip.presentation.schedule_add.component.ScheduleAddTextInputLayout
@@ -110,8 +106,8 @@ fun ScheduleAddScreen(
                     if (viewModel.scheduleTitle.value.isEmpty()) {
                         errorMessage = "일정 제목을 입력해주세요!" // ✅ 에러 메시지 설정
                     } else {
-                        // ✅ 일정 저장 로직 실행
-                        Log.d("ScheduleAddScreen", "일정 저장 성공")
+                        // 지역 선택 화면으로 이동
+                        viewModel.moveToScheduleCitySelectScreen()
                     }
                 }
             )

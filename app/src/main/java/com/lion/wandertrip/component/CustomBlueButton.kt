@@ -39,7 +39,7 @@ fun CustomBlueButton(
         onClick = onClick,
         shape = RoundedCornerShape(12.dp), // 모서리를 둥글게 만듦
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF0077B6), // 버튼 배경색
+            containerColor = Color(0xFF435C8F), // 버튼 배경색
             contentColor = Color.White // 텍스트 색상
         ),
     ) {

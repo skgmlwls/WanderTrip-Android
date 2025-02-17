@@ -11,6 +11,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.lion.wandertrip.ui.theme.NanumSquareRound
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -23,7 +24,7 @@ fun CustomTopAppBar(
     TopAppBar(
         // 타이틀
         title = {
-            Text(text = title)
+            Text(text = title, fontFamily = NanumSquareRound)
         },
         // 네비게이션 아이콘
         navigationIcon = if(navigationIconImage == null){
@@ -45,6 +46,6 @@ fun CustomTopAppBar(
         },
         colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = Color.White // ✅ 투명색 적용
-        )
+        ),
     )
 }

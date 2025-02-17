@@ -1,4 +1,6 @@
 package com.lion.wandertrip.presentation.bottom_menu_page
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -33,6 +35,7 @@ import com.lion.wandertrip.presentation.bottom.schedule_page.ScheduleScreen
 import com.lion.wandertrip.presentation.bottom.trip_note_page.TripNoteScreen
 import com.lion.wandertrip.util.NavigationData
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun BottomMenuScreen(bottomMenuViewModel: BottomMenuViewModel = hiltViewModel()) {
     val navMenus = listOf(

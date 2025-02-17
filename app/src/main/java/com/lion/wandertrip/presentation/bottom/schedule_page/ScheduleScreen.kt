@@ -76,12 +76,3 @@ fun ScheduleScreen(
         }
     }
 }
-
-// 미리 보기 추가
-@Preview(showBackground = true)
-@Composable
-fun ScheduleScreenPreview() {
-    MaterialTheme { // 기본 Material3 테마 적용
-        ScheduleScreen()
-    }
-}
