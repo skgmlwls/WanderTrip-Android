@@ -221,6 +221,7 @@ class Tools {
         }
 
         val areaCodeMap = mapOf(
+            "0" to "전체도시",
             "1" to "서울",
             "2" to "인천",
             "3" to "대전",

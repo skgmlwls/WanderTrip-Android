@@ -50,7 +50,7 @@ fun MyInfoScreen(myInfoViewModel: MyInfoViewModel = hiltViewModel()) {
             HorizontalScheduleList(ScheduleDummyData.scheduleDummyDataList)
 
             // 최근 게시글 리스트
-            HorizontalRecentPostsList(RecentPostsDummyData.RecentPostsDummyDataList)
+            HorizontalRecentPostsList(RecentPostsDummyData.RecentPostsDummyDataList,myInfoViewModel)
 
 
         }

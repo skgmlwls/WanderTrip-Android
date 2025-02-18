@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lion.wandertrip.R
+
 @Composable
 fun CustomChipButton(text: String, onClick: () -> Unit,isClick : MutableState<Boolean>) {
     Button(

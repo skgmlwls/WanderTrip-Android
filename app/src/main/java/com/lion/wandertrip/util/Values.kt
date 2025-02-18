@@ -281,8 +281,12 @@ enum class MainScreenName{
     MAIN_SCREEN_MY_INTERESTING,
     // 내 리뷰 화면
     MAIN_SCREEN_MY_REVIEW,
-    // 내 여행기
+    // 내 여행기 화면
     MAIN_SCREEN_MY_TRIP_NOTE,
+    // 상세 화면
+    MAIN_SCREEN_DETAIL,
+    // 구글 지도 화면
+    MAIN_SCREEN_GOOGLE_MAP
 
 }
 
