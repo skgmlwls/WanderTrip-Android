@@ -104,7 +104,9 @@ fun ReviewItem(reviewModel: ReviewModel, detailViewModel: DetailViewModel, pos: 
             //수정
             CustomIconButton(
                 ImageVector.vectorResource(R.drawable.ic_edit_24px),
-                iconButtonOnClick = {})
+                iconButtonOnClick = {
+                    detailViewModel.onClickIconReviewModify(reviewModel.contentDocId,reviewModel.reviewDocId)
+                })
             Spacer(modifier = Modifier.width(8.dp))
             // 삭제
             CustomIconButton(

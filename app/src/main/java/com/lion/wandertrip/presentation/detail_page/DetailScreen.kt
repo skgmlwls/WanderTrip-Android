@@ -56,6 +56,13 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
                             detailViewModel.onClickIconMap()
                         }
                     )
+                    // 일정 추가 아이콘
+                    CustomIconButton(
+                        ImageVector.vectorResource(R.drawable.ic_calendar_add_on_24px),
+                        iconButtonOnClick = {
+                            detailViewModel.onClickIconAddSchedule()
+                        }
+                    )
                 },
                 navigationIconImage = Icons.AutoMirrored.Filled.ArrowBack,
                 navigationIconOnClick = {
@@ -174,6 +181,19 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
                         fontFamily = CustomFont.customFontRegular,
                         fontSize = 16.sp
                     )
+                }
+            }
+        }
+
+        // 일정 추가 BottomSheet가 표시될 때의 설정
+        if (detailViewModel.isAddScheduleSheetOpen.value) {
+            ModalBottomSheet(
+                onDismissRequest = { detailViewModel.isAddScheduleSheetOpen.value = false }
+            ) {
+                LazyColumn {
+                    item {
+                        Text("내 여행")
+                    }
                 }
             }
         }

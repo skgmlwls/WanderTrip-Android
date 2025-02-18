@@ -1,74 +1,94 @@
 package com.lion.wandertrip.component
 
-import android.util.Log
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import android.content.res.ColorStateList
+import android.widget.RatingBar
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
-@Composable
-fun CustomDraggableRatingBar(
-    maxRating: Int = 5,
-    ratingState: MutableState<Float>, // 별점 상태를 직접 관리할 수 있도록 추가
-    onRatingChanged: (Float) -> Unit
-) {
-    val starSize = 50.dp // 별의 크기
-    val starPadding = 4.dp // 별 간의 간격
+import androidx.compose.ui.viewinterop.AndroidView
 
-    // 별을 5개로 설정
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(160.dp)
-            .padding(vertical = 20.dp, horizontal = 30.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween // 별 간의 간격을 일정하게 배치
-        ) {
-            // 각 별을 표시
-            for (i in 1..maxRating) {
-                Icon(
-                    imageVector = if (i <= ratingState.value) Icons.Filled.Star else Icons.Outlined.Star,
-                    contentDescription = "Star",
-                    tint = Color.Yellow,
-                    modifier = Modifier
-                        .size(starSize)
-                        .pointerInput(Unit) {
-                            // 클릭 이벤트
-                            detectTapGestures { offset ->
-                                val newRating = (offset.x / (starSize.toPx() + starPadding.toPx()))
-                                    .coerceIn(0f, maxRating.toFloat())
-                                ratingState.value = newRating
-                                onRatingChanged(newRating)
-                            }
-                        }
-                        .pointerInput(Unit) {
-                            // 드래그 이벤트
-                            detectHorizontalDragGestures { _, dragAmount ->
-                                val newRating = (ratingState.value + (dragAmount / (starSize.toPx() + starPadding.toPx())))
-                                    .coerceIn(0f, maxRating.toFloat())
-                                ratingState.value = newRating
-                                onRatingChanged(newRating)
-                            }
-                        }
-                )
+@Composable
+internal fun CustomDraggableRatingBar(
+    ratingState: MutableState<Float>, // 별점 상태를 관리할 수 있도록 MutableState로 선언
+    isSmall: Boolean = false, // 작은 사이즈의 RatingBar 여부
+    changAble: Boolean = true, // 별점이 변경 가능한지 여부
+    progressTintColor: Color? = Color.Yellow, // RatingBar의 색상 변경
+    onRatingChanged: (Float) -> Unit // 별점이 변경될 때 호출되는 함수
+) {
+    // AndroidView로 기존 RatingBar를 Compose UI에 추가
+    AndroidView(
+        factory = { context ->
+            // RatingBar의 크기 설정
+            if (isSmall) {
+                RatingBar(context, null, android.R.attr.ratingBarStyleSmall).apply {
+                    // 별점 상태 초기화
+                    this.rating = ratingState.value
+                    setIsIndicator(!changAble) // changable이 false일 경우, RatingBar가 수정 불가능하게 설정
+
+                    // 색상 변경이 필요한 경우 설정
+                    progressTintColor?.let {
+                        progressTintList = ColorStateList(
+                            arrayOf(
+                                intArrayOf(android.R.attr.state_enabled), // 활성화된 상태
+                            ), intArrayOf(
+                                it.hashCode(),
+                            )
+                        )
+
+                        secondaryProgressTintList = ColorStateList(
+                            arrayOf(
+                                intArrayOf(android.R.attr.state_enabled), // 활성화된 상태
+                            ), intArrayOf(
+                                it.hashCode(),
+                            )
+                        )
+                    }
+
+                    // 별점 변경 리스너 설정
+                    setOnRatingBarChangeListener { _, rating, _ ->
+                        ratingState.value = rating // 별점 값 변경 시 상태 갱신
+                        onRatingChanged(rating) // 외부 콜백 함수 호출
+                    }
+                }
+            } else {
+                RatingBar(context).apply {
+                    // 별점 상태 초기화
+                    this.rating = ratingState.value
+                    setIsIndicator(!changAble) // changable이 false일 경우, RatingBar가 수정 불가능하게 설정
+
+                    // 색상 변경이 필요한 경우 설정
+                    progressTintColor?.let {
+                        progressTintList = ColorStateList(
+                            arrayOf(
+                                intArrayOf(android.R.attr.state_enabled), // 활성화된 상태
+                            ), intArrayOf(
+                                it.hashCode(),
+                            )
+                        )
+
+                        secondaryProgressTintList = ColorStateList(
+                            arrayOf(
+                                intArrayOf(android.R.attr.state_enabled), // 활성화된 상태
+                            ), intArrayOf(
+                                it.hashCode(),
+                            )
+                        )
+                    }
+
+                    // 별점 변경 리스너 설정
+                    setOnRatingBarChangeListener { _, rating, _ ->
+                        ratingState.value = rating // 별점 값 변경 시 상태 갱신
+                        onRatingChanged(rating) // 외부 콜백 함수 호출
+                    }
+                }
             }
+        },
+        update = { view ->
+            // View가 갱신될 때 별점 상태를 업데이트
+            view.rating = ratingState.value // 최신 상태로 RatingBar의 별점 갱신
         }
-    }
+    )
 }
