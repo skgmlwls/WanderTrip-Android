@@ -24,6 +24,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,12 +40,14 @@ import com.lion.a02_boardcloneproject.component.LikeLionOutlinedTextFieldEndIcon
 import com.lion.wandertrip.component.BlueButton
 import com.lion.wandertrip.presentation.trip_note_write_page.component.AddImageButton
 import com.lion.wandertrip.ui.theme.NanumSquareRound
+import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 import com.lion.wandertrip.util.Tools
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripNoteWriteScreen(
-    tripNoteWriteViewModel: TripNoteWriteViewModel = hiltViewModel()
+    tripNoteWriteViewModel: TripNoteWriteViewModel = hiltViewModel(),
+    scheduleTitle : String
 ) {
 
     val context = LocalContext.current
@@ -52,6 +56,11 @@ fun TripNoteWriteScreen(
     val albumLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) {
         Tools.takeAlbumDataList(context, it, tripNoteWriteViewModel.tripNotePreviewBitmap)
     }
+
+//    // 일정 제목을 가져오는 함수 호출
+//    val scheduleTitle = tripNoteWriteViewModel.gettingTitle() ?: ""
+//    // scheduleTitle을 MutableState로 감싸기
+    val scheduleTitleState = remember { mutableStateOf(scheduleTitle) }
 
 
     Scaffold(
@@ -148,7 +157,25 @@ fun TripNoteWriteScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.padding(top = 18.dp))
+//            // 가져온 일정 제목 텍스트 필드
+//            CustomOutlinedTextField(
+//                textFieldValue = scheduleTitleState,
+//                label = "일정 제목",
+//                trailingIconMode = LikeLionOutlinedTextFieldEndIconMode.TEXT,
+//                singleLine = true,
+//            )
+
+            Spacer(modifier = Modifier.padding(top = 20.dp))
+
+            Text(
+                text= "선택한 일정 : ${scheduleTitleState.value}",
+                fontFamily = NanumSquareRoundRegular,
+                fontSize = 18.sp,
+                modifier = Modifier.padding(end = 5.dp)
+
+            )
+
+            Spacer(modifier = Modifier.padding(top = 11.dp))
 
             // 일정 추가하기 버튼
             BlueButton(
@@ -170,7 +197,9 @@ fun TripNoteWriteScreen(
                 singleLine = false,
             )
 
-            Spacer(modifier = Modifier.padding(top = 20.dp))
+            // Spacer(modifier = Modifier.padding(top = 20.dp))
+
+            Spacer(modifier = Modifier.weight(1f))
 
             BlueButton(
                 text = "게시하기",
@@ -179,6 +208,8 @@ fun TripNoteWriteScreen(
                     tripNoteWriteViewModel.tripNoteDoneClick()
                 }
             )
+
+            Spacer(modifier = Modifier.padding(top = 20.dp))
         }
     }
 }

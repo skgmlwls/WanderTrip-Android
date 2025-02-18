@@ -1,25 +1,23 @@
-package com.lion.wandertrip.presentation.trip_note_schedule_page.component
+package com.lion.wandertrip.presentation.trip_note_select_down_page.component
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,38 +25,56 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.wandertrip.model.TripScheduleModel
-import com.lion.wandertrip.presentation.bottom.schedule_page.component.ScheduleDropDawnIconButton
 import com.lion.wandertrip.presentation.trip_note_schedule_page.TripNoteScheduleViewModel
+import com.lion.wandertrip.presentation.trip_note_select_down_page.TripNoteSelectDownViewModel
 import com.lion.wandertrip.ui.theme.NanumSquareRound
 import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TripNoteScheduleItemList(
+fun TripNoteSelectDownItemList(
     dataList: List<TripScheduleModel>,
-    viewModel: TripNoteScheduleViewModel = hiltViewModel(),
+    viewModel: TripNoteSelectDownViewModel = hiltViewModel(),
     onRowClick: (TripScheduleModel) -> Unit = {}, // 클릭 이벤트 추가
     modifier: Modifier = Modifier // modifier 파라미터 추가
+
 ) {
+    // 선택된 카드를 저장하는 상태
+    val selectedCardIndex = remember { mutableStateOf(-1) }
+
+
+
     LazyColumn(
         modifier = modifier
             .fillMaxWidth()
             .padding(top = 10.dp),
     ) {
         items(dataList) { tripSchedule -> // 직접 데이터 항목을 사용하는 방식으로 변경
+
+            val isSelected = selectedCardIndex.value == dataList.indexOf(tripSchedule) // 현재 카드가 선택된 카드인지 확인
+
+
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 10.dp, horizontal = 10.dp),
+                    .padding(vertical = 5.dp, horizontal = 7.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp), // 카드 그림자 효과
                 shape = RoundedCornerShape(16.dp), // 라운드 모서리 설정
-                colors = CardDefaults.cardColors(Color(0xFFFFFFFF))
+                // colors = CardDefaults.cardColors(Color(0xFFFFFFFF))
+                colors = CardDefaults.cardColors(
+                    if (isSelected) Color(0xFFE0E0E0) else Color(0xFFFFFFFF) // 선택된 카드 배경 색
+                )
             ) {
                 Column( // 클릭 불필요 → 카드 내부에서만 클릭 감지
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onRowClick(tripSchedule) }, // 클릭 이벤트 적용
+                        .clickable {
+                            // onRowClick(tripSchedule)
+                            // 카드를 클릭하면 해당 카드가 선택됨
+                            selectedCardIndex.value = dataList.indexOf(tripSchedule)
+                            onRowClick(tripSchedule) // 선택된 일정 처리
+                                   }, // 클릭 이벤트 적용
                     horizontalAlignment = Alignment.Start // 내부 정렬
                 ) {
                     Row(

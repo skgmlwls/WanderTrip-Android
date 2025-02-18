@@ -65,4 +65,10 @@ class TripNoteWriteViewModel @Inject constructor(
 
     }
 
+    fun gettingTitle() : String?{
+        // 네비게이션 경로에서 전달된 일정 제목 받기
+        val scheduleTitle = tripApplication.navHostController.currentBackStackEntry?.arguments?.getString("scheduleTitle")
+        return scheduleTitle
+    }
+
 }

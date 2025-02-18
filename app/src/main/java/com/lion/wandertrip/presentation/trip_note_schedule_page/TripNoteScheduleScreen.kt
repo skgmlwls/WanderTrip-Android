@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.presentation.bottom.schedule_page.component.ScheduleItemList
 import com.lion.wandertrip.presentation.trip_note_schedule_page.component.TripNoteScheduleItemList
 import com.lion.wandertrip.ui.theme.NanumSquareRound
@@ -54,18 +55,17 @@ fun TripNoteScheduleScreen(
             )
         },
 
-        // 일정 목록 표시
         content = { paddingValues ->
-            // 로딩 상태 처리
-                // 데이터가 준비되었을 때 리스트 표시
-                TripNoteScheduleItemList(
-                    dataList = tripNoteScheduleViewModel.tripNoteScheduleList,
-                    viewModel = tripNoteScheduleViewModel,
-                    onRowClick = { tripSchedule ->
-                        // 클릭 시, tripSchedule 데이터 활용 (예: 상세 화면으로 이동)
-                    },
-                    modifier = Modifier.padding(paddingValues) // 패딩 값 전달
-                )
+            // 일정 목록 표시
+            TripNoteScheduleItemList(
+                dataList = tripNoteScheduleViewModel.tripNoteScheduleList,
+                viewModel = tripNoteScheduleViewModel,
+                onRowClick = { tripSchedule ->
+                    // 클릭 시, 다시 이 화면으로 이동 + 일정 제목 가져오기
+                    tripNoteScheduleViewModel.gettingSchedule(tripSchedule)
+                },
+                modifier = Modifier.padding(paddingValues)
+            )
         }
     )
 }

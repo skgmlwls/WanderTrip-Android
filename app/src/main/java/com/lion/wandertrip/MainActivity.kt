@@ -28,7 +28,9 @@ import com.lion.wandertrip.presentation.schedule_city_select.city_roulette.Roule
 import com.lion.wandertrip.presentation.schedule_city_select.city_roulette.roulette_city_select.RouletteCitySelectScreen
 import com.lion.wandertrip.presentation.schedule_detail_page.ScheduleDetailScreen
 import com.lion.wandertrip.presentation.start_page.StartScreen
+import com.lion.wandertrip.presentation.trip_note_other_schedule_page.TripNoteOtherScheduleScreen
 import com.lion.wandertrip.presentation.trip_note_schedule_page.TripNoteScheduleScreen
+import com.lion.wandertrip.presentation.trip_note_select_down_page.TripNoteSelectDownScreen
 import com.lion.wandertrip.presentation.user_info_page.UserInfoScreen
 import com.lion.wandertrip.presentation.user_login_page.UserLoginScreen
 import com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step1_page.UserSignUpStep1Screen
@@ -83,7 +85,21 @@ fun MyApp() {
 
         composable(BotNavScreenName.BOT_NAV_SCREEN_TRIP_NOTE.name) { TripNoteScreen() }
         composable(TripNoteScreenName.TRIP_NOTE_DETAIL.name) { TripNoteDetailScreen() }
-        composable(TripNoteScreenName.TRIP_NOTE_WRITE.name) { TripNoteWriteScreen() }
+        // composable(TripNoteScreenName.TRIP_NOTE_WRITE.name) { TripNoteWriteScreen() }
+
+        // 여행기 작성 화면
+        composable(
+            route = "${TripNoteScreenName.TRIP_NOTE_WRITE.name}/{scheduleTitle}"
+        ){
+            val scheduleTitle = it.arguments?.getString("scheduleTitle") ?:  ""
+            TripNoteWriteScreen(scheduleTitle = scheduleTitle)
+        }
+
+        // 여행기 페이지에서 다른 사람 여행기 보기
+        composable(TripNoteScreenName.TRIP_NOTE_OTHER_SCHEDULE.name) { TripNoteOtherScheduleScreen() }
+        composable(TripNoteScreenName.TRIP_NOTE_SELECT_DOWN.name) { TripNoteSelectDownScreen() }
+
+
         composable(TripNoteScreenName.TRIP_NOTE_SCHEDULE.name) { TripNoteScheduleScreen() }
 
 
