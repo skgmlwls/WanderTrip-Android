@@ -37,18 +37,20 @@ class TripScheduleModel(
 }
 
 class ScheduleItem(
+    var itemDocId: String = "",                // 문서 ID
     var itemDate: Timestamp = Timestamp.now(), // 일정 날짜
     var itemIndex: Int = 0,                   // 순서값
     var itemTitle: String = "",               // 아이템 이름
     var itemType: String = "",                // 목적지 분류 (관광지, 음식점, 숙소 중)
-    var itemLongitude: Double = 0.0,          // 경도
-    var itemLatitude: Double = 0.0,           // 위도
+    var itemLongitude: Double = 0.0,          // 경도(X)
+    var itemLatitude: Double = 0.0,           // 위도(Y)
     var itemImagesURL: List<String> = emptyList(), // 아이템 이미지 URL 리스트
     var itemReviewText: String = "",          // 후기 내용
     var itemReviewImagesURL: List<String> = emptyList() // 후기 이미지 리스트
 ) {
     fun toScheduleItemVO(): ScheduleItemVO {
         val scheduleItemVO = ScheduleItemVO()
+        scheduleItemVO.itemDocId = itemDocId
         scheduleItemVO.itemDate = itemDate
         scheduleItemVO.itemIndex = itemIndex
         scheduleItemVO.itemTitle = itemTitle

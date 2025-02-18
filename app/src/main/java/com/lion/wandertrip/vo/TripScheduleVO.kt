@@ -37,6 +37,7 @@ class TripScheduleVO {
 }
 
 class ScheduleItemVO {
+    var itemDocId: String = ""
     var itemDate: Timestamp = Timestamp.now()
     var itemIndex: Int = 0
     var itemTitle: String = ""
@@ -49,6 +50,7 @@ class ScheduleItemVO {
 
     fun toScheduleItemModel(): ScheduleItem {
         val scheduleItemModel = ScheduleItem()
+        scheduleItemModel.itemDocId = itemDocId
         scheduleItemModel.itemDate = itemDate
         scheduleItemModel.itemIndex = itemIndex
         scheduleItemModel.itemTitle = itemTitle
