@@ -53,7 +53,19 @@ class TripNoteViewModel @Inject constructor(
                 userNickname = "닉네임2",
                 tripNoteTitle = "제목2",
                 tripNoteContent = "내용내용2",
-                tripNoteImage = listOf("http://tong.visitkorea.or.kr/cms/resource/85/2504485_image2_1.jpg", "http://tong.visitkorea.or.kr/cms/resource/85/2504485_image2_1.jpg"),
+                tripNoteImage = listOf("http://tong.visitkorea.or.kr/cms/resource/92/2671592_image2_1.jpg", "http://tong.visitkorea.or.kr/cms/resource/85/2504485_image2_1.jpg"),
+            ),
+            TripNoteModel(
+                userNickname = "닉네임2",
+                tripNoteTitle = "제목2",
+                tripNoteContent = "내용내용2",
+                // tripNoteImage = listOf("http://tong.visitkorea.or.kr/cms/resource/92/2671592_image2_1.jpg", "http://tong.visitkorea.or.kr/cms/resource/85/2504485_image2_1.jpg"),
+            ),
+            TripNoteModel(
+                userNickname = "닉네임2",
+                tripNoteTitle = "제목2",
+                tripNoteContent = "내용내용2",
+                tripNoteImage = listOf("http://tong.visitkorea.or.kr/cms/resource/92/2671592_image2_1.jpg", "http://tong.visitkorea.or.kr/cms/resource/85/2504485_image2_1.jpg"),
             ),
         )
     }

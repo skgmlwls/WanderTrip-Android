@@ -53,10 +53,13 @@ fun TripNoteSelectDownScreen(tripNoteSelectDownViewModel: TripNoteSelectDownView
 {
     tripNoteSelectDownViewModel.gettingTripNoteDetailData()
 
-    // 다이얼로그를 보여주는 상태
+    // 다이얼로그를 보여주는 상태 - 완료
     val showDialogState = tripNoteSelectDownViewModel.showDialogState
+    // 다이얼로그를 보여주는 상태 - 새 여행
+    val showDialogStateNew = tripNoteSelectDownViewModel.showDialogStateNew
 
     Scaffold(
+        containerColor = Color.White,
         topBar = {
             CustomTopAppBar(
                 title = "",
@@ -72,10 +75,6 @@ fun TripNoteSelectDownScreen(tripNoteSelectDownViewModel: TripNoteSelectDownView
                 .fillMaxSize()
                 .padding(it)
                 .padding(horizontal = 20.dp, vertical = 10.dp)
-
-            // verticalArrangement = Arrangement.spacedBy(20.dp),
-            // verticalArrangement = Arrangement.SpaceBetween, // 위, 아래로 배치 균형 조정
-            // horizontalAlignment = Alignment.CenterHorizontally // 가로 정렬 중앙
         ) {
             Spacer(modifier = Modifier.height(14.dp)) // 상단 여백
 
@@ -98,9 +97,31 @@ fun TripNoteSelectDownScreen(tripNoteSelectDownViewModel: TripNoteSelectDownView
 
 
             // 새 여행 만들어 담기 버튼
-            BlueButton(text = "새 여행 만들어 담기",
+            BlueButton(text = "새 여행에 담기",
                 buttonWidth = 150.dp) {
-                tripNoteSelectDownViewModel.newTripButtonClick()
+                tripNoteSelectDownViewModel.selectNewButtonClick()
+            }
+
+            // 다이얼로그 표시
+            if (showDialogStateNew.value) {
+                CustomAlertDialog(
+                    showDialogState = showDialogStateNew,
+                    title = "일정 담기",
+                    text = "새 일정에 그대로 담을까요?",
+                    confirmButtonTitle = "확인",
+                    dismissButtonTitle = "취소",
+                    confirmButtonOnClick = {
+                        // 확인 버튼 클릭 시 동작
+                        tripNoteSelectDownViewModel.onConfirmNewClick()
+                        // 일정 제목 입력 화면으로 이동
+                        tripNoteSelectDownViewModel.goScheduleTitleButtonClick()
+
+                    },
+                    dismissButtonOnClick = {
+                        // 취소 버튼 클릭 시 동작
+                        tripNoteSelectDownViewModel.onDismissNewClick()
+                    }
+                )
             }
 
             Spacer(modifier = Modifier.height(30.dp)) // 하단 여백
