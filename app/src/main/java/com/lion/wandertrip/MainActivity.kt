@@ -77,7 +77,8 @@ fun MyApp() {
 
     NavHost(
         navController = rememberNavHostController,
-        startDestination = MainScreenName.MAIN_SCREEN_START.name
+        startDestination = "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
+                "tripScheduleDocId=jgbGuyxXMAj8nvChmAyN&areaName=서울&areaCode=1"
     ) {
         composable(MainScreenName.MAIN_SCREEN_START.name) { StartScreen() }
         // 일정 메인 화면
@@ -91,7 +92,6 @@ fun MyApp() {
 
         composable(BotNavScreenName.BOT_NAV_SCREEN_TRIP_NOTE.name) { TripNoteScreen() }
         composable(TripNoteScreenName.TRIP_NOTE_DETAIL.name) { TripNoteDetailScreen() }
-        // composable(TripNoteScreenName.TRIP_NOTE_WRITE.name) { TripNoteWriteScreen() }
 
         // 여행기 작성 화면
         composable(
@@ -154,15 +154,18 @@ fun MyApp() {
 
         // 일정 상세 화면
         composable(
-            route = "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?areaName={areaName}&areaCode={areaCode}",
+            route = "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
+                    "tripScheduleDocId={tripScheduleDocId}&areaName={areaName}&areaCode={areaCode}",
             arguments = listOf(
+                navArgument("tripScheduleDocId") { type = NavType.StringType },
                 navArgument("areaName") { type = NavType.StringType },
                 navArgument("areaCode") { type = NavType.IntType }
             )
         ) {
+            val tripScheduleDocId = it.arguments?.getString("tripScheduleDocId") ?: ""
             val areaName = it.arguments?.getString("areaName") ?: ""
             val areaCode = it.arguments?.getInt("areaCode") ?: 0
-            ScheduleDetailScreen(areaName, areaCode)
+            ScheduleDetailScreen(tripScheduleDocId, areaName, areaCode)
         }
 
         // 일정 항목 선택 화면

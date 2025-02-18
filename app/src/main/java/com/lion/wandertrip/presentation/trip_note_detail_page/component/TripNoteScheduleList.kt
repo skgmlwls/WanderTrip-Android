@@ -1,46 +1,73 @@
-package com.lion.wandertrip.presentation.schedule_detail_page.component
+package com.lion.wandertrip.presentation.trip_note_detail_page.component
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.compose.rememberImagePainter
 import com.google.firebase.Timestamp
 import com.lion.a02_boardcloneproject.component.CustomDividerComponent
-import com.lion.a02_boardcloneproject.component.CustomOutlinedButton
+import com.lion.wandertrip.R
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.presentation.schedule_detail_page.ScheduleDetailViewModel
+import com.lion.wandertrip.presentation.schedule_detail_page.component.ScheduleDetailDropDawn
+import com.lion.wandertrip.presentation.schedule_detail_page.component.ScheduleDetailGoogleMap
+import com.lion.wandertrip.presentation.trip_note_detail_page.TripNoteDetailViewModel
 import com.lion.wandertrip.ui.theme.NanumSquareRound
 import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 import com.lion.wandertrip.util.ContentTypeId
 
+
 @Composable
-fun ScheduleDetailDateList(
-    viewModel: ScheduleDetailViewModel,
+fun TripNoteScheduleList(
+    viewModel: TripNoteDetailViewModel,
     tripSchedule: TripScheduleModel,
-    formatTimestampToDate: (Timestamp) -> String
+    formatTimestampToDate: (Timestamp) -> String,
+    modifier: Modifier = Modifier
 ) {
+
     // 구글 맵 터치 감지
     var isMapTouched by remember { mutableStateOf(false) }
 
-    LazyColumn(
-        modifier = Modifier
+    // Column을 사용하여 전체 내용을 감싸고 스크롤을 직접 처리
+    Column(
+        modifier = modifier
             .fillMaxSize()
-            .padding(20.dp),
-        userScrollEnabled = !isMapTouched // Google Map 터치 시 LazyColumn 스크롤 방지
+            .padding(10.dp)
     ) {
-        items(tripSchedule.scheduleDateList.size) { index ->
+        // 날짜 및 스케줄 내용 표시
+        tripSchedule.scheduleDateList.forEachIndexed { index, date ->
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -60,16 +87,15 @@ fun ScheduleDetailDateList(
                     )
                     Text(
                         modifier = Modifier.alignByBaseline(),
-                        text = formatTimestampToDate(tripSchedule.scheduleDateList[index]),
+                        text = formatTimestampToDate(date),
                         fontSize = 14.sp,
                         fontFamily = NanumSquareRoundRegular
                     )
                 }
 
                 // 해당 날짜의 스케줄 아이템 목록 필터링 후 정렬
-                // val filteredItems = tripSchedule.scheduleItems
-                val filteredItems = viewModel.tripScheduleItems
-                    .filter { it.itemDate.seconds == tripSchedule.scheduleDateList[index].seconds }
+                val filteredItems = tripSchedule.scheduleItems
+                    .filter { it.itemDate.seconds == date.seconds }
                     .sortedBy { it.itemIndex }
 
                 // Google Map 표시 (해당 날짜의 스케줄 아이템 목록을 전달)
@@ -79,13 +105,12 @@ fun ScheduleDetailDateList(
                         .height(150.dp)
                         .padding(top = 5.dp),
                 ) {
-                    ScheduleDetailGoogleMap(
+                    TripNoteScheduleGoogleMap(
                         scheduleItems = filteredItems,
                         onTouch = { touched -> isMapTouched = touched }
                     )
                 }
 
-                // 상세 일정 리스트 표시
                 // 상세 일정 리스트 표시
                 Column(
                     modifier = Modifier
@@ -100,7 +125,7 @@ fun ScheduleDetailDateList(
                         Row(
                             modifier = Modifier.height(IntrinsicSize.Min) // intrinsic measurements
                         ) {
-                            ScheduleDetailVerticalDividerWithCircle()
+                            TripNoteScheduleDivider()
 
                             Column(
                                 modifier = Modifier
@@ -153,71 +178,22 @@ fun ScheduleDetailDateList(
 
                             }
 
-                            // 메뉴 버튼
-                            Box {
-                                IconButton(
-                                    modifier = Modifier
-                                        .padding(top = 5.dp)
-                                        .size(18.dp),
-                                    onClick = { expanded = true }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.MoreVert,
-                                        contentDescription = "더보기"
-                                    )
-                                }
-                                ScheduleDetailDropDawn(
-                                    expanded = expanded,
-                                    onDismissRequest = { expanded = false },
-                                    onDelete = { /* 삭제 기능 구현 */ },
-                                    onReview = { /* 후기 기능 구현 */ },
-                                    onMove = { /* 위치조정 기능 구현 */ }
-                                )
-                            }
                         }
                     }
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 10.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End)
-                ) {
-                    OutlinedButton(
-                        onClick = { viewModel.moveToScheduleSelectItemScreen(ContentTypeId.TOURIST_ATTRACTION.contentTypeCode) },
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp) // 내부 여백 조정
-                    ) {
-                        Text(
-                            text = "관광지 추가",
-                            fontSize = 12.sp,
-                            fontFamily = NanumSquareRound
-                        )
-                    }
-                    OutlinedButton(
-                        onClick = { viewModel.moveToScheduleSelectItemScreen(ContentTypeId.RESTAURANT.contentTypeCode) },
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp) // 내부 여백 조정
-                    ) {
-                        Text(
-                            text = "음식점 추가",
-                            fontSize = 12.sp,
-                            fontFamily = NanumSquareRound
-                        )
-                    }
-                    OutlinedButton(
-                        onClick = { viewModel.moveToScheduleSelectItemScreen(ContentTypeId.ACCOMMODATION.contentTypeCode) },
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp) // 내부 여백 조정
-                    ) {
-                        Text(
-                            text = "숙소 추가",
-                            fontSize = 12.sp,
-                            fontFamily = NanumSquareRound
-                        )
-                    }
-                }
 
-                CustomDividerComponent()
+                    Spacer(modifier = Modifier.height(15.dp))
+
+
+                    // 가로선 추가
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 0.dp), // 좌우 여백 설정
+                            thickness = 1.dp // 선의 두께
+                        )
+
+                }
             }
         }
     }
 }
-

@@ -3,20 +3,27 @@ package com.lion.wandertrip.presentation.trip_note_detail_page
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Timestamp
 import com.lion.wandertrip.TripApplication
+import com.lion.wandertrip.model.ScheduleItem
 import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.model.TripNoteReplyModel
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.model.UserModel
+import com.lion.wandertrip.util.ScheduleScreenName
 import com.lion.wandertrip.util.TripNoteScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 
@@ -25,30 +32,108 @@ class TripNoteDetailViewModel @Inject constructor(
     @ApplicationContext val context: Context,
 ) : ViewModel() {
 
-    var tripScheduleDetailList = mutableStateListOf<TripScheduleModel>()
+    // var tripScheduleDetailList = mutableStateListOf<TripScheduleModel>()
     var tripNoteDetailList = mutableStateListOf<TripNoteModel>()
     var tripNoteReplyList = mutableStateListOf<TripNoteReplyModel>()
 
     val tripApplication = context as TripApplication
 
+    val application = context as TripApplication
 
+    val areaName = mutableStateOf("")
+    val areaCode = mutableIntStateOf(0)
 
-    // 리사이클러뷰 임시 데이터 리스트 (일정), 그 트립노트에 있는 사람걸로.....나중에
-    fun gettingTripScheduleDetailData() {
-        tripScheduleDetailList = mutableStateListOf(
-            TripScheduleModel(
-                scheduleStartDate = Timestamp.now(),
-                scheduleCity = "제주",
-                scheduleEndDate = Timestamp.now(),
+    // 테스트 용 데이터 ///////////////////////////////////////////////////////////////////////////////
+    val startDate = Timestamp(1738627200, 0)
+    val endDate = Timestamp(1738886400, 0)
+    val scheduleDateList = generateDateList(startDate, endDate)
+
+    // 특정 기간 동안의 날짜 목록 생성 함수
+    fun generateDateList(startDate: Timestamp, endDate: Timestamp): List<Timestamp> {
+        val dateList = mutableListOf<Timestamp>()
+        var currentTimestamp = startDate
+
+        while (currentTimestamp.seconds <= endDate.seconds) {
+            dateList.add(currentTimestamp)
+            currentTimestamp = Timestamp(currentTimestamp.seconds + 86400, 0) // 하루(24시간 = 86400초) 추가
+        }
+
+        return dateList
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // 일정 모델
+    val tripScheduleDetailList = TripScheduleModel(
+        scheduleStartDate = startDate,
+        scheduleEndDate = endDate,
+        scheduleDateList = scheduleDateList,
+        scheduleItems = listOf(
+            ScheduleItem(
+                itemDate = Timestamp(1738627200, 0),
+                itemIndex = 1,
+                itemTitle = "강서습지생태공원",
+                itemType = "관광지",
+                itemLongitude = 126.8171490732,
+                itemLatitude = 37.5860879769,
+                itemImagesURL = emptyList(),
+                itemReviewText = "재미없었다",
+                itemReviewImagesURL = listOf(
+                    "http://tong.visitkorea.or.kr/cms/resource/92/2671592_image2_1.jpg",
+                    "http://tong.visitkorea.or.kr/cms/resource/92/2671592_image2_1.jpg"
+                ),
             ),
-            TripScheduleModel(
-                scheduleTitle = "서울 힐링여행",
-                scheduleStartDate = Timestamp.now(),
-                scheduleCity = "서울",
-                scheduleEndDate = Timestamp.now(),
+            ScheduleItem(
+                itemDate = Timestamp(1738627200, 0),
+                itemIndex = 2,
+                itemTitle = "서울 양천고성지",
+                itemType = "관광지",
+                itemLongitude = 126.8408278075,
+                itemLatitude = 37.5740425776,
+                itemImagesURL = emptyList(),
+                itemReviewText = "너무 재밌다",
+                itemReviewImagesURL = emptyList()
+            ),
+            ScheduleItem(
+                itemDate = Timestamp(1738713600, 0),
+                itemIndex = 1,
+                itemTitle = "개화산 호국공원",
+                itemType = "관광지",
+                itemLongitude = 126.8033171574,
+                itemLatitude = 37.5805689272,
+                itemImagesURL = emptyList(),
+                itemReviewText = "",
+                itemReviewImagesURL = emptyList()
             )
         )
+    )
+
+
+    // 도시 이름과 코드를 설정 하는 함수
+    fun addAreaData(areaName: String, areaCode: Int) {
+        this.areaName.value = areaName
+        this.areaCode.intValue = areaCode
     }
+
+    // Timestamp를 "yyyy년 MM월 dd일" 형식의 문자열로 변환하는 함수
+    fun formatTimestampToDate(timestamp: Timestamp): String {
+        val sdf = SimpleDateFormat("yyyy.MM.dd", Locale.getDefault())
+        return sdf.format(Date(timestamp.seconds * 1000))
+    }
+
+    // 일정 항목 선택 화면 으로 이동
+    fun moveToScheduleSelectItemScreen(itemCode: Int) {
+        application.navHostController.navigate(
+            "${ScheduleScreenName.SCHEDULE_SELECT_ITEM_SCREEN.name}?" +
+                    "itemCode=${itemCode}&areaName=${areaName.value}&areaCode=${areaCode.value}")
+    }
+
+    fun moveToScheduleDetailFriendsScreen(scheduleDocId: String) {
+        application.navHostController.navigate(
+            "${ScheduleScreenName.SCHEDULE_DETAIL_FRIENDS_SCREEN.name}?" +
+                    "scheduleDocId=${scheduleDocId}"
+        )
+    }
+
 
     // 리사이클러뷰 임시데이터 (여행기)
     fun gettingTripNoteDetailData() {
@@ -57,7 +142,7 @@ class TripNoteDetailViewModel @Inject constructor(
                 userNickname = "땡떙sla",
                 tripNoteTitle = "뒤죽박죽 제주 여행기",
                 tripNoteContent = "제주 첫 여행입니다.....어쩌구저쩌루~~~~~~~~~~~\n완전 추천추천",
-                tripNoteImage = listOf("http://tong.visitkorea.or.kr/cms/resource/85/2504485_image2_1.jpg", "http://tong.visitkorea.or.kr/cms/resource/85/2504485_image2_1.jpg"),
+                tripNoteImage = listOf("http://tong.visitkorea.or.kr/cms/resource/92/2671592_image2_1.jpg", "http://tong.visitkorea.or.kr/cms/resource/85/2504485_image2_1.jpg"),
             )
         )
     }
@@ -93,6 +178,7 @@ class TripNoteDetailViewModel @Inject constructor(
     // 휴지통 아이콘
     fun deleteButtonClick(){
         // 본인 여행기면 아이콘 보이고.... 삭제 그거 ... 다이얼로그 띄워
+
     }
 
     // 일정 담기 아이콘

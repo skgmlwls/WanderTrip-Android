@@ -3,7 +3,11 @@ package com.lion.wandertrip.presentation.trip_note_detail_page
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,32 +16,53 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberImagePainter
 import com.lion.a02_boardcloneproject.component.CustomDividerComponent
 import com.lion.wandertrip.R
+import com.lion.wandertrip.presentation.bottom.trip_note_page.TripNoteItem
+import com.lion.wandertrip.presentation.schedule_detail_page.component.ScheduleDetailDateList
+import com.lion.wandertrip.presentation.trip_note_detail_page.component.TripNoteScheduleList
+import com.lion.wandertrip.presentation.trip_note_detail_page.component.TripNoteScheduleReply
 import com.lion.wandertrip.ui.theme.NanumSquareRound
 import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,13 +72,7 @@ fun TripNoteDetailScreen(
 ) {
 
     tripNoteDetailViewModel.gettingTripNoteDetailData()
-    tripNoteDetailViewModel.gettingTripScheduleDetailData()
     tripNoteDetailViewModel.gettingTripNoteReplyData()
-
-
-
-
-
 
 
     // tripNoteDetailList를 ViewModel에서 가져옵니다.
@@ -66,12 +85,16 @@ fun TripNoteDetailScreen(
     // HorizontalPager에 필요한 상태를 pageCount를 전달하여 초기화합니다.
     val pagerState = rememberPagerState(pageCount = { images.size })
 
+    // 댓글 작성칸 (네모박스 형태)
+    var commentText by remember { mutableStateOf("") }
 
-
+    val focusRequester = remember { FocusRequester() }
+    var isFocused by remember { mutableStateOf(false) }
 
 
 
     Scaffold(
+        // containerColor = Color.White,
         topBar = {
             TopAppBar(
                 navigationIcon = {
@@ -84,7 +107,7 @@ fun TripNoteDetailScreen(
                 },
                 title = {
                     Text(
-                        text = "", // 적절한 제목으로 변경
+                        text = "",
                         fontSize = 20.sp,
                         fontFamily = NanumSquareRound // 폰트 설정 (옵션)
                     )
@@ -120,14 +143,16 @@ fun TripNoteDetailScreen(
                     }
                 }
             )
-        },
-        content = {paddingValues ->
-            // LazyColumn을 사용하여 스크롤 가능하게 처리
+        }
+    )
+        {
             LazyColumn(
                 modifier = Modifier
+                    .padding(it)
                     .fillMaxSize()
                     .padding(start = 16.dp, end = 16.dp)
             ) {
+
                 // 이미지 슬라이더
                 if (images.isNotEmpty()) {
                     item {
@@ -207,7 +232,11 @@ fun TripNoteDetailScreen(
                     }
                 }
 
-                // 가로선 추가
+                item {
+                    Spacer(modifier = Modifier.height(5.dp))
+                }
+
+                // 가로선
                 item {
                     Divider(
                         modifier = Modifier
@@ -217,7 +246,117 @@ fun TripNoteDetailScreen(
                     )
                 }
 
+                item {
+                    Spacer(modifier = Modifier.height(11.dp))
+                }
+
+                // 여행 일정 리스트
+                item {
+                    TripNoteScheduleList(
+                        viewModel = tripNoteDetailViewModel,
+                        tripSchedule = tripNoteDetailViewModel.tripScheduleDetailList,
+                        formatTimestampToDate = { timestamp ->
+                            tripNoteDetailViewModel.formatTimestampToDate(
+                                timestamp
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                }
+
+                // 댓글 작성소개
+                item {
+                    Text(
+                        text = "댓글",
+                        fontSize = 25.sp,
+                        fontFamily = NanumSquareRound,
+                        modifier = Modifier.padding(bottom = 11.dp, start = 15.dp)
+                    )
+                }
+
+                items(tripNoteDetailViewModel.tripNoteReplyList) { tripNoteReply ->
+                    TripNoteScheduleReply(
+                        tripNoteReply = tripNoteReply
+                    )
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(14.dp))
+                }
+
+
+                // 댓글 작성란
+                item {
+                    TextField(
+                        value = commentText,
+                        onValueChange = { commentText = it },
+                        // label = { Text("댓글을 입력하세요") },
+                        placeholder = {
+                            if (commentText.isEmpty()) {
+                                Text("댓글을 입력하세요",
+                                    color = Color.Gray) // 초기 플로팅 텍스트로 사용
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(if (isFocused) 62.dp else 54.dp)
+                             .padding(start = 11.dp, end = 11.dp)
+                            .focusRequester(focusRequester)
+                            .onFocusChanged { isFocused = it.isFocused }
+                            .border(0.dp, Color.Transparent)
+                            .background(Color.LightGray, shape = RoundedCornerShape(3.dp)), // 배경색만 회색으로,
+                        textStyle = TextStyle(
+                            color = Color.Black,
+                            fontSize = 14.sp,
+                            fontFamily = NanumSquareRoundRegular
+                        ),
+                        maxLines = 5, // 최대 줄 수
+                        singleLine = false, // 여러 줄 입력 가능
+                        shape = RoundedCornerShape(4.dp), // 둥근 모서리
+                        trailingIcon = {
+                            if (commentText.isNotEmpty()) {
+                                IconButton(
+                                    onClick =
+                                    { // 제출하기
+
+                                        // 비거있기
+                                        commentText = ""
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = "Clear Comment"
+                                    )
+                                }
+                            }
+                        }
+                    )
+
+//                    // 제출 버튼
+//                    Button(
+//                        onClick = {
+//                            if (commentText.isNotEmpty()) {
+//                                // 댓글 제출
+//                                // 어쩌구저쩌구
+//
+//                                // 제출 후 텍스트 필드 비우기
+//                                commentText = ""
+//                            }
+//                        },
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(top = 11.dp,start = 11.dp, end = 11.dp),
+//                    ) {
+//                        Text("댓글 등록하기")
+//                    }
+                }
+
+
+                item {
+                    Spacer(modifier = Modifier.height(15.dp))
+                }
             }
+
         }
-    )
 }
