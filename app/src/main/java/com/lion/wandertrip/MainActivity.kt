@@ -89,7 +89,6 @@ fun MyApp() {
 
         composable(BotNavScreenName.BOT_NAV_SCREEN_TRIP_NOTE.name) { TripNoteScreen() }
         composable(TripNoteScreenName.TRIP_NOTE_DETAIL.name) { TripNoteDetailScreen() }
-        // composable(TripNoteScreenName.TRIP_NOTE_WRITE.name) { TripNoteWriteScreen() }
 
         // 여행기 작성 화면
         composable(

@@ -94,11 +94,31 @@ class TripNoteSelectDownViewModel @Inject constructor(
     // 다이얼로그 확인 버튼 클릭 시 동작
     fun onConfirmClick() {
         showDialogState.value = false
+        // 일정 상세로 이동
     }
 
-    // 다이얼로그 취소 버튼 클릭 시 동작
+    // 새 일정 담기 버튼 다이얼로그 취소 버튼 클릭 시 동작
     fun onDismissClick() {
         showDialogState.value = false
+    }
+
+    // 다이얼로그 상태 관리
+    val showDialogStateNew = mutableStateOf(false)
+
+    // 새 일정 담기 버튼 클릭 시 다이얼로그 상태 변경
+    fun selectNewButtonClick() {
+        showDialogStateNew.value = true
+    }
+
+    // 새 일정 담기 버튼 다이얼로그 확인 버튼 클릭 시 동작
+    fun onConfirmNewClick() {
+        showDialogStateNew.value = false
+        // 일정 제목 그거로 이동
+    }
+
+    // 새 일정 담기 버튼 다이얼로그 취소 버튼 클릭 시 동작
+    fun onDismissNewClick() {
+        showDialogStateNew.value = false
     }
 
     // 일정 제목 입력 화면으로 이동
