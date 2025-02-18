@@ -23,6 +23,13 @@ class TripApplication : Application() {
 
         // 화면 크기 초기화
         initScreenSize()
+
+        // ✅ 기본 유저 정보를 미리 설정 (임시값)
+        loginUserModel = UserModel(
+            userDocId = "",
+            userId = "testId1",
+            userNickName = "testNickName1"
+        )
     }
 
     // 로그인한 사용자 객체

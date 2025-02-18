@@ -90,7 +90,7 @@ fun ScheduleCitySelectScreen(
                 },
                 onClearQuery = {
                     searchQuery = "" // ✅ 검색어 초기화
-                    viewModel.updateFilteredCities("") // ✅ X 버튼 클릭 시 전체 도시 목록 복원
+                    viewModel.updateFilteredCities("") // X 버튼 클릭 시 전체 도시 목록 복원
                 }
             )
 
@@ -126,9 +126,17 @@ fun ScheduleCitySelectScreen(
                 scheduleTitle = viewModel.scheduleTitle.value,
                 scheduleStartDate = viewModel.scheduleStartDate.value,
                 scheduleEndDate = viewModel.scheduleEndDate.value,
-                onSelectedCity = {
-                    // 일정 상세 화면 으로 이동
-                    viewModel.moveToScheduleDetailScreen(it.areaName, it.areaCode)
+                onSelectedCity = {areaCode ->
+                    
+                    // 일정 제목 날짜 아이디 저장 후 일정 상세로 넘어 간다
+                    viewModel.addTripSchedule(
+                        scheduleTitle = scheduleTitle,
+                        scheduleStartDate = scheduleStartDate,
+                        scheduleEndDate = scheduleEndDate,
+                        areaName = areaCode.areaName,
+                        areaCode = areaCode.areaCode
+                    )
+
                 }
             )
 

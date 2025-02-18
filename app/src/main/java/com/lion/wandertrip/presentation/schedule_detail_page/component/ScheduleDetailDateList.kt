@@ -67,7 +67,8 @@ fun ScheduleDetailDateList(
                 }
 
                 // 해당 날짜의 스케줄 아이템 목록 필터링 후 정렬
-                val filteredItems = tripSchedule.scheduleItems
+                // val filteredItems = tripSchedule.scheduleItems
+                val filteredItems = viewModel.tripScheduleItems
                     .filter { it.itemDate.seconds == tripSchedule.scheduleDateList[index].seconds }
                     .sortedBy { it.itemIndex }
 

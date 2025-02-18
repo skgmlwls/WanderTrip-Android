@@ -59,8 +59,11 @@ fun RouletteCityScreen(
     val coroutineScope = rememberCoroutineScope()
     val animatedRotation = remember { Animatable(0f) } // ✅ 초기에는 항상 `0f`로 고정
 
+    // 당첨된 도시
     var selectedCity by remember { mutableStateOf("") }
+    // 다이얼 로그 표시 유무
     var showDialog by remember { mutableStateOf(false) }
+    // 룰렛 항목
     var cities by remember { mutableStateOf(viewModel.cities) }
 
     // ✅ 항목 개수가 변경될 때마다 룰렛 위치 초기화 (무조건 12시 방향 고정)
@@ -181,7 +184,12 @@ fun RouletteCityScreen(
                             onClick = {
                                 showDialog = false
                                 // 일정 상세 화면 으로 이동
-                                viewModel.moveToScheduleDetailScreen(selectedCity)
+                                viewModel.addTripSchedule(
+                                    scheduleTitle = scheduleTitle,
+                                    scheduleStartDate = scheduleStartDate,
+                                    scheduleEndDate = scheduleEndDate,
+                                    areaName = selectedCity,
+                                )
                             }
                         ) {
                             Text("결정 하기")
