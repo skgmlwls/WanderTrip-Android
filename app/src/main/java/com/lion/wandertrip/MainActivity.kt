@@ -16,6 +16,8 @@ import com.lion.wandertrip.presentation.bottom.trip_note_page.TripNoteScreen
 import androidx.navigation.navArgument
 import com.google.firebase.Timestamp
 import com.lion.wandertrip.presentation.detail_page.DetailScreen
+import com.lion.wandertrip.presentation.detail_review_modify.DetailReviewModifyScreen
+import com.lion.wandertrip.presentation.detail_review_write_page.DetailReviewWriteScreen
 import com.lion.wandertrip.presentation.google_map_page.GoogleMapScreen
 import com.lion.wandertrip.presentation.trip_note_detail_page.TripNoteDetailScreen
 import com.lion.wandertrip.presentation.trip_note_write_page.TripNoteWriteScreen
@@ -220,6 +222,21 @@ fun MyApp() {
         composable(RouletteScreenName.ROULETTE_CITY_SELECT_SCREEN.name) { RouletteCitySelectScreen(navController = rememberNavHostController) }
 
         ////////////////////////////////////////////////////////////////////////////////////////////
+        // 리뷰 작성 화면
+        composable(
+            route = "${MainScreenName.MAIN_SCREEN_DETAIL_REVIEW_WRITE.name}/{contentID}/{contentTitle}",
+            arguments = listOf(
+                navArgument("contentID") { type = NavType.StringType },
+                navArgument("contentTitle") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val contentID = backStackEntry.arguments?.getString("contentID") ?: ""
+            val contentTitle = backStackEntry.arguments?.getString("contentTitle") ?: ""
+
+            DetailReviewWriteScreen(contentID = contentID, contentTitle = contentTitle)
+        }
+        // 리뷰 수정 화면
+        composable(MainScreenName.MAIN_SCREEN_DETAIL_REVIEW_MODIFY.name) { DetailReviewModifyScreen() }
 
     }
 }
