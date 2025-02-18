@@ -80,4 +80,6 @@ dependencies {
     implementation ("com.github.bumptech.glide:compose:1.0.0-alpha.3")
     implementation("io.coil-kt:coil-compose:2.5.0")
 
+    implementation("com.google.android.gms:play-services-maps:18.1.0")
+    implementation("com.google.maps.android:maps-compose:2.14.0")
 }

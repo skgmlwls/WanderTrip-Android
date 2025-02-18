@@ -42,7 +42,7 @@ fun RouletteWheel(
     ) {
         if (items.isEmpty()) {
             drawArc(
-                color = Color.Gray, // 🔹 항목이 없을 때 단일 색상 유지
+                color = Color.LightGray, // 🔹 항목이 없을 때 단일 색상 유지
                 startAngle = 0f,
                 sweepAngle = 360f,
                 useCenter = true

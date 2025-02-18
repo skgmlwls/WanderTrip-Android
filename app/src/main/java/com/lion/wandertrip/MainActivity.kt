@@ -26,7 +26,9 @@ import com.lion.wandertrip.presentation.schedule_add.ScheduleAddScreen
 import com.lion.wandertrip.presentation.schedule_city_select.ScheduleCitySelectScreen
 import com.lion.wandertrip.presentation.schedule_city_select.city_roulette.RouletteCityScreen
 import com.lion.wandertrip.presentation.schedule_city_select.city_roulette.roulette_city_select.RouletteCitySelectScreen
+import com.lion.wandertrip.presentation.schedule_detail_friends.ScheduleDetailFriendsScreen
 import com.lion.wandertrip.presentation.schedule_detail_page.ScheduleDetailScreen
+import com.lion.wandertrip.presentation.schedule_select_item.ScheduleSelectItemScreen
 import com.lion.wandertrip.presentation.start_page.StartScreen
 import com.lion.wandertrip.presentation.trip_note_schedule_page.TripNoteScheduleScreen
 import com.lion.wandertrip.presentation.user_info_page.UserInfoScreen
@@ -99,9 +101,7 @@ fun MyApp() {
         composable(MainScreenName.MAIN_SCREEN_MY_REVIEW.name) { MyReviewScreen() }
         // 내 여행기 화면
         composable(MainScreenName.MAIN_SCREEN_MY_TRIP_NOTE.name) { MyTripNoteScreen() }
-
-
-
+        
         // 일정 도시 선택 화면
         composable(
             route = "${ScheduleScreenName.SCHEDULE_CITY_SELECT_SCREEN.name}?" +
@@ -122,14 +122,6 @@ fun MyApp() {
             ScheduleCitySelectScreen(scheduleTitle, startDate, endDate)
         }
 
-//        composable(ScheduleScreenName.SCHEDULE_CITY_SELECT_SCREEN.name) {
-//            val defaultTitle = "기본 일정"
-//            val defaultStartDate = Timestamp.now()
-//            val defaultEndDate = Timestamp.now()
-//
-//            ScheduleCitySelectScreen(defaultTitle, defaultStartDate, defaultEndDate)
-//        }
-
         // 일정 상세 화면
         composable(
             route = "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?areaName={areaName}&areaCode={areaCode}",
@@ -141,6 +133,34 @@ fun MyApp() {
             val areaName = it.arguments?.getString("areaName") ?: ""
             val areaCode = it.arguments?.getInt("areaCode") ?: 0
             ScheduleDetailScreen(areaName, areaCode)
+        }
+
+        // 일정 항목 선택 화면
+        composable(
+            route = "${ScheduleScreenName.SCHEDULE_SELECT_ITEM_SCREEN.name}?" +
+                    "areaName={areaName}&areaCode={areaCode}&itemCode={itemCode}",
+            arguments = listOf(
+                navArgument("itemCode") { type = NavType.IntType },
+                navArgument("areaName") { type = NavType.StringType },
+                navArgument("areaCode") { type = NavType.IntType }
+            )
+        ) {
+            val areaName = it.arguments?.getString("areaName") ?: ""
+            val areaCode = it.arguments?.getInt("areaCode") ?: 0
+            val itemCode = it.arguments?.getInt("itemCode") ?: 0
+            ScheduleSelectItemScreen(itemCode, areaName, areaCode)
+        }
+
+        // 일정 초대한 친구 목록 화면
+        composable(
+            route = "${ScheduleScreenName.SCHEDULE_DETAIL_FRIENDS_SCREEN.name}?" +
+                    "scheduleDocId={scheduleDocId}",
+            arguments = listOf(
+                navArgument("scheduleDocId") { type = NavType.StringType }
+            )
+        ) {
+            val scheduleDocId = it.arguments?.getString("scheduleDocId") ?: ""
+            ScheduleDetailFriendsScreen(scheduleDocId)
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////////
