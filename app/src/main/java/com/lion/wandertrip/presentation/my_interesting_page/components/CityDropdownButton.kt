@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lion.wandertrip.presentation.my_interesting_page.MyInterestingViewModel
+import com.lion.wandertrip.util.Tools
 
 @Composable
 fun CityDropdownButton(myInterestingViewModel: MyInterestingViewModel, onClick: () -> Unit) {
@@ -40,7 +41,7 @@ fun CityDropdownButton(myInterestingViewModel: MyInterestingViewModel, onClick: 
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Text(text = myInterestingViewModel.filteredCityName.value, fontSize = 15.sp, color = Color.Black)
+            Text(text = "${Tools.areaCodeMap[myInterestingViewModel.filteredCityName.value]}", fontSize = 15.sp, color = Color.Black)
             Spacer(modifier = Modifier.width(8.dp)) // 텍스트와 아이콘 간격 조정
             Icon(
                 imageVector = Icons.Default.ArrowDropDown, // 아래 방향 화살표 아이콘

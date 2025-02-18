@@ -47,5 +47,10 @@ class MyInfoViewModel @Inject constructor(
         tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_MY_TRIP_NOTE.name)
     }
 
+    // 최근 게시물 클릭 리스너
+    fun onClickCardRecentContent(contentId: String) {
+        tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_DETAIL.name}/$contentId")
+    }
+
 
 }

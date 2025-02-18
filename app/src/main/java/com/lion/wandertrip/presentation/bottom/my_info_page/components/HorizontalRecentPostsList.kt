@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.bottom.my_info_page.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -16,25 +17,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lion.wandertrip.R
 import com.lion.wandertrip.model.TripItemModel
+import com.lion.wandertrip.presentation.bottom.my_info_page.MyInfoViewModel
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 
 
 @Composable
-fun HorizontalRecentPostsList(tripItemList: List<TripItemModel>) {
+fun HorizontalRecentPostsList(tripItemList: List<TripItemModel>,myInfoViewModel: MyInfoViewModel) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
     ) {
         items(tripItemList) { tripItem ->
-            TouristItem(tripItem)
+            TouristItem(tripItem,myInfoViewModel)
         }
     }
 }
 
 @Composable
-fun TouristItem(tripItem: TripItemModel) {
+fun TouristItem(tripItem: TripItemModel,myInfoViewModel: MyInfoViewModel) {
     // 12: 관광지, 32: 숙박, 39: 음식점
     // 글자 줄이기
     val shortedTitle = if (tripItem.title.length > 6) {
@@ -55,7 +57,10 @@ fun TouristItem(tripItem: TripItemModel) {
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
-            .height(80.dp),
+            .height(80.dp)
+            .clickable {
+                myInfoViewModel.onClickCardRecentContent(tripItem.contentId)
+            },
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {

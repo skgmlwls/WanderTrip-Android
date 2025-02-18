@@ -1,11 +1,8 @@
 package com.lion.wandertrip.presentation.bottom.my_info_page.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,11 +10,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FlightTakeoff
@@ -26,19 +21,15 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.lion.a02_boardcloneproject.component.CustomIconButton
 import com.lion.wandertrip.R
 import com.lion.wandertrip.presentation.bottom.my_info_page.MyInfoViewModel
 import com.lion.wandertrip.util.CustomFont
@@ -89,7 +80,7 @@ fun ProfileCard(
                         }
                     ) {
                         Text(
-                            text = "프로필 편집",
+                            text = "유저 정보 수정",
                             fontSize = 14.sp,
                             fontFamily = CustomFont.customFontBold
                         )
@@ -122,17 +113,17 @@ fun ProfileCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                ProfileMenuItem(Icons.Default.FlightTakeoff, "내 여행", {viewModel.onClickIconMyTrip()})
-                ProfileMenuItem(Icons.Default.Bookmark, "내 저장", {viewModel.onClickIconMyInteresting()})
-                ProfileMenuItem(Icons.Default.Star, "내 리뷰",{viewModel.onClickIconMyReview()})
-                ProfileMenuItem(Icons.Default.Edit, "내 여행기",{viewModel.onClickIconTripNote()})
+                ColumnIconAndText(Icons.Default.FlightTakeoff, "내 여행", {viewModel.onClickIconMyTrip()})
+                ColumnIconAndText(Icons.Default.Bookmark, "내 저장", {viewModel.onClickIconMyInteresting()})
+                ColumnIconAndText(Icons.Default.Star, "내 리뷰",{viewModel.onClickIconMyReview()})
+                ColumnIconAndText(Icons.Default.Edit, "내 여행기",{viewModel.onClickIconTripNote()})
             }
         }
     }
 }
 
 @Composable
-fun ProfileMenuItem(icon: ImageVector, text: String, onClick: () -> Unit = {}  ) {
+fun ColumnIconAndText(icon: ImageVector, text: String, onClick: () -> Unit = {}  ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.clickable {

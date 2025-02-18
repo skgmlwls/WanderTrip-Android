@@ -80,6 +80,10 @@ dependencies {
     implementation ("com.github.bumptech.glide:compose:1.0.0-alpha.3")
     implementation("io.coil-kt:coil-compose:2.5.0")
 
-    implementation("com.google.android.gms:play-services-maps:18.1.0")
     implementation("com.google.maps.android:maps-compose:2.14.0")
+    implementation("com.google.android.gms:play-services-maps:18.1.0") // 지도
+    implementation("com.google.android.gms:play-services-location:21.0.1") // 지도
+    implementation("com.google.maps.android:maps-compose:2.9.0") // 지도
+    implementation("com.google.accompanist:accompanist-permissions:0.30.0") // 권한 관리 의존성
+
 }
