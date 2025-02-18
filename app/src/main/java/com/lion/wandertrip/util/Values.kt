@@ -321,6 +321,10 @@ enum class TripNoteScreenName{
     TRIP_NOTE_WRITE,
     // 여행기 일정 불러오기 화면
     TRIP_NOTE_SCHEDULE,
+    // 타인 일정 리스트 보기 화면
+    TRIP_NOTE_OTHER_SCHEDULE,
+    // 일정 담을 여행 선택하기 화면
+    TRIP_NOTE_SELECT_DOWN,
 }
 
 

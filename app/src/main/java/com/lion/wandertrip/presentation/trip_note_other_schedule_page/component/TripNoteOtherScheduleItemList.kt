@@ -1,4 +1,4 @@
-package com.lion.wandertrip.presentation.trip_note_schedule_page.component
+package com.lion.wandertrip.presentation.trip_note_other_schedule_page.component
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -8,12 +8,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -27,24 +25,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.wandertrip.model.TripScheduleModel
-import com.lion.wandertrip.presentation.bottom.schedule_page.component.ScheduleDropDawnIconButton
-import com.lion.wandertrip.presentation.trip_note_schedule_page.TripNoteScheduleViewModel
+import com.lion.wandertrip.presentation.trip_note_other_schedule_page.TripNoteOtherScheduleViewModel
 import com.lion.wandertrip.ui.theme.NanumSquareRound
 import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TripNoteScheduleItemList(
+fun TripNoteOtherScheduleItemList(
     dataList: List<TripScheduleModel>,
-    viewModel: TripNoteScheduleViewModel = hiltViewModel(),
+    viewModel: TripNoteOtherScheduleViewModel = hiltViewModel(),
     onRowClick: (TripScheduleModel) -> Unit = {}, // 클릭 이벤트 추가
     modifier: Modifier = Modifier // modifier 파라미터 추가
 ) {
     LazyColumn(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 10.dp),
+            //.padding(top = 10.dp),
     ) {
         items(dataList) { tripSchedule -> // 직접 데이터 항목을 사용하는 방식으로 변경
             Card(
