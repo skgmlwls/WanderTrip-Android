@@ -1,6 +1,8 @@
 package com.lion.wandertrip
 
+import com.lion.wandertrip.repository.TripScheduleRepository
 import com.lion.wandertrip.repository.UserRepository
+import com.lion.wandertrip.service.TripScheduleService
 import com.lion.wandertrip.service.UserService
 import dagger.Module
 import dagger.Provides
@@ -25,5 +27,21 @@ object TripAppModule {
     fun userServiceProvider(userRepository: UserRepository) : UserService {
         return UserService(userRepository)
     }
+
+    // TripSchedule ////////////////////////////////////////////////////////////////////////////////
+    @Provides
+    @Singleton
+    fun tripScheduleRepositoryProvider(): TripScheduleRepository {
+        return TripScheduleRepository()
+    }
+
+    @Provides
+    @Singleton
+    fun tripScheduleServiceProvider(
+        tripScheduleRepository: TripScheduleRepository
+    ): TripScheduleService {
+        return TripScheduleService(tripScheduleRepository)
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
 }

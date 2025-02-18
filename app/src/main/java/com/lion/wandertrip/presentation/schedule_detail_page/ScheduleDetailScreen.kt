@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,14 +25,25 @@ import com.lion.wandertrip.ui.theme.NanumSquareRound
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleDetailScreen(
+    tripScheduleDocId: String,
     areaName: String,
     areaCode: Int,
     viewModel: ScheduleDetailViewModel = hiltViewModel(),
 ) {
+    // 초기 세팅
+    LaunchedEffect(Unit) {
+        // 초기 데이터 세팅
+        viewModel.addAreaData(tripScheduleDocId, areaName, areaCode)
+        // 이미 데이터가 없다면 불러오기
+        if (viewModel.tripScheduleItems.isEmpty()) {
+            viewModel.getTripSchedule()
+        }
+    }
 
-    viewModel.addAreaData(areaName, areaCode)
-
-    Log.d("ScheduleDetailScreen", "날짜 리스트 : ${viewModel.tripSchedule.scheduleDateList}")
+    Log.d("ScheduleDetailScreen", "일정 문서 ID : $tripScheduleDocId")
+    Log.d("ScheduleDetailScreen", "도시 이름 : $areaName")
+    Log.d("ScheduleDetailScreen", "도시 코드 : $areaCode")
+    Log.d("ScheduleDetailScreen", "날짜 리스트 : ${viewModel.tripSchedule.value.scheduleDateList}")
 
     Scaffold(
         containerColor = Color.White,
@@ -68,7 +80,7 @@ fun ScheduleDetailScreen(
 //            Text(text = "도시 코드 : $areaCode")
             ScheduleDetailDateList(
                 viewModel = viewModel,
-                tripSchedule = viewModel.tripSchedule,
+                tripSchedule = viewModel.tripSchedule.value,
                 // TimeStamp 를 변환 하는 함수 타입 전달
                 formatTimestampToDate = { timestamp -> viewModel.formatTimestampToDate(timestamp) }
             )

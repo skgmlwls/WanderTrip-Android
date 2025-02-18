@@ -29,15 +29,13 @@ import com.lion.wandertrip.presentation.schedule_add.component.ScheduleAddCalend
 import com.lion.wandertrip.presentation.schedule_add.component.ScheduleAddTextInputLayout
 import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ScheduleAddScreen(
     viewModel : ScheduleAddViewModel = hiltViewModel()
 ) {
+    val focusManager = LocalFocusManager.current // 포커스 관리 객체 생성
 
-    val focusManager = LocalFocusManager.current // 🔹 포커스 관리 객체 생성
-
-    var errorMessage by remember { mutableStateOf<String?>(null) } // ✅ 에러 메시지 상태 추가
+    var errorMessage by remember { mutableStateOf<String?>(null) } // 에러 메시지 상태 추가
 
     Scaffold(
         containerColor = Color.White,
