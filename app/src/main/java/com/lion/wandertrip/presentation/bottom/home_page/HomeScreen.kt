@@ -2,11 +2,8 @@ package com.lion.wandertrip.presentation.bottom.home_page
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,13 +17,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberDrawerState
@@ -43,6 +37,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.lion.wandertrip.R
@@ -55,12 +50,12 @@ data class TravelSpot(val rank: Int, val title: String, val location: String, va
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen() {
-    val viewModel: HomeViewModel = viewModel()
-    var isDrawerOpen by remember { mutableStateOf(false) }
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
-    // val travelPosts by viewModel.travelPosts
+
+    val currentBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStackEntry?.destination?.route
 
     val travelPosts = listOf(
         TravelPost(
@@ -126,25 +121,27 @@ fun HomeScreen() {
     )
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // ✅ 메인 콘텐츠
         Column(modifier = Modifier.fillMaxSize()) {
-            // 🔹 고정된 Toolbar
-            TopBar(navController, onMenuClick = {
-                coroutineScope.launch { drawerState.open() } // ✅ 클릭 시 Drawer 열기
-            })
+            // 🔹 홈 화면일 때만 `TopBar` 표시
+            if (currentRoute == "home") {
+                TopBar(navController, onMenuClick = {
+                    coroutineScope.launch { drawerState.open() }
+                })
+            }
 
+            // 🔹 네비게이션 호스트
             NavHost(navController = navController, startDestination = "home") {
                 composable("home") { /* 기존 홈 화면 콘텐츠 */ }
-                composable("search") { SearchScreen(navController) } // 검색 화면
-                composable("calendar") { ScheduleAddScreen() } // 캘린더 화면
+                composable("search") { SearchScreen() } // ✅ WanderTrip TopBar 숨김
+                composable("calendar") { ScheduleAddScreen() } // ✅ WanderTrip TopBar 숨김
             }
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                item { TravelSpotList(travelSpots) } // 인기 여행지
-                item { PopularTripSection(travelPosts) } // 인기 여행기
+                item { TravelSpotList(travelSpots) }
+                item { PopularTripSection(travelPosts) }
             }
         }
 
@@ -165,7 +162,7 @@ fun TopBar(navController: NavController, onMenuClick: () -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text("국내여행", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("WanderTrip", fontSize = 20.sp, fontWeight = FontWeight.Bold)
 
         Row {
             Icon(

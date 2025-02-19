@@ -33,6 +33,7 @@ import com.lion.wandertrip.presentation.schedule_city_select.city_roulette.roule
 import com.lion.wandertrip.presentation.schedule_detail_friends.ScheduleDetailFriendsScreen
 import com.lion.wandertrip.presentation.schedule_detail_page.ScheduleDetailScreen
 import com.lion.wandertrip.presentation.schedule_select_item.ScheduleSelectItemScreen
+import com.lion.wandertrip.presentation.search_page.SearchScreen
 import com.lion.wandertrip.presentation.start_page.StartScreen
 import com.lion.wandertrip.presentation.trip_note_other_schedule_page.TripNoteOtherScheduleScreen
 import com.lion.wandertrip.presentation.trip_note_schedule_page.TripNoteScheduleScreen
@@ -87,7 +88,7 @@ fun MyApp() {
         composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP1.name) { UserSignUpStep1Screen() }
         composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name) { UserSignUpStep2Screen() }
         composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name) { UserSignUpStep1Screen() }
-        
+        composable(MainScreenName.MAIN_SCREEN_SEARCH.name) { SearchScreen() }
         composable(MainScreenName.MAIN_SCREEN_USER_INFO.name) {UserInfoScreen()}
 
 //        // 여행기 메인 화면
