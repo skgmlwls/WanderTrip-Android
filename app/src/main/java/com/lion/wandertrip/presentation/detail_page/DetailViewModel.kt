@@ -40,7 +40,7 @@ class DetailViewModel @Inject constructor(@ApplicationContext context: Context) 
     // 리뷰 필터 시트 관리 상태 변수
     val isReviewOptionSheetOpen = mutableStateOf(false)
 
-    //  컨텐트 메뉴 시트
+    //  일정 추가 시트
     val isAddScheduleSheetOpen = mutableStateOf(false)
 
     // 리뷰 리스트
@@ -122,6 +122,11 @@ class DetailViewModel @Inject constructor(@ApplicationContext context: Context) 
         tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_GOOGLE_MAP.name)
     }
 
+    // 앱바 일정 추가 눌렀을 때 리스너
+    fun onClickIconAddSchedule() {
+        isAddScheduleSheetOpen.value=true
+    }
+
     // 뒤로가기 리스너
     fun onClickNavIconBack() {
         tripApplication.navHostController.popBackStack()
@@ -197,6 +202,11 @@ class DetailViewModel @Inject constructor(@ApplicationContext context: Context) 
         tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_DETAIL_REVIEW_WRITE.name}/${contentID}/${contentTitle}")
     }
 
+    // 리뷰 수정 버튼 리스너
+    fun onClickIconReviewModify(contentID: String, reviewDocID : String){
+        tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_DETAIL_REVIEW_MODIFY.name}/${contentID}/${reviewDocID}")
+    }
+
     // timeStamp -> String 변환
     fun convertToMonthDate(timeStamp: Timestamp): String {
         // Firestore Timestamp를 Date 객체로 변환
@@ -220,6 +230,4 @@ class DetailViewModel @Inject constructor(@ApplicationContext context: Context) 
 
         return dateFormat.format(date)
     }
-
-
 }
