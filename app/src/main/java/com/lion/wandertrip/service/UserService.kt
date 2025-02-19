@@ -1,6 +1,7 @@
 package com.lion.wandertrip.service
 
 import android.content.Context
+import android.net.Uri
 import androidx.core.content.edit
 import com.lion.wandertrip.model.UserModel
 import com.lion.wandertrip.repository.UserRepository
@@ -12,16 +13,17 @@ import com.lion.wandertrip.vo.UserVO
 class UserService (val userRepository: UserRepository) {
 
     // 가입하려는 아이디가 존재하는지 확인하는 메서드
-    suspend fun checkJoinUserId(userId:String) : Boolean{
+    suspend fun checkJoinUserId(userId: String): Boolean {
         // 아이디를 통해 사용자 정보를 가져온다.
-        val userVoList = userRepository.selectUserDataByUserId(userId)
-        // 가져온 데이터가 있다면
-        if(userVoList.isNotEmpty()){
-            return false
-        }
-        // 가져온 데이터가 없다면
-        else {
+        val userVo: UserVO? = userRepository.selectUserDataByUserId(userId)
+
+        // 가져온 데이터가 없다면 (즉, 아이디가 존재하지 않으면)
+        if (userVo == null) {
             return true
+        }
+        // 가져온 데이터가 있다면 (즉, 아이디가 이미 존재하면)
+        else {
+            return false
         }
     }
 
@@ -54,18 +56,19 @@ class UserService (val userRepository: UserRepository) {
         var result = LoginResult.LOGIN_RESULT_SUCCESS
 
         // 입력한 아이디로 사용자 정보를 가져온다.
-        val userVoList = userRepository.selectUserDataByUserId(loginUserId)
+        val userVo = userRepository.selectUserDataByUserId(loginUserId)
+
 
         // 가져온 사용자 정보가 없다면
-        if(userVoList.isEmpty()){
+        if(userVo == null){
             result = LoginResult.LOGIN_RESULT_ID_NOT_EXIST
         } else {
-            if(loginUserPw != userVoList[0].userPw){
+            if(loginUserPw != userVo.userPw){
                 // 비밀번호가 다르다면
                 result = LoginResult.LOGIN_RESULT_PASSWORD_INCORRECT
             }
             // 탈퇴한 회원이라면
-            if(userVoList[0].userState == UserState.USER_STATE_SIGN_OUT.number){
+            if(userVo.userState == UserState.USER_STATE_SIGN_OUT.number){
                 result = LoginResult.LOGIN_RESULT_SIGN_OUT_MEMBER
             }
         }
@@ -117,5 +120,21 @@ class UserService (val userRepository: UserRepository) {
     // 사용자의 상태를 변경하는 메서드
     suspend fun updateUserState(userDocumentId:String, newState:UserState){
         userRepository.updateUserState(userDocumentId, newState)
+    }
+
+    // 이미지 데이터를 서버로 업로드 하는 메서드
+    suspend fun uploadImage(sourceFilePath:String, serverFilePath:String){
+        userRepository.uploadImage(sourceFilePath, serverFilePath)
+    }
+    // 유저Model 가져오는 메서드
+    suspend fun getUserByUserDocId(userDocId: String): UserModel {
+        val result = userRepository.getUserByUserDocId(userDocId)
+        return result!!.toUserModel()
+    }
+
+    // 이미지 데이터 Uri 가져오기
+    suspend fun gettingImage(imageFileName:String) : Uri {
+        val imageUri = userRepository.gettingImage(imageFileName)
+        return imageUri
     }
 }

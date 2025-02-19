@@ -34,6 +34,7 @@ class TripApplication : Application() {
 
     // 로그인한 사용자 객체
     lateinit var loginUserModel: UserModel
+
     // 네비게이션
     lateinit var navHostController: NavHostController
 
