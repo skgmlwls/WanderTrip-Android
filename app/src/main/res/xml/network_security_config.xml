@@ -5,4 +5,8 @@
         <!-- 'tong.visitkorea.or.kr' 도메인 및 그 하위 도메인에 대해 HTTP 트래픽을 허용 -->
         <domain includeSubdomains="true">tong.visitkorea.or.kr</domain>
     </domain-config>
+
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">api.visitkorea.or.kr</domain>
+    </domain-config>
 </network-security-config>

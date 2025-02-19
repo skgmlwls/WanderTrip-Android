@@ -85,4 +85,10 @@ dependencies {
     implementation("com.google.android.gms:play-services-location:21.0.1") // 지도
     implementation("com.google.maps.android:maps-compose:2.9.0") // 지도
     implementation("com.google.accompanist:accompanist-permissions:0.30.0") // 권한 관리 의존성
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+
 }

@@ -1,5 +1,6 @@
 package com.lion.wandertrip.vo
 
+import com.lion.wandertrip.model.Item
 import com.lion.wandertrip.model.TripItemModel
 
 class TripItemVO {
@@ -27,5 +28,23 @@ class TripItemVO {
         tripItemModel.tel = tel
         tripItemModel.title = title
         return tripItemModel
+    }
+
+    // ✅ API Item → TripItemVO 변환 함수 추가
+    companion object {
+        fun from(item: Item): TripItemVO {
+            return TripItemVO().apply {
+                addr1 = item.addr1 ?: ""
+                addr2 = item.addr2 ?: ""
+                areaCode = item.areacode ?: ""
+                contentId = item.contentid ?: ""
+                contentTypeId = item.contenttypeid ?: ""
+                firstImage = item.firstimage ?: ""
+                mapLat = item.mapy?.toDoubleOrNull() ?: 0.0
+                mapLong = item.mapx?.toDoubleOrNull() ?: 0.0
+                tel = item.tel ?: ""
+                title = item.title ?: ""
+            }
+        }
     }
 }
