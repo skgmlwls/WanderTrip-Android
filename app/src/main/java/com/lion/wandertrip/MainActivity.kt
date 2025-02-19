@@ -89,7 +89,16 @@ fun MyApp() {
         composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name) { UserSignUpStep1Screen() }
         
         composable(MainScreenName.MAIN_SCREEN_USER_INFO.name) {UserInfoScreen()}
-        composable(BotNavScreenName.BOT_NAV_SCREEN_TRIP_NOTE.name) {TripNoteScreen()}
+
+//        // 여행기 메인 화면
+//        composable(
+//            route = "${BotNavScreenName.BOT_NAV_SCREEN_TRIP_NOTE.name}/{documentId}"
+//        ){
+//            val documentId = it.arguments?.getString("documentId") ?:  ""
+//            TripNoteScreen(documentId = documentId)
+//        }
+
+        composable(BotNavScreenName.BOT_NAV_SCREEN_TRIP_NOTE.name) { TripNoteScreen() }
 
         // 여행기 상세 화면
         composable(

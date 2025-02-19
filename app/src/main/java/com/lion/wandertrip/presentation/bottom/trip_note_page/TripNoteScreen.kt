@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.bottom.trip_note_page
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -42,6 +44,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.google.firebase.Firebase
+import com.google.firebase.storage.storage
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.presentation.bottom.schedule_page.component.ScheduleIconButton
@@ -58,6 +62,7 @@ fun TripNoteScreen(
     tripNoteViewModel.gettingTripNoteData()
 
     tripNoteViewModel.topAppBarTitle.value = "추천 여행기"
+
 
 
     Scaffold(
@@ -100,10 +105,14 @@ fun TripNoteScreen(
                     .fillMaxSize()
                     .padding(horizontal = 10.dp)
             ) {
-                items(tripNoteViewModel.tripNoteList) { tripNote ->
+                Log.d("TripNoteScreen", "ImageUrisMap: ${tripNoteViewModel.imageUrisMap}")
+                itemsIndexed(tripNoteViewModel.tripNoteList) { index,tripNote ->
+                    // 로그로 각 인덱스의 imageUris 확인
+                    Log.d("TripNoteScreen", "Index: $index, imageUris: ${tripNoteViewModel.imageUrisMap[index]}")
+
                     TripNoteItem(
                         tripNote = tripNote,
-                        onClick = { tripNoteViewModel.listItemOnClick() },
+                        onClick = { tripNoteViewModel.listItemOnClick(tripNote.tripNoteDocumentId) },
                         modifier = Modifier
                             .fillMaxWidth() // 항목이 화면 너비를 가득 차게
                             .padding(vertical = 8.dp) // 항목 사이에 간격 추가
@@ -111,7 +120,10 @@ fun TripNoteScreen(
                                 color = Color.White, // 배경색
                                 shape = RoundedCornerShape(6.dp) // 둥근 모서리
                             )
-                            .padding(0.dp) // 내부 여백
+                            .padding(0.dp),
+                        //imageUris = tripNoteViewModel.imageUrisMap[index]?: emptyList()
+                        imageUris = tripNoteViewModel.imageUrisMap[index]?.filterNotNull() ?: emptyList()
+
                     )
                 }
             }
@@ -125,7 +137,9 @@ fun TripNoteScreen(
 @Composable
 fun TripNoteItem(tripNote: TripNoteModel,
                  onClick: () -> Unit,
-                 modifier : Modifier) {
+                 modifier : Modifier,
+                 imageUris: List<Uri?>) {
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -142,15 +156,16 @@ fun TripNoteItem(tripNote: TripNoteModel,
 
         // 닉네임 (작은 글씨)
         Text(
-            text = tripNote.userNickname,
+            text = "${tripNote.userNickname} 님의 여행기",
             fontSize = 14.sp,
             color = Color.Gray,
             fontFamily = NanumSquareRound,
-            modifier = Modifier.padding(bottom = 15.dp)
+            modifier = Modifier.padding(bottom = 15.dp, start = 1.dp)
         )
 
+
         // 이미지 리스트
-        if (tripNote.tripNoteImage.isNotEmpty()) {
+        if (imageUris.isNotEmpty()) {
             Row(
                 modifier = Modifier
                     .wrapContentWidth(Alignment.Start) // Row를 왼쪽 정렬로 설정
@@ -158,19 +173,23 @@ fun TripNoteItem(tripNote: TripNoteModel,
                  horizontalArrangement = Arrangement.spacedBy(3.dp) // 이미지 간 간격 유지
 
             ) {
-                tripNote.tripNoteImage.forEach { imageUrl ->
-                    GlideImage(
-                        model = imageUrl,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .height(160.dp) // 이미지 높이를 고정
-                            .weight(1f) // 화면 너비를 균등하게 나누도록 설정
-                            .clip(RoundedCornerShape(0.dp)) // 둥근 모서리 적용
-                            .fillMaxWidth() // 너비를 꽉 채우기
-                            .aspectRatio(1f) // 비율을 1:1로 맞추기
-                            .then(Modifier.fillMaxHeight()),
-                        contentScale = ContentScale.Crop// 높이를 고정
-                    )
+
+                imageUris.forEach { imageUrl ->
+                    Log.d("TripNoteItem", "ImageUri: $imageUrl")
+                    imageUrl?.let {
+                        GlideImage(
+                            model = imageUrl,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .height(200.dp) // 이미지 높이를 고정
+                                .weight(1f) // 화면 너비를 균등하게 나누도록 설정
+                                .clip(RoundedCornerShape(0.dp)) // 둥근 모서리 적용
+                                .fillMaxWidth() // 너비를 꽉 채우기
+                                .aspectRatio(1f) // 비율을 1:1로 맞추기
+                                .then(Modifier.fillMaxHeight()),
+                            contentScale = ContentScale.Crop// 높이를 고정
+                        )
+                    }
                 }
             }
         }
@@ -180,6 +199,7 @@ fun TripNoteItem(tripNote: TripNoteModel,
             text = tripNote.tripNoteContent,
             fontSize = 16.sp,
             fontFamily = NanumSquareRoundRegular,
+            modifier = Modifier.padding(start = 2.dp)
         )
     }
 }
