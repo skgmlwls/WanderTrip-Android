@@ -2,6 +2,7 @@ package com.lion.wandertrip.service
 
 import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.repository.TripNoteRepository
+import com.lion.wandertrip.vo.TripNoteVO
 import javax.inject.Inject
 
 class TripNoteService @Inject constructor(val tripNoteRepository: TripNoteRepository) {
@@ -19,5 +20,23 @@ class TripNoteService @Inject constructor(val tripNoteRepository: TripNoteReposi
         // 저장한다.
         val documentId = tripNoteRepository.addTripNoteData(tripNoteVO)
         return documentId
+    }
+
+    // 여행기 리스트를 가져오는 메서드
+    suspend fun gettingTripNoteList() : MutableList<TripNoteModel>{
+        // 여행기 정보를 가져온다.
+        val tripNoteList = mutableListOf<TripNoteModel>()
+        val resultList = tripNoteRepository.gettingTripNoteList()
+
+        resultList.forEach {
+            val tripNoteVO = it["tripNoteVO"] as TripNoteVO
+            val documentId = it["documentId"] as String
+            val tripNoteImage = it["tripNoteImage"] as List<String>?
+            val tripNoteModel = tripNoteVO.toTripNoteModel(documentId)
+            tripNoteModel.tripNoteImage = tripNoteImage!!
+            tripNoteList.add(tripNoteModel)
+        }
+
+        return tripNoteList
     }
 }
