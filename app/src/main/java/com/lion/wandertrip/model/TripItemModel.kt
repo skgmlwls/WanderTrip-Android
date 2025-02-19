@@ -1,6 +1,5 @@
 package com.lion.wandertrip.model
 
-import com.lion.wandertrip.retrofit.TripItemRetrofitVO
 import com.lion.wandertrip.vo.TripItemVO
 
 class TripItemModel(
@@ -13,7 +12,10 @@ class TripItemModel(
     var mapLat: Double = 0.0,        // 위도(Y)
     var mapLong: Double = 0.0,       // 경도(X)
     var tel: String = "",            // 전화번호
-    var title: String = ""           // 제목
+    var title: String = "",          // 제목
+    var cat1 : String = "",          // 대분류
+    var cat2 : String = "",          // 중분류
+    var cat3 : String = "",          // 소분류
     // 큰 이미지도 가져와야 함
 ) {
     fun toTripItemVO(): TripItemVO {
@@ -28,6 +30,9 @@ class TripItemModel(
         tripItemVO.mapLong = mapLong
         tripItemVO.tel = tel
         tripItemVO.title = title
+        tripItemVO.cat1 = cat1
+        tripItemVO.cat2 = cat2
+        tripItemVO.cat3 = cat3
         return tripItemVO
     }
 }
