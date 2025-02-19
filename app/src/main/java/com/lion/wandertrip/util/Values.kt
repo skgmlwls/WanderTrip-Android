@@ -340,3 +340,72 @@ enum class RouletteScreenName{
     // 룰렛 도시 항목 추가 화면
     ROULETTE_CITY_SELECT_SCREEN,
 }
+
+enum class TripItemCat2(val catCode: String, val catName: String) {
+    // 🌍 자연 및 관광 자원
+    NATURE_TOURISM("A0101", "자연관광지"),
+    TOURISM_RESOURCE("A0102", "관광자원"),
+
+    // 🏛️ 역사 및 문화 관광지
+    HISTORICAL_TOURISM("A0201", "역사관광지"),
+    RESORT_TOURISM("A0202", "휴양관광지"),
+    EXPERIENCE_TOURISM("A0203", "체험관광지"),
+    INDUSTRIAL_TOURISM("A0204", "산업관광지"),
+    ARCHITECTURAL_STRUCTURE("A0205", "건축/조형물"),
+    CULTURAL_FACILITY("A0206", "문화시설"),
+    FESTIVAL("A0207", "축제"),
+    PERFORMANCE_EVENT("A0208", "공연/행사"),
+
+    // 🏅 레포츠 관광
+    SPORTS_OVERVIEW("A0301", "레포츠소개"),
+    LAND_SPORTS("A0302", "육상 레포츠"),
+    WATER_SPORTS("A0303", "수상 레포츠"),
+    AIR_SPORTS("A0304", "항공 레포츠"),
+    COMPOSITE_SPORTS("A0305", "복합 레포츠");
+
+    companion object {
+        // ✅ 코드 값으로 enum 찾기
+        fun fromCodeTripItemCat2(code: String): TripItemCat2? {
+            return values().find { it.catCode == code }
+        }
+    }
+}
+
+enum class RestaurantItemCat3(val catCode: String, val catName: String) {
+    // 🍽️ 음식점 분류
+    KOREAN_FOOD("A05020100", "한식"),
+    WESTERN_FOOD("A05020200", "서양식"),
+    JAPANESE_FOOD("A05020300", "일식"),
+    CHINESE_FOOD("A05020400", "중식"),
+    UNIQUE_RESTAURANT("A05020700", "이색음식점"),
+    CAFE_TEA_HOUSE("A05020900", "카페/전통찻집"),
+    CLUB("A05021000", "클럽");
+
+    companion object {
+        // ✅ 코드 값으로 enum 찾기
+        fun fromCodeRestaurantItemCat3(code: String): RestaurantItemCat3? {
+            return values().find { it.catCode == code }
+        }
+    }
+}
+
+enum class AccommodationItemCat3(val catCode: String, val catName: String) {
+    // 🏨 숙박 시설 유형
+    TOURIST_HOTEL("B02010100", "관광호텔"),
+    CONDOMINIUM("B02010500", "콘도미니엄"),
+    YOUTH_HOSTEL("B02010600", "유스호스텔"),
+    PENSION("B02010700", "펜션"),
+    MOTEL("B02010900", "모텔"),
+    HOMESTAY("B02011000", "민박"),
+    GUEST_HOUSE("B02011100", "게스트하우스"),
+    HOME_STAY("B02011200", "홈스테이"),
+    SERVICED_RESIDENCE("B02011300", "서비스드레지던스"),
+    HANOK("B02011600", "한옥");
+
+    companion object {
+        // ✅ 코드 값으로 enum 찾기
+        fun fromCodeAccommodationItemCat3(code: String): AccommodationItemCat3? {
+            return values().find { it.catCode == code }
+        }
+    }
+}

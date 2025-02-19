@@ -1,6 +1,5 @@
 package com.lion.wandertrip.retrofit
 
-import com.lion.wandertrip.model.ApiResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 

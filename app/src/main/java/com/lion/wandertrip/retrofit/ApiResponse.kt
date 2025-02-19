@@ -1,4 +1,4 @@
-package com.lion.wandertrip.model
+package com.lion.wandertrip.retrofit
 
 data class ApiResponse(
     val response: ResponseWrapper

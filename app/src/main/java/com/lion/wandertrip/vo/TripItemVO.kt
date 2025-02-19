@@ -1,6 +1,6 @@
 package com.lion.wandertrip.vo
 
-import com.lion.wandertrip.model.Item
+import com.lion.wandertrip.retrofit.Item
 import com.lion.wandertrip.model.TripItemModel
 
 class TripItemVO {
@@ -14,6 +14,9 @@ class TripItemVO {
     var mapLong: Double = 0.0
     var tel: String = ""
     var title: String = ""
+    var cat1 : String = ""          // 대분류
+    var cat2 : String = ""          // 중분류
+    var cat3 : String = ""          // 소분류
 
     fun toTripItemModel(): TripItemModel {
         val tripItemModel = TripItemModel()
@@ -27,6 +30,9 @@ class TripItemVO {
         tripItemModel.mapLong = mapLong
         tripItemModel.tel = tel
         tripItemModel.title = title
+        tripItemModel.cat1 = cat1
+        tripItemModel.cat2 = cat2
+        tripItemModel.cat3 = cat3
         return tripItemModel
     }
 
@@ -44,6 +50,9 @@ class TripItemVO {
                 mapLong = item.mapx?.toDoubleOrNull() ?: 0.0
                 tel = item.tel ?: ""
                 title = item.title ?: ""
+                cat1 = item.cat1 ?: ""
+                cat2 = item.cat2 ?: ""
+                cat3 = item.cat3 ?: ""
             }
         }
     }

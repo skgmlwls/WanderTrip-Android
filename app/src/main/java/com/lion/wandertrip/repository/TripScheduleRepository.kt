@@ -1,8 +1,11 @@
 package com.lion.wandertrip.repository
 
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
-import com.lion.wandertrip.model.TripScheduleModel
+import com.lion.wandertrip.retrofit.ApiResponse
+import com.lion.wandertrip.retrofit.RetrofitClient
 import com.lion.wandertrip.vo.ScheduleItemVO
+import com.lion.wandertrip.vo.TripItemVO
 import com.lion.wandertrip.vo.TripScheduleVO
 import kotlinx.coroutines.tasks.await
 
@@ -52,5 +55,48 @@ class TripScheduleRepository {
         return emptyList()
     }
 
+    // API 호출 및 데이터 로드
+    suspend fun loadTripItems(serviceKey: String, areaCode: String, contentTypeId: String) : List<TripItemVO>? {
+        // ✅ TripItemModel 대신 TripItemVO 리스트 사용
+        val tripItemList = mutableListOf<TripItemVO>()
+
+        try {
+            val rawResponse = RetrofitClient.apiService.getItems(
+                serviceKey = serviceKey,
+                numOfRows = 100000,
+                pageNo = 1,
+                mobileOS = "AND",
+                mobileApp = "WanderTrip",
+                type = "json",
+                showflag = "1",
+                listYN = "Y",
+                arrange = "A",
+                contentTypeId = contentTypeId,
+                areaCode = areaCode,
+            )
+
+            // 🚀 응답 로그 출력
+            Log.d("APIResponseRaw", "Response: $rawResponse")
+
+            // JSON 파싱
+            val apiResponse = RetrofitClient.gson.fromJson(rawResponse, ApiResponse::class.java)
+            val items = apiResponse.response.body?.items?.item ?: emptyList()
+
+            // ✅ 변환을 TripItemVO 내부에서 처리
+            val tripItemVOs = items.map { TripItemVO.from(it) }
+
+
+            tripItemList.clear()
+            tripItemList.addAll(tripItemVOs)
+            tripItemList.forEach {
+                Log.d("APIProcessedData", "저장된 데이터: ${it.title}")
+            }
+            Log.d("APIProcessedData", "총 데이터 개수: ${tripItemList.size}")
+
+        } catch (e: Exception) {
+            Log.e("APIError", "API 호출 오류: ${e.message}")
+        }
+        return tripItemList
+    }
 
 }

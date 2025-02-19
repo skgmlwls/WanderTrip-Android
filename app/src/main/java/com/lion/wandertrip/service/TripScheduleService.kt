@@ -2,9 +2,9 @@ package com.lion.wandertrip.service
 
 import android.util.Log
 import com.lion.wandertrip.model.ScheduleItem
+import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.repository.TripScheduleRepository
-import com.lion.wandertrip.vo.TripScheduleVO
 
 class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
 
@@ -32,6 +32,14 @@ class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
     suspend fun getTripScheduleItems(docId: String): List<ScheduleItem>? {
         val itemVOList = tripScheduleRepository.getTripScheduleItems(docId) ?: emptyList()
         return itemVOList.map { it.toScheduleItemModel() }
+    }
+
+    // API 호출 및 데이터 로드
+    suspend fun loadTripItems(serviceKey: String, areaCode: String, contentTypeId: String) : List<TripItemModel>? {
+        val tripItemVOList = tripScheduleRepository.loadTripItems(serviceKey, areaCode, contentTypeId)
+        val tripItemModelList = tripItemVOList?.map { it.toTripItemModel() }
+
+        return tripItemModelList
     }
 
 
