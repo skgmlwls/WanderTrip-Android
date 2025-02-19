@@ -126,11 +126,8 @@ class UserSignUpStep1ViewModel @Inject constructor(
                 val work1 = async(Dispatchers.IO){
                     userService.addUserData(userModel)
                 }
-                work1.join()
+                val userDocId = work1.await()
             }
-
-
-
             // 닉네임 설정 화면으로 이동
             tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name)
         }

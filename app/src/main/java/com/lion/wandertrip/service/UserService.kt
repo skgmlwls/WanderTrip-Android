@@ -40,11 +40,12 @@ class UserService (val userRepository: UserRepository) {
     }
 
     // 사용자 정보를 추가하는 메서드
-    fun addUserData(userModel: UserModel){
+    // userDocId 리턴받이 프로필 이미지 변경할때 사용한다.
+    fun addUserData(userModel: UserModel) : String{
         // 데이터를 VO에 담아준다.
         val userVO = userModel.toUserVO()
         // 저장하는 메서드를 호출한다.
-        userRepository.addUserData(userVO)
+        return userRepository.addUserData(userVO)
     }
 
     // 로그인 처리 메서드
