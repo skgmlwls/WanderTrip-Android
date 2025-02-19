@@ -9,6 +9,8 @@ import com.google.firebase.Timestamp
 import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.service.TripNoteService
+import com.lion.wandertrip.util.BotNavScreenName
+import com.lion.wandertrip.util.MainScreenName
 import com.lion.wandertrip.util.Tools
 import com.lion.wandertrip.util.TripNoteScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -123,8 +125,8 @@ class TripNoteWriteViewModel @Inject constructor(
 
             // 여행기 리스트 화면으로 이동
             tripApplication.navHostController.popBackStack()
-            // 여행기 메인에서 클릭할때... documentId 전달하기
-            // tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_DETAIL.name}/${documentId}")
+            // 여행기 상세에 documentId 전달하기
+            tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_DETAIL.name}/${documentId}")
         }
 
     }

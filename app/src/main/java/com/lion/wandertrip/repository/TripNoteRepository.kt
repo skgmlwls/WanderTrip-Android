@@ -2,6 +2,7 @@ package com.lion.wandertrip.repository
 
 import android.net.Uri
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.vo.TripNoteVO
@@ -29,5 +30,33 @@ class TripNoteRepository@Inject constructor() {
         val collectionReference = fireStore.collection("TripNoteData")
         val documentReference = collectionReference.add(tripNoteVO).await()
         return documentReference.id
+    }
+
+    // 여행기 리스트 가져오는 메서드
+    suspend fun gettingTripNoteList(): MutableList<Map<String, *>> {
+        val firestore = FirebaseFirestore.getInstance()
+        val collectionReference = firestore.collection("TripNoteData")
+        // 데이터를 가져온다.
+        val result =
+            collectionReference.orderBy("tripNoteTimeStamp", Query.Direction.DESCENDING).get()
+                .await()
+        // 반환할 리스트
+        val resultList = mutableListOf<Map<String, *>>()
+        // 데이터의 수 만큼 반환한다.
+        result.forEach {
+            val tripNoteVO = it.toObject(TripNoteVO::class.java) // TripNoteVO 객체 가져오기
+            val tripNoteImage = tripNoteVO.tripNoteImage
+
+            val map = mapOf(
+                // 문서의 id
+                "documentId" to it.id,
+                // 데이터를 가지고 있는 객체
+                "tripNoteVO" to tripNoteVO,
+                // 이미지 경로
+                "tripNoteImage" to tripNoteImage
+            )
+            resultList.add(map)
+        }
+        return resultList
     }
 }

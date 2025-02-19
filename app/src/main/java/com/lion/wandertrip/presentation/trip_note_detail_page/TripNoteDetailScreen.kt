@@ -68,6 +68,7 @@ import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripNoteDetailScreen(
+    documentId: String,
     tripNoteDetailViewModel: TripNoteDetailViewModel = hiltViewModel(),
 ) {
 

@@ -77,8 +77,9 @@ fun MyApp() {
 
     NavHost(
         navController = rememberNavHostController,
-        startDestination = "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
-                "tripScheduleDocId=jgbGuyxXMAj8nvChmAyN&areaName=서울&areaCode=1"
+        startDestination = MainScreenName.MAIN_SCREEN_START.name
+//        startDestination = "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
+//                "tripScheduleDocId=jgbGuyxXMAj8nvChmAyN&areaName=서울&areaCode=1"
     ) {
         composable(MainScreenName.MAIN_SCREEN_START.name) { StartScreen() }
         // 일정 메인 화면
@@ -89,9 +90,16 @@ fun MyApp() {
         composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name) { UserSignUpStep1Screen() }
         
         composable(MainScreenName.MAIN_SCREEN_USER_INFO.name) {UserInfoScreen()}
+        composable(BotNavScreenName.BOT_NAV_SCREEN_TRIP_NOTE.name) {TripNoteScreen()}
 
-        composable(BotNavScreenName.BOT_NAV_SCREEN_TRIP_NOTE.name) { TripNoteScreen() }
-        composable(TripNoteScreenName.TRIP_NOTE_DETAIL.name) { TripNoteDetailScreen() }
+        // 여행기 상세 화면
+        composable(
+            route = "${TripNoteScreenName.TRIP_NOTE_DETAIL.name}/{documentId}"
+        ){
+            val documentId = it.arguments?.getString("documentId") ?:  ""
+            TripNoteDetailScreen(documentId = documentId)
+        }
+
 
         // 여행기 작성 화면
         composable(
@@ -128,6 +136,7 @@ fun MyApp() {
             val contentId = backStackEntry.arguments?.getString("contentId") ?: "default_id"
             DetailScreen(contentId)
         }
+
         // 구글 맵 화면
         composable(MainScreenName.MAIN_SCREEN_GOOGLE_MAP.name) { GoogleMapScreen() }
 
