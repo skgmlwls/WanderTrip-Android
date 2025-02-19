@@ -77,8 +77,7 @@ fun MyApp() {
 
     NavHost(
         navController = rememberNavHostController,
-        startDestination = "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
-                "tripScheduleDocId=jgbGuyxXMAj8nvChmAyN&areaName=서울&areaCode=1"
+        startDestination = MainScreenName.MAIN_SCREEN_START.name
     ) {
         composable(MainScreenName.MAIN_SCREEN_START.name) { StartScreen() }
         // 일정 메인 화면
