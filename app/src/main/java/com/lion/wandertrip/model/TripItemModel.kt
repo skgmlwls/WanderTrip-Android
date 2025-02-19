@@ -1,5 +1,6 @@
 package com.lion.wandertrip.model
 
+import com.lion.wandertrip.retrofit.TripItemRetrofitVO
 import com.lion.wandertrip.vo.TripItemVO
 
 class TripItemModel(

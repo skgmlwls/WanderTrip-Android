@@ -78,8 +78,6 @@ fun MyApp() {
     NavHost(
         navController = rememberNavHostController,
         startDestination = MainScreenName.MAIN_SCREEN_START.name
-//        startDestination = "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
-//                "tripScheduleDocId=jgbGuyxXMAj8nvChmAyN&areaName=서울&areaCode=1"
     ) {
         composable(MainScreenName.MAIN_SCREEN_START.name) { StartScreen() }
         // 일정 메인 화면
@@ -248,7 +246,18 @@ fun MyApp() {
             DetailReviewWriteScreen(contentID = contentID, contentTitle = contentTitle)
         }
         // 리뷰 수정 화면
-        composable(MainScreenName.MAIN_SCREEN_DETAIL_REVIEW_MODIFY.name) { DetailReviewModifyScreen() }
+        composable(
+            route = "${MainScreenName.MAIN_SCREEN_DETAIL_REVIEW_MODIFY.name}/{contentDocID}/{reviewDocID}",
+            arguments = listOf(
+                navArgument("contentDocID") { type = NavType.StringType },
+                navArgument("reviewDocID") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val contentDocID = backStackEntry.arguments?.getString("contentDocID") ?: ""
+            val reviewDocID = backStackEntry.arguments?.getString("reviewDocID") ?: ""
+
+            DetailReviewModifyScreen(contentDocID = contentDocID, reviewDocID = reviewDocID)
+        }
 
     }
 }

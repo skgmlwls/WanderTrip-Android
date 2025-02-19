@@ -44,6 +44,11 @@ fun ScheduleSelectItemScreen(
     Log.d("ScheduleSelectItemScreen", itemCode.toString())
     Log.d("ScheduleSelectItemScreen", areaName)
     Log.d("ScheduleSelectItemScreen", areaCode.toString())
+    viewModel.loadTripItems(
+        serviceKey = "ksezhUKKJp9M9RgOdmmu9i7lN1+AbkA1dk1xZpqMMam319sa3VIQHFtCXfADM1OxBUls7SrMrmun3AFTYRj5Qw==",
+        areaCode = "1",
+        contentTypeId = "12"
+    )
 
     Scaffold(
         containerColor = Color.White,
