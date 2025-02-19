@@ -5,6 +5,8 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +28,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +37,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
@@ -48,12 +52,18 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.lion.a02_boardcloneproject.component.CustomDividerComponent
 import com.lion.wandertrip.R
 import com.lion.wandertrip.presentation.bottom.trip_note_page.TripNoteItem
@@ -62,18 +72,24 @@ import com.lion.wandertrip.presentation.trip_note_detail_page.component.TripNote
 import com.lion.wandertrip.presentation.trip_note_detail_page.component.TripNoteScheduleReply
 import com.lion.wandertrip.ui.theme.NanumSquareRound
 import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
+import com.bumptech.glide.integration.compose.GlideImage
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun TripNoteDetailScreen(
     documentId: String,
     tripNoteDetailViewModel: TripNoteDetailViewModel = hiltViewModel(),
 ) {
 
-    tripNoteDetailViewModel.gettingTripNoteDetailData()
-    tripNoteDetailViewModel.gettingTripNoteReplyData()
+    // 여행기 상세 데이터 가져오기
+    tripNoteDetailViewModel.gettingTripNoteDetailData(documentId)
+    // 댓글 리스트 가져오기
+    tripNoteDetailViewModel.gettingTripNoteReplyData(documentId)
+    // 닉네임 가져오기
+    tripNoteDetailViewModel.nickName
+
 
 
     // tripNoteDetailList를 ViewModel에서 가져옵니다.
@@ -81,10 +97,10 @@ fun TripNoteDetailScreen(
     val tripNoteDetailData = tripNoteDetailList.firstOrNull()  // 데이터를 제대로 가져옵니다.
 
     // 이미지 목록 가져오기
-    val images = tripNoteDetailData?.tripNoteImage ?: listOf()  // 이미지 목록을 안전하게 처리합니다.
-
+    // val images = tripNoteDetailData?.tripNoteImage ?: listOf()  // 이미지 목록을 안전하게 처리합니다.
+    val images = tripNoteDetailViewModel.showImageUri
     // HorizontalPager에 필요한 상태를 pageCount를 전달하여 초기화합니다.
-    val pagerState = rememberPagerState(pageCount = { images.size })
+    val pagerState = rememberPagerState(pageCount = { images.value.size })
 
     // 댓글 작성칸 (네모박스 형태)
     var commentText by remember { mutableStateOf("") }
@@ -118,16 +134,19 @@ fun TripNoteDetailScreen(
                         horizontalArrangement = Arrangement.spacedBy(0.dp), // 아이콘 간 간격을 0으로 설정
                         // verticalAlignment = Alignment.CenterVertically
                     ) {
-                        // 휴지통 아이콘 (오른쪽 상단에 배치)
-                        IconButton(
-                            onClick = { tripNoteDetailViewModel.deleteButtonClick() },
-                            modifier = Modifier.padding(start = 20.dp)
-                        ) {
-                            Icon(
-                                // imageVector = Icons.Filled.Delete,
-                                painter = painterResource(id = R.drawable.ic_delete_24px),
-                                contentDescription = "Delete"
-                            )
+                        // 본인이 작성한 여행기일떄만 아이콘 뜨게
+                        if(tripNoteDetailViewModel.showTopAppBarDeleteMenuState.value) {
+                            // 휴지통 아이콘 (오른쪽 상단에 배치)
+                            IconButton(
+                                onClick = { tripNoteDetailViewModel.deleteButtonClick() },
+                                modifier = Modifier.padding(start = 20.dp)
+                            ) {
+                                Icon(
+                                    // imageVector = Icons.Filled.Delete,
+                                    painter = painterResource(id = R.drawable.ic_delete_24px),
+                                    contentDescription = "Delete"
+                                )
+                            }
                         }
 
                         // 다운로드 아이콘 (오른쪽 상단에 배치)
@@ -155,20 +174,56 @@ fun TripNoteDetailScreen(
             ) {
 
                 // 이미지 슬라이더
-                if (images.isNotEmpty()) {
+                if (tripNoteDetailViewModel.showImageState.value) {
                     item {
+
+                        var showFullImage by remember { mutableStateOf(false) }  // 전체 이미지 보기 상태
+
                         HorizontalPager(
                             state = pagerState,
-                            // pageCount = images.size,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(260.dp)
+                                .height(200.dp)
                         ) { page ->
-                            Image(
-                                painter = rememberImagePainter(images[page]),
+
+                            val imageUrl = images.value[page]
+
+                            // GlideImage 클릭 시 showFullImage 상태를 true로 변경
+                            GlideImage(
+                                model = imageUrl,
                                 contentDescription = "Image",
-                                modifier = Modifier.fillMaxSize()
+                                modifier = Modifier
+                                    .fillMaxWidth() // 가로 꽉 차게
+                                    .height(200.dp) // 세로 고정
+                                    .clickable { showFullImage = true },
+                                contentScale = ContentScale.Crop // 이미지 자르기
                             )
+
+                            // 클릭 시 전체 이미지 보여주는 Dialog
+                            if (showFullImage) {
+                                // 다이얼로그에 이미지와 닫기 버튼 추가
+                                Dialog(onDismissRequest = { showFullImage = false }) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(0.dp)
+                                            .pointerInput(Unit) {
+                                                // 화면의 아무 곳이나 클릭하면 다이얼로그를 닫음
+                                                detectTapGestures(onTap = { showFullImage = false })
+                                            }
+                                    ) {
+                                        // 전체 화면 이미지 표시
+                                        AsyncImage(
+                                            model = imageUrl,
+                                            contentDescription = "Full Image",
+                                            modifier = Modifier
+                                                .fillMaxSize()
+                                                .padding(0.dp),
+                                            contentScale = ContentScale.Fit // 이미지 비율 유지
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -178,16 +233,16 @@ fun TripNoteDetailScreen(
                 }
 
                 // 여행기 제목
-                tripNoteDetailData?.tripNoteTitle?.let { title ->
+                //tripNoteDetailData?.tripNoteTitle?.let { title ->
                     item {
                         Text(
-                            text = title,
+                            text = tripNoteDetailViewModel.textFieldTripNoteSubject.value,
                             fontSize = 27.sp,
                             fontFamily = NanumSquareRound,
                             modifier = Modifier.padding(start = 10.dp)
                         )
                     }
-                }
+               // }
 
                 item {
                     Spacer(modifier = Modifier.height(10.dp))
@@ -202,7 +257,7 @@ fun TripNoteDetailScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = tripNoteDetailData?.tripNoteContent ?: "",
+                            text = tripNoteDetailViewModel.textFieldTripNoteContent.value,
                             fontSize = 15.sp,
                             fontFamily = NanumSquareRoundRegular
                         )
@@ -218,7 +273,7 @@ fun TripNoteDetailScreen(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = tripNoteDetailData?.userNickname ?: "닉네임 없음",
+                            text = tripNoteDetailViewModel.textFieldTripNoteNickName.value ?: "닉네임 없음",
                             fontSize = 13.sp,
                             fontFamily = NanumSquareRound,
                             // modifier = Modifier.padding(end = 1.dp)
@@ -278,7 +333,8 @@ fun TripNoteDetailScreen(
 
                 items(tripNoteDetailViewModel.tripNoteReplyList) { tripNoteReply ->
                     TripNoteScheduleReply(
-                        tripNoteReply = tripNoteReply
+                        tripNoteReply = tripNoteReply,
+                        loginNickName = tripNoteDetailViewModel.nickName
                     )
                 }
 
@@ -290,11 +346,11 @@ fun TripNoteDetailScreen(
                 // 댓글 작성란
                 item {
                     TextField(
-                        value = commentText,
-                        onValueChange = { commentText = it },
+                        value = tripNoteDetailViewModel.textFieldTripNoteReply.value,
+                        onValueChange = { tripNoteDetailViewModel.textFieldTripNoteReply.value = it },
                         // label = { Text("댓글을 입력하세요") },
                         placeholder = {
-                            if (commentText.isEmpty()) {
+                            if (tripNoteDetailViewModel.textFieldTripNoteReply.value.isEmpty()) {
                                 Text("댓글을 입력하세요",
                                     color = Color.Gray) // 초기 플로팅 텍스트로 사용
                             }
@@ -316,13 +372,14 @@ fun TripNoteDetailScreen(
                         singleLine = false, // 여러 줄 입력 가능
                         shape = RoundedCornerShape(4.dp), // 둥근 모서리
                         trailingIcon = {
-                            if (commentText.isNotEmpty()) {
+                            if (tripNoteDetailViewModel.textFieldTripNoteReply.value.isNotEmpty()) {
                                 IconButton(
                                     onClick =
-                                    { // 제출하기
-
-                                        // 비거있기
-                                        commentText = ""
+                                    {   // 제출하기
+                                        tripNoteDetailViewModel.addReplyClick(documentId)
+                                        tripNoteDetailViewModel.gettingTripNoteReplyData(documentId)
+                                        // 제출하면 필드 비어있게
+                                        tripNoteDetailViewModel.textFieldTripNoteReply.value = ""
                                     }
                                 ) {
                                     Icon(
@@ -333,24 +390,6 @@ fun TripNoteDetailScreen(
                             }
                         }
                     )
-
-//                    // 제출 버튼
-//                    Button(
-//                        onClick = {
-//                            if (commentText.isNotEmpty()) {
-//                                // 댓글 제출
-//                                // 어쩌구저쩌구
-//
-//                                // 제출 후 텍스트 필드 비우기
-//                                commentText = ""
-//                            }
-//                        },
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(top = 11.dp,start = 11.dp, end = 11.dp),
-//                    ) {
-//                        Text("댓글 등록하기")
-//                    }
                 }
 
 

@@ -11,7 +11,7 @@ class TripNoteReplyVO {
     var replyTimeStamp: Timestamp = Timestamp.now()
     var tripNoteDocumentId: String = "" // 여행기 문서 ID
 
-    fun toReplyItemModel(): TripNoteReplyModel {
+    fun toReplyItemModel(tripNoteDocumentId : String): TripNoteReplyModel {
         val replyItemModel = TripNoteReplyModel()
         replyItemModel.tripNoteReplyDocId = tripNoteReplyDocId
         replyItemModel.userNickname = userNickname

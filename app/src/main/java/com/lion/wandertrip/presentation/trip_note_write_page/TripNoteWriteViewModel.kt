@@ -2,6 +2,7 @@ package com.lion.wandertrip.presentation.trip_note_write_page
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -38,10 +39,10 @@ class TripNoteWriteViewModel @Inject constructor(
     val topAppBarTitle = mutableStateOf("여행기 작성")
 
     // 여행기 제목
-    val tripNoteTitle = mutableStateOf(" ")
+    val tripNoteTitle = mutableStateOf("")
 
     // 여행기 내용
-    val tripNoteContent = mutableStateOf(" ")
+    val tripNoteContent = mutableStateOf("")
 
     // Bitmap
     val tripNotePreviewBitmap = mutableStateListOf<Bitmap?>()
@@ -78,8 +79,8 @@ class TripNoteWriteViewModel @Inject constructor(
         // 나중에 받아와야함
         val tripScheduleDocumentId = ""
 
-        // 나중에 로그인한거 받아서,,,?
-        val userNickname = ""
+        // 로그인한 사용자의 닉네임
+        val userNickname = tripApplication.loginUserModel.userNickName
 
         // 저장
         CoroutineScope(Dispatchers.Main).launch {
@@ -114,6 +115,7 @@ class TripNoteWriteViewModel @Inject constructor(
             tripNoteModel.tripScheduleDocumentId = tripScheduleDocumentId
             tripNoteModel.userNickname = userNickname
 
+            try {
             // 저장하기
             val work2 = async(Dispatchers.IO){
                 tripNoteService.addTripNoteData(tripNoteModel)
@@ -127,6 +129,17 @@ class TripNoteWriteViewModel @Inject constructor(
             tripApplication.navHostController.popBackStack()
             // 여행기 상세에 documentId 전달하기
             tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_DETAIL.name}/${documentId}")
+                tripApplication.navHostController.popBackStack()
+//                tripApplication.navHostController.navigate("${BotNavScreenName.BOT_NAV_SCREEN_TRIP_NOTE.name}/${documentId}")
+//                tripApplication.navHostController.popBackStack()
+
+
+        } catch (e: Exception) {
+            Log.e("TripNote", "Error saving trip note", e)
+            isProgressVisible.value = false
+            // 에러 메시지 표시 (옵션)
+        }
+            // tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_DETAIL.name}/${documentId}")
         }
 
     }
