@@ -26,10 +26,14 @@ class UserRepository {
     }
 
     // 사용자 정보를 추가하는 메서드
-    fun addUserData(userVO: UserVO){
+    fun addUserData(userVO: UserVO) : String {
         val firestore = FirebaseFirestore.getInstance()
-        val collectionReference = firestore.collection("UserData")
-        collectionReference.add(userVO)
+        val collectionReference = firestore.collection("userData")
+        val documentReference = collectionReference.document()
+        val addUserVO = userVO
+        addUserVO.userDocId = documentReference.id
+        documentReference.set(addUserVO)
+        return documentReference.id
     }
 
     // 사용자 아이디와 동일한 사용자의 정보 하나를 반환하는 메서드

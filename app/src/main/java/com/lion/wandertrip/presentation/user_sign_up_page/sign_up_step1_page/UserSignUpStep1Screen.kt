@@ -53,6 +53,7 @@ fun UserSignUpStep1Screen(userSignUpStep1ViewModel: UserSignUpStep1ViewModel = h
                     supportText = userSignUpStep1ViewModel.textFieldUserJoinStep1IdErrorText,
                     isError = userSignUpStep1ViewModel.textFieldUserJoinStep1IdIsError,
                     isCheckValue = userSignUpStep1ViewModel.isCheckUserId,
+                    readOnly = userSignUpStep1ViewModel.textFieldUserJoinStep1IdReadOnly.value
 
                     )
 
@@ -61,7 +62,7 @@ fun UserSignUpStep1Screen(userSignUpStep1ViewModel: UserSignUpStep1ViewModel = h
                     text = "아이디 중복 확인",
                     paddingTop = 10.dp,
                     onClick = {
-                        userSignUpStep1ViewModel.buttonCheckUserIdOnClick()
+                        userSignUpStep1ViewModel.onClickButtonCheckUserId()
                     }
                 )
 
@@ -105,8 +106,9 @@ fun UserSignUpStep1Screen(userSignUpStep1ViewModel: UserSignUpStep1ViewModel = h
                     singleLine = true,
                     paddingTop = 10.dp,
                     inputType = LikeLionOutlinedTextFieldInputType.TEXT,
-                    supportText = userSignUpStep1ViewModel.textFieldUserJoinStep1Password2ErrorText,
-                    isError = userSignUpStep1ViewModel.textFieldUserJoinStep1Password2IsError,
+                    supportText = userSignUpStep1ViewModel.textFieldUserJoinStep1NickNameErrorText,
+                    isError = userSignUpStep1ViewModel.textFieldUserJoinStep1NickNameIsError,
+                    readOnly = userSignUpStep1ViewModel.textFieldUserJoinStep1NickNameReadOnly.value
                 )
 
 
@@ -115,7 +117,7 @@ fun UserSignUpStep1Screen(userSignUpStep1ViewModel: UserSignUpStep1ViewModel = h
                     text = "닉네임 중복 확인",
                     paddingTop = 10.dp,
                     onClick = {
-
+                        userSignUpStep1ViewModel.onClickButtonCheckUserNickName()
                     }
                 )
             }

@@ -61,7 +61,7 @@ fun ReviewLazyColumn(detailViewModel: DetailViewModel) {
         }
         item {
             Text(
-                text = "추천순 ▼",
+                text = "${detailViewModel.filterStateStringValue.value} ▼",
                 color = Color.Gray,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier

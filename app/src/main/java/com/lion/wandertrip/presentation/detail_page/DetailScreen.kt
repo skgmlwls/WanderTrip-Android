@@ -33,6 +33,8 @@ import com.lion.a02_boardcloneproject.component.CustomIconButton
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.wandertrip.R
 import com.lion.wandertrip.presentation.detail_page.components.BasicInfoDescriptionColumn
+import com.lion.wandertrip.presentation.detail_page.components.BottomSheetAddSchedule
+import com.lion.wandertrip.presentation.detail_page.components.BottomSheetReviewFilter
 import com.lion.wandertrip.presentation.detail_page.components.IndicatorButton
 import com.lion.wandertrip.presentation.detail_page.components.IntroColumn
 import com.lion.wandertrip.presentation.detail_page.components.ReviewLazyColumn
@@ -112,7 +114,7 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
                 }
             }
 
-
+            // 뷰페이저 항목
             if (detailViewModel.isClickIntroState.value)
                 item { IntroColumn(detailViewModel) }
             if (detailViewModel.isClickBasicInfoState.value)
@@ -137,65 +139,12 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
 
         // 리뷰 필터 BottomSheet가 표시될 때의 설정
         if (detailViewModel.isReviewOptionSheetOpen.value) {
-            ModalBottomSheet(
-                onDismissRequest = { detailViewModel.isReviewOptionSheetOpen.value = false }
-            ) {
-                Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
-                    Text(
-                        "정렬", modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 6.dp),
-                        fontFamily = CustomFont.customFontBold,
-                        fontSize = 24.sp
-                    )
-                    Text(
-                        "최신순", modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 6.dp)
-                            .clickable {
-                                detailViewModel.onClickTextRecentFilter()
-                                detailViewModel.isReviewOptionSheetOpen.value = false
-                            },
-                        fontFamily = CustomFont.customFontRegular,
-                        fontSize = 16.sp
-                    )
-                    Text(
-                        "별점 낮은순", modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 6.dp)
-                            .clickable {
-                                detailViewModel.onClickTextRatingAsc()
-                                detailViewModel.isReviewOptionSheetOpen.value = false
-                            },
-                        fontFamily = CustomFont.customFontRegular,
-                        fontSize = 16.sp
-                    )
-                    Text(
-                        "별점  높은순", modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 6.dp)
-                            .clickable {
-                                detailViewModel.onClickTextRatingDesc()
-                                detailViewModel.isReviewOptionSheetOpen.value = false
-                            },
-                        fontFamily = CustomFont.customFontRegular,
-                        fontSize = 16.sp
-                    )
-                }
-            }
+         BottomSheetReviewFilter(detailViewModel)
         }
 
         // 일정 추가 BottomSheet가 표시될 때의 설정
         if (detailViewModel.isAddScheduleSheetOpen.value) {
-            ModalBottomSheet(
-                onDismissRequest = { detailViewModel.isAddScheduleSheetOpen.value = false }
-            ) {
-                LazyColumn {
-                    item {
-                        Text("내 여행")
-                    }
-                }
-            }
+            BottomSheetAddSchedule(detailViewModel)
         }
 
     }
