@@ -64,10 +64,14 @@ class TripNoteDetailViewModel @Inject constructor(
     // 댓글 리스트
     var tripNoteReplyList = mutableStateListOf<TripNoteReplyModel>()
 
-
     val tripApplication = context as TripApplication
-
     val nickName = tripApplication.loginUserModel.userNickName
+
+    // 댓글 정보를 담을 변수
+    lateinit var tripNoteReplyModel : MutableList<TripNoteReplyModel>
+
+
+
 
 
     var tripNoteDetailList = mutableStateListOf<TripNoteModel>()
@@ -145,6 +149,7 @@ class TripNoteDetailViewModel @Inject constructor(
             val work1 = async(Dispatchers.IO) {
                 tripNoteService.addTripNoteReplyData(tripNoteReplyModel)
             }
+
         }
     }
 
@@ -155,16 +160,39 @@ class TripNoteDetailViewModel @Inject constructor(
             val work1 = async(Dispatchers.IO) {
                 tripNoteService.selectReplyDataOneById(documentId)
             }
-            val result = work1.await()
+            // val result = work1.await()
+            tripNoteReplyModel = work1.await()
             tripNoteReplyList.clear()
-            tripNoteReplyList.addAll(result)
+            tripNoteReplyList.addAll(tripNoteReplyModel)
+            // tripNoteReplyList.addAll(result)
+
         }
     }
 
-    // 댓글 삭제하기
-    fun deleteTripNoteReply(){
+    // 댓글 삭제하기 다이얼로그 확인 버튼 누르면,,
+    fun deleteTripNoteReply(tripNoteReplyDocId : String){
+        CoroutineScope(Dispatchers.Main).launch {
+
+            // 댓글을 삭제한다.
+            val work1 = async(Dispatchers.IO){
+                tripNoteService.deleteReplyData(tripNoteReplyDocId)
+            }
+            work1.join()
+        }
 
     }
+
+    // 뒤로 가기 버튼
+    fun navigationButtonClick(){
+        tripApplication.navHostController.popBackStack()
+    }
+
+    // 휴지통 아이콘 (여행기 삭제)
+    fun deleteButtonClick(){
+        // 삭제 그거 ... 다이얼로그 띄워
+
+    }
+
 
 
 
@@ -246,17 +274,6 @@ class TripNoteDetailViewModel @Inject constructor(
     }
 
 
-
-    // 뒤로 가기 버튼
-    fun navigationButtonClick(){
-        tripApplication.navHostController.popBackStack()
-    }
-
-    // 휴지통 아이콘
-    fun deleteButtonClick(){
-        // 삭제 그거 ... 다이얼로그 띄워
-
-    }
 
     // 일정 담기 아이콘
     fun bringTripNote(){
