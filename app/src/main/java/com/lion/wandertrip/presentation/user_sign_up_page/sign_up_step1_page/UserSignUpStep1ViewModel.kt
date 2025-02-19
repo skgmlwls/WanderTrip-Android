@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.lion.wandertrip.TripApplication
+import com.lion.wandertrip.model.UserModel
 import com.lion.wandertrip.service.UserService
 import com.lion.wandertrip.util.MainScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +22,10 @@ class UserSignUpStep1ViewModel @Inject constructor(
 ) : ViewModel() {
 
     val tripApplication = context as TripApplication
+    // 아이디 입렵란 readOnly상태
+    val textFieldUserJoinStep1IdReadOnly = mutableStateOf(false)
+    // 닉네임 입렵란 readOnly상태
+    val textFieldUserJoinStep1NickNameReadOnly = mutableStateOf(false)
 
     // 아이디
     val textFieldUserJoinStep1IdValue = mutableStateOf("")
@@ -35,13 +40,19 @@ class UserSignUpStep1ViewModel @Inject constructor(
     val textFieldUserJoinStep1IdErrorText = mutableStateOf("")
     val textFieldUserJoinStep1Password1ErrorText = mutableStateOf("")
     val textFieldUserJoinStep1Password2ErrorText = mutableStateOf("")
+    val textFieldUserJoinStep1NickNameErrorText = mutableStateOf("")
+
+
 
     val textFieldUserJoinStep1IdIsError = mutableStateOf(false)
     val textFieldUserJoinStep1Password1IsError = mutableStateOf(false)
     val textFieldUserJoinStep1Password2IsError = mutableStateOf(false)
+    val textFieldUserJoinStep1NickNameIsError = mutableStateOf(false)
 
     // 아이디 중복확인을 성공했는지
     var isCheckUserId = mutableStateOf(false)
+    // 닉네임 중복확인을 성공했는지
+    var isCheckUserNickName = mutableStateOf(false)
 
     // 네비게이션 아이콘을 누르면 호출되는 메서드
     fun navigationIconOnClick(){
@@ -51,12 +62,14 @@ class UserSignUpStep1ViewModel @Inject constructor(
     // 다음 버튼을 누르면 호출되는 메서드
     fun onClickButtonSignUp(){
         // 기본에 있는 에러 메시지는 모두 초기화
+        textFieldUserJoinStep1NickNameErrorText.value=""
         textFieldUserJoinStep1IdErrorText.value = ""
         textFieldUserJoinStep1Password1ErrorText.value = ""
         textFieldUserJoinStep1Password2ErrorText.value = ""
         textFieldUserJoinStep1IdIsError.value = false
         textFieldUserJoinStep1Password1IsError.value = false
         textFieldUserJoinStep1Password2IsError.value = false
+        textFieldUserJoinStep1NickNameIsError.value=false
 
         var isError = false
 
@@ -95,8 +108,28 @@ class UserSignUpStep1ViewModel @Inject constructor(
             isError = true
         }
 
+        if(!isCheckUserNickName.value){
+            textFieldUserJoinStep1NickNameErrorText.value = "아이디 중복 확인을 해주세요"
+            textFieldUserJoinStep1NickNameIsError.value = true
+            isError = true
+        }
+
         if(isError == false) {
             // TODO 유저 정보 등록
+            val userModel = UserModel(
+                userId = textFieldUserJoinStep1IdValue.value,
+                userNickName = textFieldUserJoinStep1NickNameValue.value,
+                userPw = textFieldUserJoinStep1Password1Value.value,
+            )
+
+            CoroutineScope(Dispatchers.Main).launch {
+                val work1 = async(Dispatchers.IO){
+                    userService.addUserData(userModel)
+                }
+                work1.join()
+            }
+
+
 
             // 닉네임 설정 화면으로 이동
             tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name)
@@ -104,7 +137,7 @@ class UserSignUpStep1ViewModel @Inject constructor(
     }
 
     // 아이디 중복확인을 누르면 호출되는 함수
-    fun buttonCheckUserIdOnClick(){
+    fun onClickButtonCheckUserId(){
         // 사용자가 입력한 아이디
         val userId = textFieldUserJoinStep1IdValue.value
 
@@ -120,7 +153,7 @@ class UserSignUpStep1ViewModel @Inject constructor(
                 userService.checkJoinUserId(userId)
             }
             isCheckUserId.value = work1.await()
-            
+            textFieldUserJoinStep1IdReadOnly.value=true
             if(isCheckUserId.value){
                 textFieldUserJoinStep1IdIsError.value = false
                 textFieldUserJoinStep1IdErrorText.value = "사용 가능한 아이디 입니다"
@@ -131,6 +164,36 @@ class UserSignUpStep1ViewModel @Inject constructor(
         }
         
     }
+
+    // 닉네임 중복확인을 누르면 호출되는 함수
+    fun onClickButtonCheckUserNickName(){
+        // 사용자가 입력한 아이디
+        val userNickName = textFieldUserJoinStep1NickNameValue.value
+
+        // 입력한 것이 없다면
+        if(userNickName.isEmpty()){
+            textFieldUserJoinStep1NickNameIsError.value = true
+            textFieldUserJoinStep1NickNameErrorText.value = "닉네임을 입력해주세요"
+            return
+        }
+        // 사용할 수 있는 닉네임인지 검사한다.
+        CoroutineScope(Dispatchers.Main).launch {
+            val work1 = async(Dispatchers.IO){
+                userService.checkJoinUserNickName(userNickName)
+            }
+            isCheckUserNickName.value = work1.await()
+            textFieldUserJoinStep1NickNameReadOnly.value=true
+            if(isCheckUserNickName.value){
+                textFieldUserJoinStep1NickNameIsError.value = false
+                textFieldUserJoinStep1NickNameErrorText.value = "사용 가능한 닉네임 입니다"
+            } else {
+                textFieldUserJoinStep1NickNameIsError.value = true
+                textFieldUserJoinStep1NickNameErrorText.value = "이미 존재하는 닉네임입니다."
+            }
+        }
+
+    }
+
 }
 
 
