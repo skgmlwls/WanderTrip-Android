@@ -18,12 +18,16 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.presentation.trip_note_other_schedule_page.TripNoteOtherScheduleViewModel
 import com.lion.wandertrip.ui.theme.NanumSquareRound
@@ -33,9 +37,9 @@ import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun TripNoteOtherScheduleItemList(
-    dataList: List<TripScheduleModel>,
+    dataList: SnapshotStateList<TripNoteModel?>,
     viewModel: TripNoteOtherScheduleViewModel = hiltViewModel(),
-    onRowClick: (TripScheduleModel) -> Unit = {}, // 클릭 이벤트 추가
+    onRowClick: (String?) -> Unit = {}, // 클릭 이벤트 추가
     modifier: Modifier = Modifier // modifier 파라미터 추가
 ) {
     LazyColumn(
@@ -44,6 +48,14 @@ fun TripNoteOtherScheduleItemList(
             //.padding(top = 10.dp),
     ) {
         items(dataList) { tripSchedule -> // 직접 데이터 항목을 사용하는 방식으로 변경
+
+
+            val tripScheduleA = tripSchedule?.tripScheduleDocumentId?.let { documentId ->
+                viewModel.getTripScheduleByDocumentId(documentId)
+            }
+
+
+
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -55,7 +67,13 @@ fun TripNoteOtherScheduleItemList(
                 Column( // 클릭 불필요 → 카드 내부에서만 클릭 감지
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onRowClick(tripSchedule) }, // 클릭 이벤트 적용
+                        .clickable {
+                            val position = dataList.indexOf(tripSchedule) // 클릭된 위치 확인
+                            if (position != -1) {
+                                val documentId = viewModel.tripNoteOtherScheduleDocIdList[position]
+                                onRowClick(documentId) // 클릭 이벤트 처리
+                            }
+                        }, // 클릭 이벤트 적용
                     horizontalAlignment = Alignment.Start // 내부 정렬
                 ) {
                     Row(
@@ -64,12 +82,14 @@ fun TripNoteOtherScheduleItemList(
                             .padding(15.dp), // Row padding
                     ) {
                         // 일정 제목
-                        Text(
-                            text = tripSchedule.scheduleTitle,
-                            fontFamily = NanumSquareRound,
-                            fontSize = 20.sp,
-                            modifier = Modifier.weight(1f) // 제목 부분 확장
-                        )
+                        if (tripSchedule != null) {
+                            Text(
+                                text = tripSchedule.tripNoteTitle,
+                                fontFamily = NanumSquareRound,
+                                fontSize = 20.sp,
+                                modifier = Modifier.weight(1f) // 제목 부분 확장
+                            )
+                        }
 
                     }
 
@@ -88,24 +108,28 @@ fun TripNoteOtherScheduleItemList(
                         )
 
                         // 일정 지역
-                        Text(
-                            text = tripSchedule.scheduleCity,
-                            fontFamily = NanumSquareRoundRegular,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(end = 10.dp)
-                        )
+                        if (tripScheduleA != null) {
+                            Text(
+                                text = tripScheduleA.scheduleCity,
+                                fontFamily = NanumSquareRoundRegular,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(end = 10.dp)
+                            )
+                        }
 
                         // 일정 날짜
-                        Text(
-                            text = "${viewModel.formatTimestampToDateString(tripSchedule.scheduleStartDate)} " +
-                                    "~" +
-                                    " ${viewModel.formatTimestampToDateString(tripSchedule.scheduleEndDate)}",
-                            fontFamily = NanumSquareRoundRegular,
-                            fontSize = 12.sp,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(end = 10.dp)
-                        )
+                        if (tripScheduleA != null) {
+                            Text(
+                                text = "${viewModel.formatTimestampToDateString(tripScheduleA.scheduleStartDate)} " +
+                                        "~" +
+                                        " ${viewModel.formatTimestampToDateString(tripScheduleA.scheduleEndDate)}",
+                                fontFamily = NanumSquareRoundRegular,
+                                fontSize = 12.sp,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(end = 10.dp)
+                            )
+                        }
                     }
                 }
             }

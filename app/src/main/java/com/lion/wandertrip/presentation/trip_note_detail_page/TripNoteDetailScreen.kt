@@ -90,6 +90,9 @@ fun TripNoteDetailScreen(
     // 닉네임 가져오기
     tripNoteDetailViewModel.nickName
 
+    // 휴지통 다이얼로그 상태값
+    var showDeleteDialogState by remember { mutableStateOf(false) }
+
 
 
     // tripNoteDetailList를 ViewModel에서 가져옵니다.
@@ -138,7 +141,8 @@ fun TripNoteDetailScreen(
                         if(tripNoteDetailViewModel.showTopAppBarDeleteMenuState.value) {
                             // 휴지통 아이콘 (오른쪽 상단에 배치)
                             IconButton(
-                                onClick = { tripNoteDetailViewModel.deleteButtonClick() },
+                                onClick = {
+                                    showDeleteDialogState = true },
                                 modifier = Modifier.padding(start = 20.dp)
                             ) {
                                 Icon(
@@ -148,6 +152,42 @@ fun TripNoteDetailScreen(
                                 )
                             }
                         }
+
+
+                        // 삭제 확인 다이얼로그
+                        if (showDeleteDialogState) {
+                            AlertDialog(
+                                onDismissRequest = {
+                                    // 다이얼로그 닫기
+                                    showDeleteDialogState = false
+                                },
+                                title = {
+                                    Text(text = "삭제 확인")
+                                },
+                                text = {
+                                    Text(text = "정말로 삭제하시겠습니까?")
+                                },
+                                confirmButton = {
+                                    TextButton(onClick = {
+                                        // 삭제 버튼 클릭
+                                        tripNoteDetailViewModel.deleteButtonClick(documentId)
+                                        // 다이얼로그 닫기
+                                        showDeleteDialogState = false
+                                    }) {
+                                        Text(text = "확인")
+                                    }
+                                },
+                                dismissButton = {
+                                    TextButton(onClick = {
+                                        // 다이얼로그 닫기
+                                        showDeleteDialogState = false
+                                    }) {
+                                        Text(text = "취소")
+                                    }
+                                }
+                            )
+                        }
+
 
                         // 다운로드 아이콘 (오른쪽 상단에 배치)
                         IconButton(

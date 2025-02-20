@@ -95,13 +95,6 @@ fun MyApp() {
         composable(MainScreenName.MAIN_SCREEN_SEARCH.name) { SearchScreen() }
         composable(MainScreenName.MAIN_SCREEN_USER_INFO.name) {UserInfoScreen()}
 
-//        // 여행기 메인 화면
-//        composable(
-//            route = "${BotNavScreenName.BOT_NAV_SCREEN_TRIP_NOTE.name}/{documentId}"
-//        ){
-//            val documentId = it.arguments?.getString("documentId") ?:  ""
-//            TripNoteScreen(documentId = documentId)
-//        }
 
         composable(BotNavScreenName.BOT_NAV_SCREEN_TRIP_NOTE.name) { TripNoteScreen() }
 
@@ -116,17 +109,27 @@ fun MyApp() {
 
         // 여행기 작성 화면
         composable(
-            route = "${TripNoteScreenName.TRIP_NOTE_WRITE.name}/{scheduleTitle}"
+            route = "${TripNoteScreenName.TRIP_NOTE_WRITE.name}/{scheduleTitle}/{scheduleDocId}"
         ){
             val scheduleTitle = it.arguments?.getString("scheduleTitle") ?:  ""
-            TripNoteWriteScreen(scheduleTitle = scheduleTitle)
+            val scheduleDocId = it.arguments?.getString("scheduleDocId") ?: ""
+            TripNoteWriteScreen(tripScheduleTitle = scheduleTitle, scheduleDocId = scheduleDocId)
         }
 
         // 여행기 페이지에서 다른 사람 여행기 보기
-        composable(TripNoteScreenName.TRIP_NOTE_OTHER_SCHEDULE.name) { TripNoteOtherScheduleScreen() }
+        // composable(TripNoteScreenName.TRIP_NOTE_OTHER_SCHEDULE.name) { TripNoteOtherScheduleScreen() }
+        composable(
+            route = "${TripNoteScreenName.TRIP_NOTE_OTHER_SCHEDULE.name}/{otherNickName}"
+        ){
+            val otherNickName = it.arguments?.getString("otherNickName") ?:  ""
+            TripNoteOtherScheduleScreen(otherNickName = otherNickName)
+        }
+
+        // 여행기에서 다른 사람 일정 다운
         composable(TripNoteScreenName.TRIP_NOTE_SELECT_DOWN.name) { TripNoteSelectDownScreen() }
 
 
+        // 여행기에서 일정 가져오기
         composable(TripNoteScreenName.TRIP_NOTE_SCHEDULE.name) { TripNoteScheduleScreen() }
 
 
