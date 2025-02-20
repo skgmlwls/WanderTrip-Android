@@ -120,4 +120,13 @@ class TripNoteRepository@Inject constructor() {
         val imageUri = childStorageReference.downloadUrl.await()
         return imageUri
     }
+
+    // 서버에서 댓글을 삭제한다.
+    suspend fun deleteReplyData(documentId:String){
+        val firestore = FirebaseFirestore.getInstance()
+        val collectionReference = firestore.collection("TripNoteReplyData")
+        val documentReference = collectionReference.document(documentId)
+        documentReference.delete().await()
+    }
+
 }

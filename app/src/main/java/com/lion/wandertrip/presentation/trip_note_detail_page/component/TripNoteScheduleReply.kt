@@ -52,7 +52,9 @@ import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 @Composable
 fun TripNoteScheduleReply(
     tripNoteReply: TripNoteReplyModel,
-    loginNickName : String
+    loginNickName : String,
+    tripNoteDetailViewModel : TripNoteDetailViewModel,
+    documentId : String
 ) {
     var showDialog by remember { mutableStateOf(false) }
 
@@ -98,8 +100,8 @@ fun TripNoteScheduleReply(
             confirmButton = {
                 TextButton(onClick = {
                     // 삭제 메서드 호출
-
-
+                    tripNoteDetailViewModel.deleteTripNoteReply(tripNoteReply.tripNoteReplyDocId)
+                    tripNoteDetailViewModel.gettingTripNoteReplyData(documentId = documentId)
                     showDialog = false
                 }) {
                     Text(text = "삭제")

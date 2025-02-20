@@ -334,7 +334,9 @@ fun TripNoteDetailScreen(
                 items(tripNoteDetailViewModel.tripNoteReplyList) { tripNoteReply ->
                     TripNoteScheduleReply(
                         tripNoteReply = tripNoteReply,
-                        loginNickName = tripNoteDetailViewModel.nickName
+                        loginNickName = tripNoteDetailViewModel.nickName,
+                        tripNoteDetailViewModel = tripNoteDetailViewModel,
+                        documentId = documentId
                     )
                 }
 
