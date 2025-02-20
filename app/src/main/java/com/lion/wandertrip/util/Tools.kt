@@ -107,7 +107,7 @@ class Tools {
             val file = File(picPath)
 
             // 사진이 저장될 위치를 관리하는 Uri 객체를 생성ㅎ
-            val contentUri = FileProvider.getUriForFile(context, "com.lion.a02_boardcloneproject.camera", file)
+            val contentUri = FileProvider.getUriForFile(context, "com.lion.wandertrip.camera", file)
             return contentUri
         }
 

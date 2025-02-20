@@ -1,6 +1,5 @@
 package com.lion.wandertrip.presentation.bottom.my_info_page.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bookmark
@@ -25,26 +24,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lion.wandertrip.R
 import com.lion.wandertrip.presentation.bottom.my_info_page.MyInfoViewModel
 import com.lion.wandertrip.util.CustomFont
+import com.skydoves.landscapist.CircularReveal
+import com.skydoves.landscapist.glide.GlideImage
 
 
 @Composable
-fun ProfileCard(
+fun ProfileCardBasicImage(
     userNickName: String,
-    profileImage: Painter?,
-    viewModel : MyInfoViewModel
+    viewModel: MyInfoViewModel
 ) {
-
-    val defaultImage = painterResource(id = R.drawable.img_basic_profile_image) // 기본 프로필 이미지 설정
-    val profilePainter = profileImage ?: defaultImage  // NULL 체크 후 기본 이미지 사용
-
     // 카드뷰
     Card(
         modifier = Modifier
@@ -93,46 +91,40 @@ fun ProfileCard(
 
                     }
                 }
-
                 // 프로필 이미지 (우측 상단)
-                Image(
-                    painter = profilePainter,
-                    contentDescription = "프로필 이미지",
+                GlideImage(
+                    imageModel = R.drawable.img_basic_profile_image,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(60.dp)
-                        .clip(CircleShape)
-
+                        .width(60.dp)
+                        .height(60.dp)
+                        .clip(RoundedCornerShape(8.dp)),  // 이미지 둥글게 만들기
+                    circularReveal = CircularReveal(duration = 250),
+                    placeHolder = ImageBitmap.imageResource(R.drawable.img_image_holder),
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+        }
 
-            // 아이콘 + 텍스트 Row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ColumnIconAndText(Icons.Default.FlightTakeoff, "내 여행", {viewModel.onClickIconMyTrip()})
-                ColumnIconAndText(Icons.Default.Bookmark, "내 저장", {viewModel.onClickIconMyInteresting()})
-                ColumnIconAndText(Icons.Default.Star, "내 리뷰",{viewModel.onClickIconMyReview()})
-                ColumnIconAndText(Icons.Default.Edit, "내 여행기",{viewModel.onClickIconTripNote()})
-            }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // 아이콘 + 텍스트 Row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ColumnIconAndText(
+                Icons.Default.FlightTakeoff,
+                "내 여행",
+                { viewModel.onClickIconMyTrip() })
+            ColumnIconAndText(
+                Icons.Default.Bookmark,
+                "내 저장",
+                { viewModel.onClickIconMyInteresting() })
+            ColumnIconAndText(Icons.Default.Star, "내 리뷰", { viewModel.onClickIconMyReview() })
+            ColumnIconAndText(Icons.Default.Edit, "내 여행기", { viewModel.onClickIconTripNote() })
         }
     }
 }
 
-@Composable
-fun ColumnIconAndText(icon: ImageVector, text: String, onClick: () -> Unit = {}  ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable {
-            onClick()
-        }
-    ) {
-        Icon(imageVector = icon, contentDescription = text, modifier = Modifier.size(24.dp))
-        Text(
-            text, fontSize = 12.sp, fontFamily = CustomFont.customFontBold
-        )
-    }
-}

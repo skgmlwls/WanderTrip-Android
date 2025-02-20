@@ -71,7 +71,6 @@ class UserLoginViewModel @Inject constructor(
     fun buttonUserLoginOnClick(){
         Log.d("test100","클릭")
         tripApplication.navHostController.popBackStack(MainScreenName.MAIN_SCREEN_USER_LOGIN.name, true)
-        tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name)
 
         if(textFieldUserLoginIdValue.value.isEmpty()){
             alertDialogUserIdState.value = true
@@ -105,6 +104,7 @@ class UserLoginViewModel @Inject constructor(
                 LoginResult.LOGIN_RESULT_SIGN_OUT_MEMBER -> {
                     alertDialogLoginFail3State.value = true
                 }
+                // 로그인 성공시
                 LoginResult.LOGIN_RESULT_SUCCESS -> {
                     // 로그인한 사용자 정보를 가져온다.
                     val work2 = async(Dispatchers.IO){
@@ -125,8 +125,9 @@ class UserLoginViewModel @Inject constructor(
                     // Application 객체에 로그인한 사용자의 정보를 담고 게시판 메인 화면으로 이동한다.
                     tripApplication.loginUserModel = loginUserModel
 
+
                     tripApplication.navHostController.popBackStack(MainScreenName.MAIN_SCREEN_USER_LOGIN.name, true)
-                    tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name)
+                    tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name)
                 }
             }
         }

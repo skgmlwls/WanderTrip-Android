@@ -78,16 +78,19 @@ fun MyApp() {
 
     NavHost(
         navController = rememberNavHostController,
-        startDestination = "${MainScreenName.MAIN_SCREEN_START.name}"
-//        startDestination = "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
-//                "tripScheduleDocId=jgbGuyxXMAj8nvChmAyN&areaName=서울&areaCode=1"
+        startDestination = MainScreenName.MAIN_SCREEN_START.name
     ) {
         composable(MainScreenName.MAIN_SCREEN_START.name) { StartScreen() }
         // 일정 메인 화면
         composable(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) { UserLoginScreen() }
         composable(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) { MainScreen() }
         composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP1.name) { UserSignUpStep1Screen() }
-        composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name) { UserSignUpStep2Screen() }
+        composable(
+            route = "${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name}/{userDocId}"
+        ) { backStackEntry ->
+            val userDocId = backStackEntry.arguments?.getString("userDocId") ?: ""
+            UserSignUpStep2Screen(userDocId = userDocId)
+        }
         composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name) { UserSignUpStep1Screen() }
         composable(MainScreenName.MAIN_SCREEN_SEARCH.name) { SearchScreen() }
         composable(MainScreenName.MAIN_SCREEN_USER_INFO.name) {UserInfoScreen()}

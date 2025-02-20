@@ -60,6 +60,7 @@ class UserSignUpStep1ViewModel @Inject constructor(
     }
 
     // 다음 버튼을 누르면 호출되는 메서드
+    // 회원가입 메서드
     fun onClickButtonSignUp(){
         // 기본에 있는 에러 메시지는 모두 초기화
         textFieldUserJoinStep1NickNameErrorText.value=""
@@ -123,13 +124,19 @@ class UserSignUpStep1ViewModel @Inject constructor(
             )
 
             CoroutineScope(Dispatchers.Main).launch {
-                val work1 = async(Dispatchers.IO){
+                // 비동기 작업으로 유저 정보 추가 후 userDocId 받아오기
+                val work1 = async(Dispatchers.IO) {
                     userService.addUserData(userModel)
                 }
+
+                // userDocId 값을 받음
                 val userDocId = work1.await()
+                // 어플리케이션에 userModel 저장
+                tripApplication.loginUserModel = userModel
+
+                // 닉네임 설정 화면으로 이동, userDocId 값을 경로에 포함시켜 전달
+                tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name}/$userDocId")
             }
-            // 닉네임 설정 화면으로 이동
-            tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name)
         }
     }
 
@@ -179,10 +186,10 @@ class UserSignUpStep1ViewModel @Inject constructor(
                 userService.checkJoinUserNickName(userNickName)
             }
             isCheckUserNickName.value = work1.await()
-            textFieldUserJoinStep1NickNameReadOnly.value=true
             if(isCheckUserNickName.value){
                 textFieldUserJoinStep1NickNameIsError.value = false
                 textFieldUserJoinStep1NickNameErrorText.value = "사용 가능한 닉네임 입니다"
+                textFieldUserJoinStep1NickNameReadOnly.value=true
             } else {
                 textFieldUserJoinStep1NickNameIsError.value = true
                 textFieldUserJoinStep1NickNameErrorText.value = "이미 존재하는 닉네임입니다."

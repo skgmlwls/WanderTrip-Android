@@ -1,13 +1,20 @@
 package com.lion.wandertrip.presentation.bottom.my_info_page
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.lion.wandertrip.TripApplication
+import com.lion.wandertrip.model.UserModel
 import com.lion.wandertrip.service.UserService
 import com.lion.wandertrip.util.MainScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -16,7 +23,14 @@ class MyInfoViewModel @Inject constructor(
     val userService: UserService,
 ) : ViewModel(){
 
+    // userModelState
+    val userModel = UserModel()
+    val userModelValue = mutableStateOf(userModel)
+    // context
     val tripApplication = context as TripApplication
+
+    // 보여줄 이미지의 Uri
+    val showImageUri = mutableStateOf<Uri?>(null)
 
     // 프로필 편집
     fun onClickTextUserInfoModify() {
@@ -50,6 +64,22 @@ class MyInfoViewModel @Inject constructor(
     // 최근 게시물 클릭 리스너
     fun onClickCardRecentContent(contentId: String) {
         tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_DETAIL.name}/$contentId")
+    }
+
+    // userModel 가져오기
+    fun gettingUserModel() {
+        CoroutineScope(Dispatchers.Main).launch {
+            val work1= async(Dispatchers.IO){
+                userService.getUserByUserDocId(tripApplication.loginUserModel.userDocId)
+            }
+            userModelValue.value = work1.await()
+            if(userModelValue.value.userProfileImageURL !=""){
+                val work2 = async(Dispatchers.IO){
+                    userService.gettingImage(userModelValue.value.userProfileImageURL)
+                }
+                showImageUri.value = work2.await()
+            }
+        }
     }
 
 
