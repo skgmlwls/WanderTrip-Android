@@ -9,6 +9,7 @@ import com.lion.wandertrip.vo.ScheduleItemVO
 import com.lion.wandertrip.vo.TripItemVO
 import com.lion.wandertrip.vo.TripScheduleVO
 import kotlinx.coroutines.tasks.await
+import kotlinx.serialization.json.Json
 
 class TripScheduleRepository {
 
@@ -84,9 +85,9 @@ class TripScheduleRepository {
             // ✅ Firestore에 저장
             newItemRef.set(scheduleItemVO).await()
 
-            println("✅ 새로운 여행지 추가 완료: ${scheduleItemVO.itemTitle} (index: $newItemIndex)")
+            println("새로운 여행지 추가 완료: ${scheduleItemVO.itemTitle} (index: $newItemIndex)")
         } catch (e: Exception) {
-            println("❌ Firestore 추가 실패: ${e.message}")
+            println("Firestore 추가 실패: ${e.message}")
         }
     }
 
@@ -118,7 +119,7 @@ class TripScheduleRepository {
             Log.d("APIResponseRaw", "Response: $rawResponse")
 
             // JSON 파싱
-            val apiResponse = RetrofitClient.gson.fromJson(rawResponse, ApiResponse::class.java)
+            val apiResponse = Json.decodeFromString<ApiResponse>(rawResponse)
             val items = apiResponse.response.body?.items?.item ?: emptyList()
 
             // ✅ 변환을 TripItemVO 내부에서 처리

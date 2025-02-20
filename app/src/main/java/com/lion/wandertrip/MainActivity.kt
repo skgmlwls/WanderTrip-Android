@@ -33,6 +33,8 @@ import com.lion.wandertrip.presentation.schedule_city_select.city_roulette.roule
 import com.lion.wandertrip.presentation.schedule_detail_friends.ScheduleDetailFriendsScreen
 import com.lion.wandertrip.presentation.schedule_detail_page.ScheduleDetailScreen
 import com.lion.wandertrip.presentation.schedule_select_item.ScheduleSelectItemScreen
+import com.lion.wandertrip.presentation.schedule_select_item.roulette_item.RouletteItemScreen
+import com.lion.wandertrip.presentation.schedule_select_item.roulette_item.roulette_item_select.RouletteItemSelectScreen
 import com.lion.wandertrip.presentation.search_page.SearchScreen
 import com.lion.wandertrip.presentation.start_page.StartScreen
 import com.lion.wandertrip.presentation.trip_note_other_schedule_page.TripNoteOtherScheduleScreen
@@ -78,7 +80,8 @@ fun MyApp() {
 
     NavHost(
         navController = rememberNavHostController,
-        startDestination = MainScreenName.MAIN_SCREEN_START.name
+        startDestination = "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
+                "tripScheduleDocId=jgbGuyxXMAj8nvChmAyN&areaName=서울&areaCode=1"
     ) {
         composable(MainScreenName.MAIN_SCREEN_START.name) { StartScreen() }
         // 일정 메인 화면
@@ -249,6 +252,12 @@ fun MyApp() {
 
         // 룰렛 도시 항목 추가 화면
         composable(RouletteScreenName.ROULETTE_CITY_SELECT_SCREEN.name) { RouletteCitySelectScreen(navController = rememberNavHostController) }
+
+        // 룰렛 일정 화면
+        composable(RouletteScreenName.ROULETTE_ITEM_SCREEN.name) { RouletteItemScreen(navController = rememberNavHostController) }
+
+        // 룰렛 일정 항목 선택 화면
+        composable(RouletteScreenName.ROULETTE_ITEM_SELECT_SCREEN.name) { RouletteItemSelectScreen(navController = rememberNavHostController) }
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         // 리뷰 작성 화면
