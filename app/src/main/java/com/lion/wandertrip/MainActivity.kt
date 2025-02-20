@@ -78,8 +78,9 @@ fun MyApp() {
 
     NavHost(
         navController = rememberNavHostController,
-        startDestination = "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
-                "tripScheduleDocId=jgbGuyxXMAj8nvChmAyN&areaName=서울&areaCode=1"
+        startDestination = BotNavScreenName.BOT_NAV_SCREEN_HOME.name
+//        startDestination = "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
+//                "tripScheduleDocId=jgbGuyxXMAj8nvChmAyN&areaName=서울&areaCode=1"
     ) {
         composable(MainScreenName.MAIN_SCREEN_START.name) { StartScreen() }
         // 일정 메인 화면
@@ -189,17 +190,21 @@ fun MyApp() {
         // 일정 항목 선택 화면
         composable(
             route = "${ScheduleScreenName.SCHEDULE_SELECT_ITEM_SCREEN.name}?" +
-                    "areaName={areaName}&areaCode={areaCode}&itemCode={itemCode}",
+                    "itemCode={itemCode}&areaName={areaName}&areaCode={areaCode}&scheduleDate={scheduleDate}&tripScheduleDocId={tripScheduleDocId}",
             arguments = listOf(
                 navArgument("itemCode") { type = NavType.IntType },
                 navArgument("areaName") { type = NavType.StringType },
-                navArgument("areaCode") { type = NavType.IntType }
+                navArgument("areaCode") { type = NavType.IntType },
+                navArgument("scheduleDate") { type = NavType.LongType },
+                navArgument("tripScheduleDocId") { type = NavType.StringType },
             )
         ) {
             val areaName = it.arguments?.getString("areaName") ?: ""
             val areaCode = it.arguments?.getInt("areaCode") ?: 0
             val itemCode = it.arguments?.getInt("itemCode") ?: 0
-            ScheduleSelectItemScreen(itemCode, areaName, areaCode)
+            val scheduleDate = it.arguments?.getLong("scheduleDate") ?: 0
+            val tripScheduleDocId = it.arguments?.getString("tripScheduleDocId") ?: ""
+            ScheduleSelectItemScreen(itemCode, areaName, areaCode, scheduleDate, tripScheduleDocId)
         }
 
         // 일정 초대한 친구 목록 화면

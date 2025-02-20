@@ -1,10 +1,12 @@
 package com.lion.wandertrip.service
 
 import android.util.Log
+import com.google.firebase.Timestamp
 import com.lion.wandertrip.model.ScheduleItem
 import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.repository.TripScheduleRepository
+import com.lion.wandertrip.vo.ScheduleItemVO
 
 class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
 
@@ -34,6 +36,15 @@ class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
         return itemVOList.map { it.toScheduleItemModel() }
     }
 
+    // 일정에 여행지 항목 추가
+    suspend fun addTripItemToSchedule(docId: String, scheduleDate: Timestamp, scheduleItem: ScheduleItem) {
+        val scheduleItemVO = scheduleItem.toScheduleItemVO()
+        tripScheduleRepository.addTripItemToSchedule(docId, scheduleDate, scheduleItemVO)
+    }
+
+
+    // 공공 데이터 관련 ///////////////////////////////////////////////////////////////////////////////
+
     // API 호출 및 데이터 로드
     suspend fun loadTripItems(serviceKey: String, areaCode: String, contentTypeId: String) : List<TripItemModel>? {
         val tripItemVOList = tripScheduleRepository.loadTripItems(serviceKey, areaCode, contentTypeId)
@@ -42,5 +53,6 @@ class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
         return tripItemModelList
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
 }

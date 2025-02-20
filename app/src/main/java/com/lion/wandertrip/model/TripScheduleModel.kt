@@ -38,7 +38,6 @@ class TripScheduleModel(
 
 class ScheduleItem(
     // 서브컬렉션으로 할거면, var tripScheduleDocId: String = "",  이 필요함 인덱스 조절할때나, 삭제할때 필요함
-
     var itemDocId: String = "",                          // 문서 ID
     var itemDate: Timestamp = Timestamp.now(),           // 일정 날짜
     var itemIndex: Int = 0,                             // 순서값
@@ -48,7 +47,8 @@ class ScheduleItem(
     var itemLatitude: Double = 0.0,                     // 위도(Y)
     var itemImagesURL: List<String> = emptyList(),       // 아이템 이미지 URL 리스트
     var itemReviewText: String = "",                     // 후기 내용
-    var itemReviewImagesURL: List<String> = emptyList() // 후기 이미지 리스트
+    var itemReviewImagesURL: List<String> = emptyList(), // 후기 이미지 리스트
+    var itemContentId: String = "",                         // 콘텐츠 ID
 ) {
     fun toScheduleItemVO(): ScheduleItemVO {
         val scheduleItemVO = ScheduleItemVO()
@@ -62,6 +62,7 @@ class ScheduleItem(
         scheduleItemVO.itemImagesURL = itemImagesURL
         scheduleItemVO.itemReviewText = itemReviewText
         scheduleItemVO.itemReviewImagesURL = itemReviewImagesURL
+        scheduleItemVO.itemContentId = itemContentId
         return scheduleItemVO
     }
 }
