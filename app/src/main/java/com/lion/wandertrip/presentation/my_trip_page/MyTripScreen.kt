@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.my_trip_page
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,6 +17,7 @@ import com.lion.wandertrip.presentation.my_trip_page.components.VerticalTripItem
 
 @Composable
 fun MyTripScreen(myTripViewModel: MyTripViewModel = hiltViewModel()) {
+    Log.d("test100","MyTripScreen")
     myTripViewModel.getTripList()
     Scaffold(
         topBar = {

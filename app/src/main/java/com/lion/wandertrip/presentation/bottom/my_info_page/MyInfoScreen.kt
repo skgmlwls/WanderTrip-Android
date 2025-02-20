@@ -18,14 +18,13 @@ import com.lion.wandertrip.presentation.bottom.my_info_page.components.Horizonta
 import com.lion.wandertrip.presentation.bottom.my_info_page.components.ProfileCardBasicImage
 import com.lion.wandertrip.presentation.bottom.my_info_page.components.ProfileCardHasProfileImage
 import com.lion.wandertrip.presentation.bottom.my_info_page.used_dummy_data.RecentPostsDummyData
-import com.lion.wandertrip.presentation.bottom.my_info_page.used_dummy_data.ScheduleDummyData
 
 @Composable
 fun MyInfoScreen(myInfoViewModel: MyInfoViewModel = hiltViewModel()) {
     LaunchedEffect (Unit){
         myInfoViewModel.gettingUserModel()
         // 화면 열때 리스트 가져오기
-        myInfoViewModel.getTripList()
+        myInfoViewModel.getTripScheduleList()
     }
     val userModel = myInfoViewModel.userModelValue.value
     Scaffold { paddingValues ->

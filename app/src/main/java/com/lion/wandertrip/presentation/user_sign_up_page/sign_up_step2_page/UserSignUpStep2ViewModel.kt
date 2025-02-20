@@ -2,6 +2,7 @@ package com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step2_page
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.lion.wandertrip.TripApplication
