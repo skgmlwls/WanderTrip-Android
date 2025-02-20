@@ -14,6 +14,8 @@ class UserVO {
     var rouletteAgainCnt: Int = 0
     var userTimeStamp: Timestamp = Timestamp.now()
     var userState: Int = 1
+    var userKakaoToken : String = ""
+
 
     fun toUserModel(): UserModel {
         val userModel = UserModel()
@@ -27,6 +29,7 @@ class UserVO {
         userModel.rouletteAgainCnt = rouletteAgainCnt
         userModel.userTimeStamp = userTimeStamp
         userModel.userState = userState
+        userModel.userKakaoToken = userKakaoToken
         return userModel
     }
 }

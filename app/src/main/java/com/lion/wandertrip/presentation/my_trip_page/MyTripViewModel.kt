@@ -6,19 +6,25 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.presentation.my_trip_page.used_dummy_data.ComeAndPastScheduleDummyData
+import com.lion.wandertrip.service.TripScheduleService
 import com.lion.wandertrip.service.UserService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MyTripViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    val userService: UserService
+    val userService: UserService,
+    val tripScheduleService: TripScheduleService,
 ):ViewModel(){
     // 현재 날짜 가져오기
     val currentDate = Timestamp.now()
@@ -32,10 +38,19 @@ class MyTripViewModel @Inject constructor(
     val menuStateMap = mutableStateMapOf<Int,Boolean>()
     // 화면 열때 리스트 가져오기
     fun getTripList() {
-        tripList.addAll(ComeAndPastScheduleDummyData.scheduleDummyDataList)
-        getUpComingList()
-        getPastList()
-        addMap()
+
+        viewModelScope.launch {
+            val work1 = async(Dispatchers.IO){
+                tripScheduleService.gettingMyTripSchedules(tripApplication.loginUserModel.userId)
+            }
+            val result = work1.await()
+            tripList.addAll(result)
+            getUpComingList()
+            getPastList()
+            addMap()
+
+        }
+
     }
     // 리스트 길이로 맵을 초기화
     fun addMap() {
