@@ -12,6 +12,7 @@ import com.lion.wandertrip.model.ScheduleItem
 import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.service.TripScheduleService
 import com.lion.wandertrip.util.ContentTypeId
+import com.lion.wandertrip.util.RouletteScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -50,11 +51,9 @@ class ScheduleSelectItemViewModel @Inject constructor(
             if (tripItems != null) {
                 tripItemList.addAll(tripItems)
             }
-
-            tripItemList.forEach {
-                Log.d("ScheduleSelectItemViewModel", "loadTripItems: ${it.cat1}")
-            }
-
+//            tripItemList.forEach {
+//                Log.d("ScheduleSelectItemViewModel", "loadTripItems: ${it.cat1}")
+//            }
             Log.d("ScheduleSelectItemViewModel", "loadTripItems: ${tripItemList.size}")
         }
     }
@@ -84,6 +83,9 @@ class ScheduleSelectItemViewModel @Inject constructor(
         }
     }
 
+    fun moveToRouletteItemScreen() {
+        application.navHostController.navigate(RouletteScreenName.ROULETTE_ITEM_SCREEN.name)
+    }
 
 
 
