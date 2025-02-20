@@ -30,4 +30,18 @@ fun StartScreen(startViewModel: StartViewModel = hiltViewModel()){
             }
         }
     }
+
+    if(startViewModel.showKakaoLoginMessageState.value) {
+        Scaffold {
+            Row(
+                modifier = Modifier.fillMaxSize().padding(it).padding(start = 10.dp, end = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "카카오 로그인 중입니다",
+                )
+            }
+        }
+    }
 }

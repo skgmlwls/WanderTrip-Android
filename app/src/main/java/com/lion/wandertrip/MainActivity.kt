@@ -2,6 +2,7 @@ package com.lion.wandertrip
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -42,6 +43,7 @@ import com.lion.wandertrip.presentation.user_info_page.UserInfoScreen
 import com.lion.wandertrip.presentation.user_login_page.UserLoginScreen
 import com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step1_page.UserSignUpStep1Screen
 import com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step2_page.UserSignUpStep2Screen
+import com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step3_page.UserSignUpStep3Screen
 import com.lion.wandertrip.ui.theme.WanderTripTheme
 import com.lion.wandertrip.util.BotNavScreenName
 import com.lion.wandertrip.util.MainScreenName
@@ -86,12 +88,20 @@ fun MyApp() {
         composable(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) { MainScreen() }
         composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP1.name) { UserSignUpStep1Screen() }
         composable(
-            route = "${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name}/{userDocId}"
+            route = "${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name}/{userDocId}/{fromWhere}"
         ) { backStackEntry ->
             val userDocId = backStackEntry.arguments?.getString("userDocId") ?: ""
-            UserSignUpStep2Screen(userDocId = userDocId)
+            val fromWhere = backStackEntry.arguments?.getString("fromWhere") ?: ""
+            UserSignUpStep2Screen(userDocId = userDocId, fromWhere = fromWhere)
         }
-        composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name) { UserSignUpStep1Screen() }
+
+        // 카카오 가입
+        composable("${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name}/{kakaoToken}") {
+                backStackEntry ->
+            val kakaoToken = backStackEntry.arguments?.getString("kakaoToken")?:""
+            UserSignUpStep3Screen(kakaoToken = kakaoToken)
+        }
+
         composable(MainScreenName.MAIN_SCREEN_SEARCH.name) { SearchScreen() }
         composable(MainScreenName.MAIN_SCREEN_USER_INFO.name) {UserInfoScreen()}
 

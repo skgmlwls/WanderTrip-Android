@@ -111,6 +111,13 @@ class UserService (val userRepository: UserRepository) {
         }
     }
 
+    // 카카오 로그인 토큰 값으로 사용자 정보를 가져오는 메서드
+    suspend fun selectUserDataByKakaoLoginToken(kToken:String) : UserModel?{
+        val userVO = userRepository.selectUserDataByKakaoLoginToken(kToken)
+
+        return userVO?.toUserModel()
+    }
+
     // 사용자 데이터를 수정한다.
     suspend fun updateUserData(userModel: UserModel){
         val userVO = userModel.toUserVO()

@@ -38,7 +38,7 @@ class UserSignUpStep2ViewModel @Inject constructor(
    lateinit var userModel :UserModel
 
     // 체크 아이콘 누를 때 리스너
-    fun onClickIconCheck() {
+    fun onClickIconCheck(fromWhere:String) {
         CoroutineScope(Dispatchers.Main).launch {
             // 서버상에서의 파일 이름
             userModel.userProfileImageURL = "image_${System.currentTimeMillis()}.jpg"
@@ -58,14 +58,30 @@ class UserSignUpStep2ViewModel @Inject constructor(
             tripApplication.loginUserModel = userModel
 
         }
-        tripApplication.navHostController.popBackStack(MainScreenName.MAIN_SCREEN_USER_LOGIN.name, false)
+        if(fromWhere==""){
+            tripApplication.navHostController.popBackStack(MainScreenName.MAIN_SCREEN_USER_LOGIN.name, false)
+
+        }else{
+            //백스택 싹 지우기
+            tripApplication.navHostController.popBackStack(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name,true)
+            // 카카오 로그인 시 홈으로 바로 이동
+            tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name)
+        }
 
 
     }
 
     // 건너뛰기 버튼
-    fun onClickButtonPass() {
-        tripApplication.navHostController.popBackStack(MainScreenName.MAIN_SCREEN_USER_LOGIN.name, false)
+    fun onClickButtonPass(fromWhere: String) {
+        if(fromWhere==""){
+            tripApplication.navHostController.popBackStack(MainScreenName.MAIN_SCREEN_USER_LOGIN.name, false)
+
+        }else{
+            //백스택 싹 지우기
+            tripApplication.navHostController.popBackStack(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name,true)
+            // 카카오 로그인 시 홈으로 바로 이동
+            tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name)
+        }
     }
 
     // 유저 DocId 가져오기

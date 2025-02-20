@@ -30,7 +30,7 @@ class UserRepository {
     }
 
     // 사용자 닉네임을 통해 사용자 데이터를 가져오는 메서드
-    suspend fun selectUserDataByUserNickName(userNickName:String) : MutableList<UserVO>{
+    suspend fun selectUserDataByUserNickName(userNickName: String): MutableList<UserVO> {
         val firestore = FirebaseFirestore.getInstance()
         val collectionReference = firestore.collection("UserData")
         val result = collectionReference.whereEqualTo("userNickName", userNickName).get().await()
@@ -39,7 +39,7 @@ class UserRepository {
     }
 
     // 사용자 정보를 추가하는 메서드
-    fun addUserData(userVO: UserVO) : String {
+    fun addUserData(userVO: UserVO): String {
         val firestore = FirebaseFirestore.getInstance()
         val collectionReference = firestore.collection("UserData")
         val documentReference = collectionReference.document()
@@ -50,7 +50,7 @@ class UserRepository {
     }
 
     // 사용자 아이디와 동일한 사용자의 정보 하나를 반환하는 메서드
-    suspend fun selectUserDataByUserIdOne(userId:String) : MutableMap<String, *>{
+    suspend fun selectUserDataByUserIdOne(userId: String): MutableMap<String, *> {
         val firestore = FirebaseFirestore.getInstance()
         val collectionReference = firestore.collection("UserData")
         val result = collectionReference.whereEqualTo("userId", userId).get().await()
@@ -64,7 +64,7 @@ class UserRepository {
     }
 
     // 자동로그인 토큰값을 갱신하는 메서드
-    suspend fun updateUserAutoLoginToken(userDocumentId:String, newToken:String){
+    suspend fun updateUserAutoLoginToken(userDocumentId: String, newToken: String) {
         val firestore = FirebaseFirestore.getInstance()
         val collectionReference = firestore.collection("UserData")
         val documentReference = collectionReference.document(userDocumentId)
@@ -75,12 +75,13 @@ class UserRepository {
     }
 
     // 자동 로그인 토큰 값으로 사용자 정보를 가져오는 메서드
-    suspend fun selectUserDataByLoginToken(loginToken:String) : Map<String, *>?{
+    suspend fun selectUserDataByLoginToken(loginToken: String): Map<String, *>? {
         val firestore = FirebaseFirestore.getInstance()
         val collectionReference = firestore.collection("UserData")
-        val resultList = collectionReference.whereEqualTo("userAutoLoginToken", loginToken).get().await()
+        val resultList =
+            collectionReference.whereEqualTo("userAutoLoginToken", loginToken).get().await()
         val userVOList = resultList.toObjects(UserVO::class.java)
-        if(userVOList.isEmpty()){
+        if (userVOList.isEmpty()) {
             return null
         } else {
             val userDocumentId = resultList.documents[0].id
@@ -92,8 +93,33 @@ class UserRepository {
         }
     }
 
+    // 카카오 로그인 토큰 값으로 사용자 정보를 가져오는 메서드
+    suspend fun selectUserDataByKakaoLoginToken(kToken: String): UserVO? {
+        val firestore = FirebaseFirestore.getInstance()
+        val collectionReference = firestore.collection("UserData")
+
+        return try {
+            // Firestore에서 데이터를 조회
+            val result = collectionReference.whereEqualTo("userKakaoToken", kToken).get().await()
+
+            // 데이터를 객체로 변환하여 반환
+            val userVo = result.toObjects(UserVO::class.java).firstOrNull()
+
+            // 결과가 없으면 null 반환
+            if (userVo == null) {
+                Log.d("test100", "No user found for the given Kakao token")
+            }
+
+            userVo
+        } catch (e: Exception) {
+            // 예외 발생 시 로그 출력
+            Log.e("test100", "Failed to fetch user data by Kakao token", e)
+            null  // 예외 발생 시 null 반환
+        }
+    }
+
     // 사용자 정보 전체를 가져오는 메서드
-    suspend fun selectUserDataAll() : MutableList<MutableMap<String, *>>{
+    suspend fun selectUserDataAll(): MutableList<MutableMap<String, *>> {
         val firestore = FirebaseFirestore.getInstance()
         val collectionReference = firestore.collection("UserData")
         val result = collectionReference.get().await()
@@ -109,7 +135,7 @@ class UserRepository {
     }
 
     // 사용자 문서 아이디를 통해 사용자 정보를 가져온다.
-    suspend fun selectUserDataByUserDocumentIdOne(userDocumentId:String) : UserVO{
+    suspend fun selectUserDataByUserDocumentIdOne(userDocumentId: String): UserVO {
         val firestore = FirebaseFirestore.getInstance()
         val collectionReference = firestore.collection("UserData")
         val result = collectionReference.document(userDocumentId).get().await()
@@ -120,7 +146,6 @@ class UserRepository {
 
     // 사용자 데이터를 수정한다.
     suspend fun updateUserData(userVO: UserVO) {
-        Log.d("Test100","userVo : ${userVO.userDocId}")
         // Firestore 인스턴스 가져오기
         val firestore = FirebaseFirestore.getInstance()
         val collectionReference = firestore.collection("UserData")
@@ -138,7 +163,7 @@ class UserRepository {
     }
 
     // 사용자의 상태를 변경하는 메서드
-    suspend fun updateUserState(userDocumentId:String, newState: UserState){
+    suspend fun updateUserState(userDocumentId: String, newState: UserState) {
         val firestore = FirebaseFirestore.getInstance()
         val collectionReference = firestore.collection("UserData")
         val documentReference = collectionReference.document(userDocumentId)
@@ -151,7 +176,7 @@ class UserRepository {
     }
 
     // 이미지 데이터를 서버로 업로드 하는 메서드
-    suspend fun uploadImage(sourceFilePath:String, serverFilePath:String){
+    suspend fun uploadImage(sourceFilePath: String, serverFilePath: String) {
         // 저장되어 있는 이미지의 경로
         val file = File(sourceFilePath)
         val fileUri = Uri.fromFile(file)

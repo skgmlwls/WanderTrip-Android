@@ -47,6 +47,7 @@ import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun UserSignUpStep2Screen(
+    fromWhere : String,
     userDocId: String,
     userSignUpStep2ViewModel: UserSignUpStep2ViewModel = hiltViewModel()
 ) {
@@ -74,7 +75,6 @@ fun UserSignUpStep2Screen(
         }
     }
 
-    Log.d("test100", "userDocId : $userDocId")
     val sh = userSignUpStep2ViewModel.tripApplication.screenHeight
     Scaffold(
         topBar = {
@@ -86,7 +86,7 @@ fun UserSignUpStep2Screen(
                         iconButtonOnClick = {
                             // 저장 메서드
                             // 다음 화면으로 넘어감
-                            userSignUpStep2ViewModel.onClickIconCheck()
+                            userSignUpStep2ViewModel.onClickIconCheck(fromWhere)
                         }
                     )
                 }
@@ -157,7 +157,7 @@ fun UserSignUpStep2Screen(
 
                 BlueButton(text = "건너뛰기") {
                     // 건너뛰기 동작 추가
-                    userSignUpStep2ViewModel.onClickButtonPass()
+                    userSignUpStep2ViewModel.onClickButtonPass(fromWhere)
                 }
             }
 
