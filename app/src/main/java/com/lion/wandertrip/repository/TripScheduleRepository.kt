@@ -1,6 +1,7 @@
 package com.lion.wandertrip.repository
 
 import android.util.Log
+import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.lion.wandertrip.retrofit.ApiResponse
 import com.lion.wandertrip.retrofit.RetrofitClient
@@ -55,6 +56,44 @@ class TripScheduleRepository {
         return emptyList()
     }
 
+
+    // ✅ 일정에 여행지 항목 추가 함수
+    suspend fun addTripItemToSchedule(docId: String, scheduleDate: Timestamp, scheduleItemVO: ScheduleItemVO) {
+        val firestore = FirebaseFirestore.getInstance()
+        val subCollectionRef = firestore.collection("TripSchedule")
+            .document(docId)
+            .collection("TripScheduleItem")
+
+        try {
+            // ✅ Firestore에서 scheduleDate와 동일한 날짜를 가진 항목 가져오기
+            val snapshot = subCollectionRef.whereEqualTo("itemDate", scheduleDate).get().await()
+
+            // ✅ 동일한 날짜를 가진 항목 중 가장 높은 itemIndex 찾기
+            val maxIndex = snapshot.documents
+                .mapNotNull { it.getLong("itemIndex")?.toInt() } // 🔹 Long → Int 변환
+                .maxOrNull() ?: 0 // 값이 없으면 기본값 0
+
+            // ✅ 새로운 itemIndex 설정 (최소 1부터 시작)
+            val newItemIndex = if (maxIndex == 0) 1 else maxIndex + 1
+
+            // ✅ Firestore에 새로운 아이템 추가
+            val newItemRef = subCollectionRef.document()
+            scheduleItemVO.itemDocId = newItemRef.id // Firestore 문서 ID 설정
+            scheduleItemVO.itemIndex = newItemIndex // 새로운 인덱스 설정
+
+            // ✅ Firestore에 저장
+            newItemRef.set(scheduleItemVO).await()
+
+            println("✅ 새로운 여행지 추가 완료: ${scheduleItemVO.itemTitle} (index: $newItemIndex)")
+        } catch (e: Exception) {
+            println("❌ Firestore 추가 실패: ${e.message}")
+        }
+    }
+
+
+
+    // 공공 데이터 관련 //////////////////////////////////////////////////////////////////////////////
+
     // API 호출 및 데이터 로드
     suspend fun loadTripItems(serviceKey: String, areaCode: String, contentTypeId: String) : List<TripItemVO>? {
         // ✅ TripItemModel 대신 TripItemVO 리스트 사용
@@ -98,5 +137,7 @@ class TripScheduleRepository {
         }
         return tripItemList
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
 }

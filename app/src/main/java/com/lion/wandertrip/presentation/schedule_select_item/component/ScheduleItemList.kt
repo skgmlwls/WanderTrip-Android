@@ -1,6 +1,7 @@
 package com.lion.wandertrip.presentation.schedule_select_item.component
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,6 +33,7 @@ import com.lion.wandertrip.util.TripItemCat2.Companion.fromCodeTripItemCat2
 @Composable
 fun ScheduleItemList(
     tripItemList : List<TripItemModel>,
+    onItemClick: (TripItemModel) -> Unit // ✅ 클릭 이벤트 콜백 추가
 ) {
 
     LazyColumn(
@@ -40,12 +42,16 @@ fun ScheduleItemList(
     ) {
         items(tripItemList.size) { index ->
 
-            Column {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onItemClick(tripItemList[index]) } // ✅ 클릭 이벤트 추가
+            ) {
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 8.dp, end = 8.dp, top = 20.dp, bottom = 8.dp),
+                        .padding(start = 8.dp, end = 8.dp, top = 20.dp, bottom = 8.dp), // ✅ 클릭 이벤트 추가,
                     verticalAlignment = Alignment.Top
                 ) {
 

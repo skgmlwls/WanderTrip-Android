@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.schedule_detail_page.component
 
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -184,7 +185,13 @@ fun ScheduleDetailDateList(
                     horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End)
                 ) {
                     OutlinedButton(
-                        onClick = { viewModel.moveToScheduleSelectItemScreen(ContentTypeId.TOURIST_ATTRACTION.contentTypeCode) },
+                        onClick = {
+                            Log.d("ScheduleDetailDateList", "${tripSchedule.scheduleDateList[index]}")
+                            viewModel.moveToScheduleSelectItemScreen(
+                                ContentTypeId.TOURIST_ATTRACTION.contentTypeCode,
+                                tripSchedule.scheduleDateList[index]
+                            )
+                        },
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp) // 내부 여백 조정
                     ) {
                         Text(
@@ -194,7 +201,12 @@ fun ScheduleDetailDateList(
                         )
                     }
                     OutlinedButton(
-                        onClick = { viewModel.moveToScheduleSelectItemScreen(ContentTypeId.RESTAURANT.contentTypeCode) },
+                        onClick = {
+                            viewModel.moveToScheduleSelectItemScreen(
+                                ContentTypeId.RESTAURANT.contentTypeCode,
+                                tripSchedule.scheduleDateList[index]
+                            )
+                        },
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp) // 내부 여백 조정
                     ) {
                         Text(
@@ -204,7 +216,12 @@ fun ScheduleDetailDateList(
                         )
                     }
                     OutlinedButton(
-                        onClick = { viewModel.moveToScheduleSelectItemScreen(ContentTypeId.ACCOMMODATION.contentTypeCode) },
+                        onClick = {
+                            viewModel.moveToScheduleSelectItemScreen(
+                                ContentTypeId.ACCOMMODATION.contentTypeCode,
+                                tripSchedule.scheduleDateList[index]
+                            )
+                        },
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp) // 내부 여백 조정
                     ) {
                         Text(
