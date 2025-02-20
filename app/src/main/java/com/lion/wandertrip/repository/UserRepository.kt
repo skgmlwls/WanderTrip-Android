@@ -11,6 +11,7 @@ import java.io.File
 
 class UserRepository {
 
+    // userID로 userVO찾기
     suspend fun selectUserDataByUserId(userId: String): UserVO? {
         val firestore = FirebaseFirestore.getInstance()
         val collectionReference = firestore.collection("UserData")

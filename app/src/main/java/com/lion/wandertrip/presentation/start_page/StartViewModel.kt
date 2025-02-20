@@ -1,6 +1,7 @@
 package com.lion.wandertrip.presentation.start_page
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.lion.wandertrip.TripApplication
@@ -27,33 +28,40 @@ class StartViewModel @Inject constructor(
     val boardApplication = context as TripApplication
 
     // 자동 로그인 처리
-    fun autoLoginProcess(){
+    fun autoLoginProcess() {
         // Preference에 login token이 있는지 확인한다.
         val pref = boardApplication.getSharedPreferences("LoginToken", Context.MODE_PRIVATE)
         val loginToken = pref.getString("token", null)
-        // Log.d("test100", "$loginToken")
+        Log.d("test100", "$loginToken")
 
         CoroutineScope(Dispatchers.Main).launch {
-            if(loginToken != null){
+            if (loginToken != null) {
 
                 showLoginMessageState.value = true
 
                 // 사용자 정보를 가져온다.
-                val work1 = async(Dispatchers.IO){
+                val work1 = async(Dispatchers.IO) {
                     userService.selectUserDataByLoginToken(loginToken)
                 }
                 val loginUserModel = work1.await()
                 // 가져온 사용자 데이터가 있다면
-                if(loginUserModel != null){
+                if (loginUserModel != null) {
 
                     boardApplication.loginUserModel = loginUserModel
 
-                    boardApplication.navHostController.popBackStack(MainScreenName.MAIN_SCREEN_START.name, true)
+                    boardApplication.navHostController.popBackStack(
+                        MainScreenName.MAIN_SCREEN_START.name,
+                        true
+                    )
                     boardApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name)
                 } else {
                     // 로그인 화면으로 이동한다.
                     boardApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name)
                 }
+            } else if (true) {
+                // 카카오 로그인 토큰도 검사한다.
+                // 로그인 화면으로 이동한다.
+                boardApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name)
             } else {
                 // 로그인 화면으로 이동한다.
                 boardApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name)

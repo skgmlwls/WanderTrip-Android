@@ -17,7 +17,6 @@ import com.lion.wandertrip.util.BotNavScreenName
 import com.lion.wandertrip.util.MainScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineStart
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import javax.inject.Inject
@@ -25,7 +24,6 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 import android.util.Base64
 import com.lion.wandertrip.util.LoginResult
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -115,10 +113,10 @@ class UserLoginViewModel @Inject constructor(
                     // 만약 자동로그인이 체크되어 있다면
                     if(checkBoxAutoLoginValue.value){
                         CoroutineScope(Dispatchers.Main).launch{
-                            val work1 = async(Dispatchers.IO){
+                            val work3 = async(Dispatchers.IO){
                                 userService.updateUserAutoLoginToken(tripApplication, loginUserModel.userDocId)
                             }
-                            work1.join()
+                            work3.join()
                         }
                     }
 
