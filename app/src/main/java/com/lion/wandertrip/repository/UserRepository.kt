@@ -1,19 +1,31 @@
 package com.lion.wandertrip.repository
 
+import android.net.Uri
+import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.lion.wandertrip.util.UserState
 import com.lion.wandertrip.vo.UserVO
 import kotlinx.coroutines.tasks.await
+import java.io.File
 
 class UserRepository {
 
-    // 사용자 아이디를 통해 사용자 데이터를 가져오는 메서드
-    suspend fun selectUserDataByUserId(userId:String) : MutableList<UserVO>{
+    suspend fun selectUserDataByUserId(userId: String): UserVO? {
         val firestore = FirebaseFirestore.getInstance()
         val collectionReference = firestore.collection("UserData")
+
+        // 쿼리 결과 가져오기
         val result = collectionReference.whereEqualTo("userId", userId).get().await()
-        val userVoList = result.toObjects(UserVO::class.java)
-        return userVoList
+
+        // 데이터가 없다면 null 반환
+        if (result.isEmpty) {
+            Log.d("UserData", "사용자 아이디 '$userId'에 해당하는 사용자가 없습니다.")
+            return null
+        }
+
+        // 데이터가 있을 경우 첫 번째 사용자 정보 반환
+        return result.toObjects(UserVO::class.java).firstOrNull()
     }
 
     // 사용자 닉네임을 통해 사용자 데이터를 가져오는 메서드
@@ -28,7 +40,7 @@ class UserRepository {
     // 사용자 정보를 추가하는 메서드
     fun addUserData(userVO: UserVO) : String {
         val firestore = FirebaseFirestore.getInstance()
-        val collectionReference = firestore.collection("userData")
+        val collectionReference = firestore.collection("UserData")
         val documentReference = collectionReference.document()
         val addUserVO = userVO
         addUserVO.userDocId = documentReference.id
@@ -106,24 +118,22 @@ class UserRepository {
 
 
     // 사용자 데이터를 수정한다.
-    suspend fun updateUserData(userVO: UserVO){
-        // 수정할 데이터를 담을 맵
-     /*   val userMap = mapOf(
-            "userPw" to userVO.userPw,
-            "userNickName" to userVO.userNickName,
-            "userAge" to userVO.userAge,
-            "userHobby1" to userVO.userHobby1,
-            "userHobby2" to userVO.userHobby2,
-            "userHobby3" to userVO.userHobby3,
-            "userHobby4" to userVO.userHobby4,
-            "userHobby5" to userVO.userHobby5,
-            "userHobby6" to userVO.userHobby6,
-        )*/
-        // 수정할 문서에 접근할 수 있는 객체를 가져온다.
+    suspend fun updateUserData(userVO: UserVO) {
+        Log.d("Test100","userVo : ${userVO.userDocId}")
+        // Firestore 인스턴스 가져오기
         val firestore = FirebaseFirestore.getInstance()
         val collectionReference = firestore.collection("UserData")
+
+        // 수정할 문서에 접근
         val documentReference = collectionReference.document(userVO.userDocId)
-        /*documentReference.update(userMap).await()*/
+
+        try {
+            // UserVO 객체 그대로 업데이트 (set 사용)
+            documentReference.set(userVO).await()  // set() 메서드로 데이터 저장
+            Log.d("Firestore", "사용자 데이터 업데이트 성공")
+        } catch (e: Exception) {
+            Log.e("Firestore", "사용자 데이터 업데이트 실패", e)
+        }
     }
 
     // 사용자의 상태를 변경하는 메서드
@@ -137,5 +147,56 @@ class UserRepository {
         )
 
         documentReference.update(updateMap).await()
+    }
+
+    // 이미지 데이터를 서버로 업로드 하는 메서드
+    suspend fun uploadImage(sourceFilePath:String, serverFilePath:String){
+        // 저장되어 있는 이미지의 경로
+        val file = File(sourceFilePath)
+        val fileUri = Uri.fromFile(file)
+        // 업로드 한다.
+        val firebaseStorage = FirebaseStorage.getInstance()
+        val childReference = firebaseStorage.reference.child("userProfileImage/$serverFilePath")
+        childReference.putFile(fileUri).await()
+    }
+
+    // userDocID 로 user 정보 가져오기
+    suspend fun getUserByUserDocId(userDocId: String): UserVO? {
+        val firestore = FirebaseFirestore.getInstance()
+        val collectionReference = firestore.collection("UserData")
+
+        return try {
+            val documentSnapshot = collectionReference.document(userDocId).get().await()
+            if (documentSnapshot.exists()) {
+                documentSnapshot.toObject(UserVO::class.java) // Firestore 데이터를 UserVO 객체로 변환
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    // 이미지 Uri 가져온다.
+    // 이미지 데이터를 가져온다.
+    suspend fun gettingImage(imageFileName: String): Uri {
+        Log.d("gettingImage", "이미지 파일명을 받음: $imageFileName")
+
+        val storageReference = FirebaseStorage.getInstance().reference
+        Log.d("gettingImage", "Firebase Storage 레퍼런스 초기화됨")
+
+        // 파일명을 지정하여 이미지 데이터를 가져온다.
+        val childStorageReference = storageReference.child("userProfileImage/$imageFileName")
+        Log.d("gettingImage", "이미지 파일 경로: userProfileImage/$imageFileName")
+
+        try {
+            val imageUri = childStorageReference.downloadUrl.await()
+            Log.d("gettingImage", "이미지 URI 가져옴: $imageUri")
+            return imageUri
+        } catch (e: Exception) {
+            Log.e("gettingImage", "이미지 URI 가져오기 실패: ${e.message}")
+            throw e
+        }
     }
 }

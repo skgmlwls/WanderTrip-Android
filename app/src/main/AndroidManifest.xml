@@ -52,7 +52,7 @@
         </activity>
 
         <provider
-            android:authorities="com.lion.wandertrip.camera."
+            android:authorities="com.lion.wandertrip.camera"
             android:name="androidx.core.content.FileProvider"
             android:exported="false"
             android:grantUriPermissions="true">
