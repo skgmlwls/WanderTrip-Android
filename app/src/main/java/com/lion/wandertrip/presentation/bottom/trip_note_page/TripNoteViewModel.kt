@@ -20,6 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import okhttp3.internal.toImmutableList
 import javax.inject.Inject
 
@@ -46,7 +47,7 @@ class TripNoteViewModel @Inject constructor(
     fun addButtonOnClick(){
         val scheduleTitle = "" // 기본값 설정
         // 여행기 추가하는 화면으로 이동
-        tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_WRITE.name}/$scheduleTitle")
+        tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_WRITE.name}/$scheduleTitle/")
     }
 
     // 각 항목을 눌렀을 때
@@ -55,52 +56,40 @@ class TripNoteViewModel @Inject constructor(
         tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_DETAIL.name}/${documentId}")
     }
 
-    // 데이터 가져오기
+
     fun gettingTripNoteData() {
         CoroutineScope(Dispatchers.Main).launch {
-            val work1 = async(Dispatchers.IO){
+            val work1 = async(Dispatchers.IO) {
                 tripNoteService.gettingTripNoteList()
             }
 
+            val recyclerViewList = work1.await().mapIndexed { index, tripNoteModel ->
+                index to tripNoteModel
+            }
 
-                    // recyclerViewList에 인덱스 포함
-                    val recyclerViewList = work1.await().mapIndexed { index, tripNoteModel ->
-                        index to tripNoteModel
-                    }
-
-
-            val storage = Firebase.storage  // Firebase Storage 인스턴스 가져오기
+            val storage = Firebase.storage // Firebase Storage 인스턴스 가져오기
             val storageReference = storage.reference
 
             recyclerViewList.forEach { (index, tripNoteModel) ->
-                // tripNoteImage를 Firebase Storage URL로 변환하여 showImageUri에 넣기
-                val imagePaths = tripNoteModel.tripNoteImage ?: emptyList()  // null일 경우 빈 리스트 처리
-
-                // Firebase에서 이미지를 비동기적으로 다운로드
+                val imagePaths = tripNoteModel.tripNoteImage ?: emptyList() // null일 경우 빈 리스트 처리
                 val imageUris = mutableListOf<Uri?>()
 
+                // Firebase에서 이미지를 동기적으로 다운로드
                 imagePaths.forEach { imagePath ->
-                    // Firebase Storage에서 해당 경로의 참조 생성
                     val imageRef = storageReference.child("image/$imagePath")
-                    imageRef.downloadUrl.addOnSuccessListener { uri ->
-                        // 성공적으로 URL을 가져왔을 때 showImageUri에 추가
+                    try {
+                        val uri = imageRef.downloadUrl.await() // `await`를 사용해 비동기 작업 완료 대기
                         imageUris.add(uri)
-
-                        // 모든 이미지 URI가 로드된 경우 map에 추가
-                        if (imageUris.size == imagePaths.size) {
-                            imageUrisMap[index] = imageUris
-                        }
-
-                            // 모든 이미지 URI가 로드된 경우 map에 추가
-                            Log.d("TripNoteScreen", "ImageUrisMap after adding: ${imageUrisMap[index]}")
-
-                            // 로그로 해당 인덱스의 imageUris 상태 확인
-                            Log.d("TripNoteScreen", "Index: $index, imageUris: ${imageUrisMap[index]}")
-                    }.addOnFailureListener { exception ->
-                        // 실패 시 로그 출력 (필요시 처리 추가)
-                        Log.e("FirebaseStorage", "Failed to get download URL for $imagePath", exception)
+                    } catch (e: Exception) {
+                        Log.e("FirebaseStorage", "Failed to get download URL for $imagePath", e)
                     }
                 }
+
+                // 모든 이미지를 로드한 후 map에 추가
+                imageUrisMap[index] = imageUris
+
+                // 로그로 확인
+                Log.d("TripNoteScreen", "Index: $index, imageUris: ${imageUrisMap[index]}")
             }
 
             // 상태 관리 변수에 담아준다.
@@ -108,5 +97,6 @@ class TripNoteViewModel @Inject constructor(
             tripNoteList.addAll(recyclerViewList.map { it.second })
         }
     }
+
 
 }

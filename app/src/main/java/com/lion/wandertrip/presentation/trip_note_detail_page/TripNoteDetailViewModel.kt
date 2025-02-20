@@ -4,11 +4,14 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.Timestamp
 import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.ScheduleItem
@@ -16,7 +19,9 @@ import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.model.TripNoteReplyModel
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.model.UserModel
+import com.lion.wandertrip.presentation.bottom.trip_note_page.TripNoteViewModel
 import com.lion.wandertrip.service.TripNoteService
+import com.lion.wandertrip.util.BotNavScreenName
 import com.lion.wandertrip.util.ScheduleScreenName
 import com.lion.wandertrip.util.TripNoteScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,11 +42,12 @@ import javax.inject.Inject
 @HiltViewModel
 class TripNoteDetailViewModel @Inject constructor(
     @ApplicationContext val context: Context,
-    val tripNoteService : TripNoteService
+    val tripNoteService : TripNoteService,
 ) : ViewModel() {
 
     // 여행기 정보를 담을 변수
     lateinit var tripNoteModel:TripNoteModel
+
 
     // 여행기 제목
     val textFieldTripNoteSubject = mutableStateOf(" ")
@@ -74,6 +80,9 @@ class TripNoteDetailViewModel @Inject constructor(
 
 
 
+
+
+
     var tripNoteDetailList = mutableStateListOf<TripNoteModel>()
     //var tripNoteReplyList = mutableStateListOf<TripNoteReplyModel>()
 
@@ -96,7 +105,7 @@ class TripNoteDetailViewModel @Inject constructor(
             val work1 = async(Dispatchers.IO) {
                 tripNoteService.selectTripNoteDataOneById(documentId)
             }
-            tripNoteModel = work1.await()
+            tripNoteModel = work1.await()!!
 
             textFieldTripNoteNickName.value = tripNoteModel.userNickname
             textFieldTripNoteSubject.value = tripNoteModel.tripNoteTitle
@@ -131,7 +140,7 @@ class TripNoteDetailViewModel @Inject constructor(
         // 댓글 작성한 여행기 문서 id
         val tripNoteDocumentId = documentId
         // 작성자 닉네임
-        val userNickname = textFieldTripNoteNickName.value
+        val userNickname = nickName
         // 댓글 내용
         val replyText = textFieldTripNoteReply.value
         // 댓글 작성 시간
@@ -188,10 +197,45 @@ class TripNoteDetailViewModel @Inject constructor(
     }
 
     // 휴지통 아이콘 (여행기 삭제)
-    fun deleteButtonClick(){
-        // 삭제 그거 ... 다이얼로그 띄워
+    fun deleteButtonClick(documentId : String){
+        // 삭제 그거 ... 다이얼로그 띄우고 확인 누르면,,,
+        CoroutineScope(Dispatchers.Main).launch {
+
+            // 사진도 삭제
+            if(tripNoteModel.tripNoteImage.isNotEmpty()){
+                val work2 = async(Dispatchers.IO){
+                    tripNoteModel.tripNoteImage.map { imagePath ->
+                        tripNoteService.removeImageFile(imagePath) // 개별 이미지 가져오기
+                    }
+                }
+                work2.join()
+            }
+
+            // 여행기를 삭제한다.
+            val work1 = async(Dispatchers.IO){
+                tripNoteService.deleteTripNoteData(documentId)
+            }
+            work1.join()
+
+            tripApplication.navHostController.popBackStack()
+
+        }
 
     }
+
+    // 일정 담기 아이콘
+    fun bringTripNote(){
+        tripApplication.navHostController.navigate(TripNoteScreenName.TRIP_NOTE_SELECT_DOWN.name)
+    }
+
+    // 닉네임 클릭하면 그 사람 여행기 리스트 화면으로 이동
+    fun clickNickname(){
+        val otherNickName = textFieldTripNoteNickName.value
+        tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_OTHER_SCHEDULE.name}/${otherNickName}")
+    }
+
+
+
 
 
 
@@ -274,16 +318,6 @@ class TripNoteDetailViewModel @Inject constructor(
     }
 
 
-
-    // 일정 담기 아이콘
-    fun bringTripNote(){
-        tripApplication.navHostController.navigate(TripNoteScreenName.TRIP_NOTE_SELECT_DOWN.name)
-    }
-
-    // 닉네임 클릭하면 그 사람 여행기 리스트 화면으로 이동
-    fun clickNickname(){
-        tripApplication.navHostController.navigate(TripNoteScreenName.TRIP_NOTE_OTHER_SCHEDULE.name)
-    }
 
 
     // ✅ Timestamp -> "YYYY.MM.DD" 형식 변환 함수

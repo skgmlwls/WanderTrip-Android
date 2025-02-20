@@ -29,8 +29,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,8 +54,10 @@ import com.lion.wandertrip.util.Tools
 @Composable
 fun TripNoteWriteScreen(
     tripNoteWriteViewModel: TripNoteWriteViewModel = hiltViewModel(),
-    scheduleTitle : String
+    tripScheduleTitle : String,
+    scheduleDocId : String
 ) {
+
 
     val context = LocalContext.current
 
@@ -62,7 +66,12 @@ fun TripNoteWriteScreen(
         Tools.takeAlbumDataList(context, it, tripNoteWriteViewModel.tripNotePreviewBitmap)
     }
 
-    val scheduleTitleState = remember { mutableStateOf(scheduleTitle) }
+    val scheduleTitleState = remember { mutableStateOf(tripScheduleTitle) }
+
+    // tripNoteWriteViewModel에 tripScheduleTitle 값을 설정
+    tripNoteWriteViewModel.tripScheduleTitle.value = scheduleTitleState.value
+    tripNoteWriteViewModel.scheduleDocId =  scheduleDocId
+
 
 
     Scaffold(
@@ -101,6 +110,7 @@ fun TripNoteWriteScreen(
 
                 Text(
                     text = "${scheduleTitleState.value}",
+                    // text = tripNoteWriteViewModel.scheduleTitleState.value,
                     fontFamily = NanumSquareRound,
                     fontSize = 22.sp,
                     modifier = Modifier.padding(start = 11.dp, top = 0.dp)
@@ -182,6 +192,8 @@ fun TripNoteWriteScreen(
                 placeHolder = "제목을 입력해 주세요",
                 trailingIconMode = LikeLionOutlinedTextFieldEndIconMode.TEXT,
                 singleLine = true,
+                isError = tripNoteWriteViewModel.tripNoteTitleIsError,  // 에러 상태 전달
+                supportText = tripNoteWriteViewModel.tripNoteTitleError,  // 에러 메시지 전달
             )
 
             Spacer(modifier = Modifier.padding(top = 25.dp))
@@ -192,20 +204,46 @@ fun TripNoteWriteScreen(
                 label = "후기",
                 placeHolder = "여행기 후기를 입력해 주세요",
                 trailingIconMode = LikeLionOutlinedTextFieldEndIconMode.TEXT,
-                singleLine = false
+                singleLine = false,
+                isError = tripNoteWriteViewModel.tripNoteContentIsError,  // 에러 상태 전달
+                supportText = tripNoteWriteViewModel.tripNoteContentError,  // 에러 메시지 전달
             )
 
 
             Spacer(modifier = Modifier.padding(top = 20.dp))
 
-            // Spacer(modifier = Modifier.weight(1f))
 
-
+            // 게시 버튼
             BlueButton(
                 text = "게시하기",
                 paddingTop = 5.dp,
                 onClick = {
-                    tripNoteWriteViewModel.tripNoteDoneClick()
+                    // 제목이 비어있는지 확인
+                    if (tripNoteWriteViewModel.tripNoteTitle.value.isEmpty()) {
+                        // 제목 에러 처리
+                        tripNoteWriteViewModel.tripNoteTitleError.value = "제목을 입력해 주세요."
+                        tripNoteWriteViewModel.tripNoteTitleIsError.value = true
+                    } else {
+                        // 제목 에러 메시지 초기화
+                        tripNoteWriteViewModel.tripNoteTitleError.value = ""
+                        tripNoteWriteViewModel.tripNoteTitleIsError.value = false
+                    }
+
+                    // 내용이 비어있는지 확인
+                    if (tripNoteWriteViewModel.tripNoteContent.value.isEmpty()) {
+                        // 내용 에러 처리
+                        tripNoteWriteViewModel.tripNoteContentError.value = "내용을 입력해 주세요."
+                        tripNoteWriteViewModel.tripNoteContentIsError.value = true
+                    } else {
+                        // 내용 에러 메시지 초기화
+                        tripNoteWriteViewModel.tripNoteContentError.value = ""
+                        tripNoteWriteViewModel.tripNoteContentIsError.value = false
+                    }
+
+                    // 제목과 내용이 모두 비어 있지 않으면 tripNoteDoneClick 호출
+                    if (tripNoteWriteViewModel.tripNoteTitle.value.isNotEmpty() && tripNoteWriteViewModel.tripNoteContent.value.isNotEmpty()) {
+                        tripNoteWriteViewModel.tripNoteDoneClick()
+                    }
                 }
             )
 
