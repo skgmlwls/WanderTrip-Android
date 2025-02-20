@@ -58,12 +58,14 @@ class UserSignUpStep2ViewModel @Inject constructor(
             tripApplication.loginUserModel = userModel
 
         }
-        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name)
+        tripApplication.navHostController.popBackStack(MainScreenName.MAIN_SCREEN_USER_LOGIN.name, false)
+
+
     }
 
     // 건너뛰기 버튼
     fun onClickButtonPass() {
-        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name)
+        tripApplication.navHostController.popBackStack(MainScreenName.MAIN_SCREEN_USER_LOGIN.name, false)
     }
 
     // 유저 DocId 가져오기
