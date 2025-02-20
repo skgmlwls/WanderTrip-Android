@@ -86,7 +86,7 @@ fun ScheduleSelectItemScreen(
             // 룰렛 화면으로 이동하는 버튼
             Button(
                 onClick = {
-
+                    viewModel.moveToRouletteItemScreen()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
