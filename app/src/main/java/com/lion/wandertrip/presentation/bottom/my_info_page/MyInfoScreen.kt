@@ -24,6 +24,8 @@ import com.lion.wandertrip.presentation.bottom.my_info_page.used_dummy_data.Sche
 fun MyInfoScreen(myInfoViewModel: MyInfoViewModel = hiltViewModel()) {
     LaunchedEffect (Unit){
         myInfoViewModel.gettingUserModel()
+        // 화면 열때 리스트 가져오기
+        myInfoViewModel.getTripList()
     }
     val userModel = myInfoViewModel.userModelValue.value
     Scaffold { paddingValues ->
@@ -45,7 +47,7 @@ fun MyInfoScreen(myInfoViewModel: MyInfoViewModel = hiltViewModel()) {
             Spacer(modifier = Modifier.height(16.dp))  // 프로필 카드와 일정 리스트 사이 간격
 
             // 일정 리스트
-            HorizontalScheduleList(ScheduleDummyData.scheduleDummyDataList)
+            HorizontalScheduleList(myInfoViewModel.recentScheduleList)
 
             // 최근 게시글 리스트
             HorizontalRecentPostsList(

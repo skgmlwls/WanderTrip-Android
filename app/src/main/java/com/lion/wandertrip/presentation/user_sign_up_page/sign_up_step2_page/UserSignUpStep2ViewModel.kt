@@ -67,8 +67,6 @@ class UserSignUpStep2ViewModel @Inject constructor(
             // 카카오 로그인 시 홈으로 바로 이동
             tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name)
         }
-
-
     }
 
     // 건너뛰기 버튼

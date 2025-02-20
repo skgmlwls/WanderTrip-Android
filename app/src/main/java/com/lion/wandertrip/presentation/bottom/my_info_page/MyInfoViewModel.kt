@@ -3,10 +3,14 @@ package com.lion.wandertrip.presentation.bottom.my_info_page
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.lion.wandertrip.TripApplication
+import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.model.UserModel
+import com.lion.wandertrip.service.TripScheduleService
 import com.lion.wandertrip.service.UserService
 import com.lion.wandertrip.util.MainScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,6 +25,7 @@ import javax.inject.Inject
 class MyInfoViewModel @Inject constructor(
     @ApplicationContext context: Context,
     val userService: UserService,
+    val tripScheduleService: TripScheduleService,
 ) : ViewModel(){
 
     // userModelState
@@ -31,6 +36,8 @@ class MyInfoViewModel @Inject constructor(
 
     // 보여줄 이미지의 Uri
     val showImageUri = mutableStateOf<Uri?>(null)
+
+    val recentScheduleList = mutableStateListOf<TripScheduleModel>()
 
     // 프로필 편집
     fun onClickTextUserInfoModify() {
@@ -80,6 +87,21 @@ class MyInfoViewModel @Inject constructor(
                 showImageUri.value = work2.await()
             }
         }
+    }
+
+    // 화면 열때 리스트 가져오기
+    fun getTripList() {
+
+        viewModelScope.launch {
+            val work1 = async(Dispatchers.IO){
+                tripScheduleService.gettingMyTripSchedules(tripApplication.loginUserModel.userId)
+            }
+            val result = work1.await()
+            recentScheduleList.addAll(
+                result
+            )
+        }
+
     }
 
 

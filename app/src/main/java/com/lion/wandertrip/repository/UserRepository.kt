@@ -191,14 +191,22 @@ class UserRepository {
         val firestore = FirebaseFirestore.getInstance()
         val collectionReference = firestore.collection("UserData")
 
+        Log.d("test200", "getUserByUserDocId() 호출됨 - userDocId: $userDocId")
+
         return try {
             val documentSnapshot = collectionReference.document(userDocId).get().await()
+
             if (documentSnapshot.exists()) {
-                documentSnapshot.toObject(UserVO::class.java) // Firestore 데이터를 UserVO 객체로 변환
+                Log.d("test200", "문서 존재함 - userDocId: $userDocId")
+                val user = documentSnapshot.toObject(UserVO::class.java)
+                Log.d("test200", "변환된 UserVO: $user")
+                user // Firestore 데이터를 UserVO 객체로 변환
             } else {
+                Log.d("test200", "문서 없음 - userDocId: $userDocId")
                 null
             }
         } catch (e: Exception) {
+            Log.e("test200", "오류 발생 - userDocId: $userDocId", e)
             e.printStackTrace()
             null
         }

@@ -55,4 +55,14 @@ class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // hj
+    // 내 스케줄 가져오기
+    suspend fun gettingMyTripSchedules(userID:String) :MutableList<TripScheduleModel>{
+        val voList = tripScheduleRepository.gettingMyTripSchedules(userID)
+        val result = mutableListOf<TripScheduleModel>()
+        voList.forEach {
+            result.add(it.toTripScheduleModel())
+        }
+        return result
+    }
 }

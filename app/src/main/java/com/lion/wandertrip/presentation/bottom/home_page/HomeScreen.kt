@@ -1,6 +1,7 @@
 package com.lion.wandertrip.presentation.bottom.home_page
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -50,6 +51,7 @@ data class TravelSpot(val rank: Int, val title: String, val location: String, va
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen() {
+
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()

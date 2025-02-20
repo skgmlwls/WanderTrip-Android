@@ -23,7 +23,7 @@ import com.skydoves.landscapist.glide.GlideImage
 
 
 @Composable
-fun HorizontalRecentPostsList(tripItemList: List<TripItemModel>,myInfoViewModel: MyInfoViewModel) {
+fun HorizontalRecentPostsList(tripItemList: MutableList<TripItemModel>,myInfoViewModel: MyInfoViewModel) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()

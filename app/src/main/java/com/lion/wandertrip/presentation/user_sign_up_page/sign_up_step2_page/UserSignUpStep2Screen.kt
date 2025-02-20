@@ -40,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.a02_boardcloneproject.component.CustomIconButton
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.wandertrip.R
+import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.component.BlueButton
 import com.lion.wandertrip.util.Tools
 import com.skydoves.landscapist.CircularReveal

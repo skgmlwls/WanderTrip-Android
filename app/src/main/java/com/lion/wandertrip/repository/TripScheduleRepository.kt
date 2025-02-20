@@ -140,4 +140,35 @@ class TripScheduleRepository {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // hj
+    // 내 여행 목록 가져오기
+    suspend fun gettingMyTripSchedules(userID: String): MutableList<TripScheduleVO> {
+        val firestore = FirebaseFirestore.getInstance()
+        val collRef = firestore.collection("TripSchedule")
+
+        val tripSchedules = mutableListOf<TripScheduleVO>()
+
+        try {
+            // userID가 일치하는 문서를 가져오기 위한 쿼리
+            val querySnapshot = collRef.whereEqualTo("userID", userID).get().await()
+
+            // 가져온 문서를 TripScheduleVO로 변환하여 리스트에 추가
+            for (document in querySnapshot.documents) {
+                val tripSchedule = document.toObject(TripScheduleVO::class.java)
+                if (tripSchedule != null) {
+                    tripSchedules.add(tripSchedule)
+                }
+            }
+
+            // 쿼리 결과 로그 출력 (디버그용)
+            Log.d("test100", "userID: $userID")
+
+        } catch (e: Exception) {
+            // 예외가 발생하면 에러 메시지 로그 출력
+            Log.e("test100", "에러남: $userID, $e", e)
+        }
+
+        // 결과 반환
+        return tripSchedules
+    }
 }
