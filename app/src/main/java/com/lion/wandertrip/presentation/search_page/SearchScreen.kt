@@ -29,13 +29,13 @@ import androidx.navigation.NavController
 
 @Composable
 fun SearchScreen(searchViewModel: SearchViewModel = hiltViewModel()) {
-    val selectedCity by searchViewModel.selectedCity.collectAsState()
+    val selectedRecentSearch by searchViewModel.selectedRecentSearch.collectAsState()
 
-    if (selectedCity != null) {
-        // 🔹 선택한 도시가 있으면 `DetailScreen`으로 이동
-        DetailScreen(contentId = selectedCity!!, searchViewModel)
+    if (selectedRecentSearch != null) {
+        // ✅ 선택된 도시가 있으면 `DetailSearchScreen` 표시
+        DetailSearchScreen(contentId = selectedRecentSearch!!, searchViewModel)
     } else {
-        // 🔹 검색 화면 표시
+        // ✅ 선택된 도시가 없으면 `SearchView` 표시
         SearchView(searchViewModel)
     }
 }
@@ -43,7 +43,7 @@ fun SearchScreen(searchViewModel: SearchViewModel = hiltViewModel()) {
 @Composable
 fun SearchView(searchViewModel: SearchViewModel) {
     var searchText by remember { mutableStateOf(TextFieldValue("")) }
-    var recentSearches by remember { mutableStateOf(listOf<String>()) } // ✅ 최근 검색어 리스트
+    val recentSearches by searchViewModel.recentSearches.collectAsState()
 
     Column(
         modifier = Modifier
@@ -63,7 +63,7 @@ fun SearchView(searchViewModel: SearchViewModel) {
                 contentDescription = "Back",
                 modifier = Modifier
                     .size(24.dp)
-                    .clickable { /* 뒤로가기 기능 추가 가능 */ }
+                    .clickable { searchViewModel.clearSelectedRecentSearch() } // ✅ 뒤로 가기 클릭 시 `selectedCity` 초기화
             )
 
             Spacer(modifier = Modifier.width(8.dp))
@@ -71,7 +71,7 @@ fun SearchView(searchViewModel: SearchViewModel) {
             TextField(
                 value = searchText,
                 onValueChange = { searchText = it },
-                placeholder = { Text("도시, 장소, 숙소, 투어·티켓 검색", color = Color.Gray) },
+                placeholder = { Text("도시, 장소, 숙소 검색", color = Color.Gray) },
                 singleLine = true,
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                 modifier = Modifier
@@ -82,7 +82,7 @@ fun SearchView(searchViewModel: SearchViewModel) {
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // 🔹 검색 버튼 (검색어 저장 & 상세 검색 이동)
+            // 🔹 검색 버튼 (검색어 저장 & 상세 검색 화면으로 변경)
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = "Search",
@@ -90,52 +90,21 @@ fun SearchView(searchViewModel: SearchViewModel) {
                     .size(24.dp)
                     .clickable {
                         if (searchText.text.isNotBlank()) {
-                            // ✅ 최근 검색어 리스트 업데이트 (중복 제거)
-                            recentSearches = listOf(searchText.text) + recentSearches.filter { it != searchText.text }
-
-                            // ✅ 상세 검색 페이지로 이동 (검색어를 `ViewModel`에 저장)
-                            searchViewModel.selectCity(searchText.text)
+                            searchViewModel.addRecentSearch(searchText.text) // ✅ 최근 검색어 저장
+                            searchViewModel.selectRecentSearch(searchText.text) // ✅ 선택된 도시 저장 (자동으로 `DetailSearchScreen`으로 변경)
                         }
                     }
             )
         }
 
-        // 🔹 "최근 검색어" 제목 (항상 표시)
-        Text(
-            text = "최근 검색어",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        // 🔹 최근 검색어 목록 (없을 경우 "검색 기록이 없습니다." 표시)
-        if (recentSearches.isNotEmpty()) {
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(bottom = 16.dp)
-            ) {
-                items(recentSearches) { search ->
-                    RecentSearchChip(search, onDelete = {
-                        recentSearches = recentSearches.filterNot { it == search } // ✅ 삭제 기능 추가
-                    }) {
-                        searchText = TextFieldValue(search) // ✅ 클릭하면 검색어 입력창에 자동 입력
-                    }
-                }
-            }
-        } else {
-            Text(
-                text = "검색 기록이 없습니다.",
-                fontSize = 14.sp,
-                color = Color.Gray,
-                modifier = Modifier.padding(start = 8.dp)
-            )
-        }
+        // 🔹 최근 검색어 목록
+        RecentSearchList(recentSearches, searchViewModel)
     }
 }
 
+
 @Composable
-fun DetailScreen(
+fun DetailSearchScreen(
     contentId: String,
     searchViewModel: SearchViewModel = hiltViewModel(),
 ) {
@@ -415,25 +384,66 @@ fun RestaurantItem(restaurant: Restaurant) { /* UI 구현 */ }
 fun TravelLogItem(travelLog: TravelLog) { /* UI 구현 */ }
 
 @Composable
-fun RecentSearchChip(text: String, onDelete: () -> Unit, onClick: () -> Unit) {
+fun RecentSearchList(recentSearches: List<String>, searchViewModel: SearchViewModel) {
+    if (recentSearches.isNotEmpty()) {
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("최근 검색", fontWeight = FontWeight.Bold)
+                Text(
+                    "모두 삭제",
+                    color = Color.Gray,
+                    modifier = Modifier.clickable { searchViewModel.clearRecentSearches() }
+                )
+            }
+
+                // ✅ 최근 검색어가 있으면 목록 표시
+                LazyColumn {
+                    items(recentSearches) { search ->
+                        RecentSearchItem(
+                            text = search,
+                            onDelete = { searchViewModel.removeRecentSearch(search) },
+                            onClick = { searchViewModel.selectRecentSearch(search) }
+                        )
+                    }
+                }
+        }
+    } else {
+        // ✅ 최근 검색어가 없을 때 메시지 표시
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 20.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "최근 검색어가 없습니다",
+                color = Color.Gray
+            )
+        }
+    }
+}
+
+@Composable
+fun RecentSearchItem(text: String, onDelete: () -> Unit, onClick: () -> Unit) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(Color(0xFFF0F0F0))
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .fillMaxWidth()
             .clickable { onClick() }
+            .padding(12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text, fontSize = 14.sp, color = Color.Black)
+        Text(text, fontSize = 16.sp, modifier = Modifier.weight(1f))
 
-        Spacer(modifier = Modifier.width(8.dp))
-
-        // 🔹 삭제 버튼 (X 클릭 시 해당 검색어 삭제)
         Icon(
             imageVector = Icons.Default.Close,
             contentDescription = "Delete",
             modifier = Modifier
-                .size(16.dp)
+                .size(20.dp)
                 .clickable { onDelete() }
         )
     }
