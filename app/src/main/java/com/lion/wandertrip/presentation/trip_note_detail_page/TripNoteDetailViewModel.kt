@@ -3,12 +3,15 @@ package com.lion.wandertrip.presentation.trip_note_detail_page
 import android.content.Context
 import android.net.Uri
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.ScheduleItem
@@ -16,6 +19,7 @@ import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.model.TripNoteReplyModel
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.service.TripNoteService
+import com.lion.wandertrip.service.TripScheduleService
 import com.lion.wandertrip.util.TripNoteScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -36,6 +40,7 @@ import javax.inject.Inject
 class TripNoteDetailViewModel @Inject constructor(
     @ApplicationContext val context: Context,
     val tripNoteService : TripNoteService,
+    val tripScheduleService : TripScheduleService
 ) : ViewModel() {
 
     // 여행기 정보를 담을 변수
@@ -70,6 +75,72 @@ class TripNoteDetailViewModel @Inject constructor(
 
     // 댓글 정보를 담을 변수
     lateinit var tripNoteReplyModel : MutableList<TripNoteReplyModel>
+
+    val tripSchedule = mutableStateOf(TripScheduleModel())
+    var tripScheduleItems = mutableStateListOf<ScheduleItem>()
+
+    val isLoading = mutableStateOf(false) // ✅ 로딩 상태 추가
+
+//    // 일정 상세 정보 가져오기
+//    fun getTripSchedule() {
+//        viewModelScope.launch {
+//
+//            isLoading.value = true // ✅ 로딩 시작
+//
+//            val work1 = async(Dispatchers.IO) {
+//                tripScheduleService.getTripSchedule(textFieldTripNoteScheduleDocId.value)
+//            }.await()
+//
+//            if (work1 != null) {
+//                tripSchedule.value = work1
+//            } else {
+//                Log.d("ScheduleViewModel", "해당 문서가 없습니다.")
+//            }
+//
+//            val work2 = async(Dispatchers.IO) {
+//                tripScheduleService.getTripScheduleItems(textFieldTripNoteScheduleDocId.value)
+//            }.await()
+//
+//            if (work2 != null) {
+//                tripScheduleItems.clear()
+//                tripScheduleItems.addAll(work2)
+//            } else {
+//                Log.d("ScheduleViewModel", "해당 문서가 없습니다.")
+//            }
+//
+//            isLoading.value = false // ✅ 로딩 완료
+//
+//
+//        }
+//    }
+
+    // 일정 상세 정보 가져오기
+    fun getTripSchedule() {
+        viewModelScope.launch {
+
+            isLoading.value = true // ✅ 로딩 시작
+
+            // 첫 번째 작업
+            val work1 = tripNoteService.getTripSchedule(textFieldTripNoteScheduleDocId.value)
+            if (work1 != null) {
+                tripSchedule.value = work1
+            } else {
+                Log.d("ScheduleViewModel", "해당 문서가 없습니다.")
+            }
+
+            // 두 번째 작업은 첫 번째 작업이 완료된 후 실행됨
+            val work2 = tripNoteService.getTripScheduleItems(textFieldTripNoteScheduleDocId.value)
+            if (work2 != null) {
+                tripScheduleItems.clear()
+                tripScheduleItems.addAll(work2)
+            } else {
+                Log.d("ScheduleViewModel", "해당 문서가 없습니다.")
+            }
+
+            isLoading.value = false // ✅ 로딩 완료
+        }
+    }
+
 
 
 
@@ -231,18 +302,6 @@ class TripNoteDetailViewModel @Inject constructor(
         tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_OTHER_SCHEDULE.name}/${otherNickName}")
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
     // 특정 기간 동안의 날짜 목록 생성 함수
     fun generateDateList(startDate: Timestamp, endDate: Timestamp): List<Timestamp> {
         val dateList = mutableListOf<Timestamp>()
@@ -256,6 +315,9 @@ class TripNoteDetailViewModel @Inject constructor(
         return dateList
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 
     // 일정 모델
     val tripScheduleDetailList = TripScheduleModel(
@@ -303,7 +365,8 @@ class TripNoteDetailViewModel @Inject constructor(
     )
 
     // 도시 이름과 코드를 설정 하는 함수
-    fun addAreaData(areaName: String, areaCode: Int) {
+    fun addAreaData(tripScheduleDocId: String, areaName: String, areaCode: Int) {
+        this.textFieldTripNoteScheduleDocId.value = tripScheduleDocId
         this.areaName.value = areaName
         this.areaCode.intValue = areaCode
     }

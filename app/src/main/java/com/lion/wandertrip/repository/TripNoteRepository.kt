@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
 import com.lion.wandertrip.model.TripNoteModel
+import com.lion.wandertrip.vo.ScheduleItemVO
 import com.lion.wandertrip.vo.TripNoteReplyVO
 import com.lion.wandertrip.vo.TripNoteVO
 import com.lion.wandertrip.vo.TripScheduleVO
@@ -190,6 +191,33 @@ class TripNoteRepository@Inject constructor() {
         }
 
         return resultList
+    }
+
+    // 일정 조회 (VO 리턴)
+    suspend fun getTripSchedule(docId: String): TripScheduleVO? {
+        val firestore = FirebaseFirestore.getInstance()
+        val docRef = firestore.collection("TripSchedule").document(docId)
+
+        val snapshot = docRef.get().await()
+        if (snapshot.exists()) {
+            // 스냅샷을 VO로 변환
+            return snapshot.toObject(TripScheduleVO::class.java)
+        }
+        return null
+    }
+
+    // TripSchedule 서브 컬렉션의 모든 문서를 ScheduleItemVO 리스트로 조회
+    suspend fun getTripScheduleItems(docId: String): List<ScheduleItemVO>? {
+        val firestore = FirebaseFirestore.getInstance()
+        val subCollectionRef = firestore.collection("TripSchedule")
+            .document(docId)
+            .collection("TripScheduleItem")
+
+        val snapshot = subCollectionRef.get().await()
+        if (!snapshot.isEmpty) {
+            return snapshot.toObjects(ScheduleItemVO::class.java)
+        }
+        return emptyList()
     }
 
 

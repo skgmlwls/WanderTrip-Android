@@ -34,9 +34,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +62,7 @@ import com.lion.wandertrip.presentation.trip_note_detail_page.component.TripNote
 import com.lion.wandertrip.ui.theme.NanumSquareRound
 import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 import com.bumptech.glide.integration.compose.GlideImage
+import com.lion.wandertrip.component.LottieLoadingIndicator
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -69,6 +72,22 @@ fun TripNoteDetailScreen(
     documentId: String,
     tripNoteDetailViewModel: TripNoteDetailViewModel = hiltViewModel(),
 ) {
+
+
+    val isFirstLaunch = rememberSaveable { mutableStateOf(true) } // ✅ 처음 실행 여부 저장
+    val isLoading by tripNoteDetailViewModel.isLoading // ✅ 로딩 상태 가져오기
+
+//    LaunchedEffect(isFirstLaunch.value) {
+//        if (isFirstLaunch.value) { // ✅ 처음 실행될 때만 실행
+//            tripNoteDetailViewModel.getTripSchedule()
+//            isFirstLaunch.value = false // ✅ 이후에는 실행되지 않도록 설정
+//        }
+//    }
+
+
+
+    tripNoteDetailViewModel.getTripSchedule()
+
 
     // 여행기 상세 데이터 가져오기
     tripNoteDetailViewModel.gettingTripNoteDetailData(documentId)
@@ -84,7 +103,9 @@ fun TripNoteDetailScreen(
 
     // tripNoteDetailList를 ViewModel에서 가져옵니다.
     val tripNoteDetailList = tripNoteDetailViewModel.tripNoteDetailList
-    val tripNoteDetailData = tripNoteDetailList.firstOrNull()  // 데이터를 제대로 가져옵니다.
+    val tripNoteDetailData = tripNoteDetailList.firstOrNull()
+
+
 
     // 이미지 목록 가져오기
     // val images = tripNoteDetailData?.tripNoteImage ?: listOf()  // 이미지 목록을 안전하게 처리합니다.
@@ -97,6 +118,7 @@ fun TripNoteDetailScreen(
 
     val focusRequester = remember { FocusRequester() }
     var isFocused by remember { mutableStateOf(false) }
+
 
 
 
@@ -361,13 +383,16 @@ fun TripNoteDetailScreen(
                 // 여행 일정 리스트
                 item {
                     TripNoteScheduleList(
+//                        viewModel = tripNoteDetailViewModel,
+//                        tripSchedule = tripNoteDetailViewModel.tripScheduleDetailList,
+//                        formatTimestampToDate = { timestamp ->
+//                            tripNoteDetailViewModel.formatTimestampToDate(
+//                                timestamp
+//                            )
+//                        },
                         viewModel = tripNoteDetailViewModel,
-                        tripSchedule = tripNoteDetailViewModel.tripScheduleDetailList,
-                        formatTimestampToDate = { timestamp ->
-                            tripNoteDetailViewModel.formatTimestampToDate(
-                                timestamp
-                            )
-                        },
+                        tripSchedule = tripNoteDetailViewModel.tripSchedule.value,
+                        formatTimestampToDate = { timestamp -> tripNoteDetailViewModel.formatTimestampToDate(timestamp) },
                         modifier = Modifier
                             .fillMaxWidth()
                     )
@@ -451,6 +476,11 @@ fun TripNoteDetailScreen(
                     Spacer(modifier = Modifier.height(15.dp))
                 }
             }
+
+//            // ✅ 로딩 화면 추가 (투명 오버레이)
+//            if (isLoading) {
+//                LottieLoadingIndicator() // ✅ 로딩 애니메이션
+//            }
 
         }
 }

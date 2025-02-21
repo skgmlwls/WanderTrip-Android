@@ -87,15 +87,15 @@ fun TripNoteScheduleList(
                     )
                     Text(
                         modifier = Modifier.alignByBaseline(),
-                        text = formatTimestampToDate(date),
+                        text = formatTimestampToDate(tripSchedule.scheduleDateList[index]),
                         fontSize = 14.sp,
                         fontFamily = NanumSquareRoundRegular
                     )
                 }
 
                 // 해당 날짜의 스케줄 아이템 목록 필터링 후 정렬
-                val filteredItems = tripSchedule.scheduleItems
-                    .filter { it.itemDate.seconds == date.seconds }
+                val filteredItems = viewModel.tripScheduleItems
+                    .filter { it.itemDate.seconds == tripSchedule.scheduleDateList[index].seconds }
                     .sortedBy { it.itemIndex }
 
                 // Google Map 표시 (해당 날짜의 스케줄 아이템 목록을 전달)
