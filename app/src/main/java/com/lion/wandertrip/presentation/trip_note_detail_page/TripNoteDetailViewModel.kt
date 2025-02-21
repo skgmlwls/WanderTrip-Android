@@ -4,25 +4,18 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.Timestamp
 import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.ScheduleItem
 import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.model.TripNoteReplyModel
 import com.lion.wandertrip.model.TripScheduleModel
-import com.lion.wandertrip.model.UserModel
-import com.lion.wandertrip.presentation.bottom.trip_note_page.TripNoteViewModel
 import com.lion.wandertrip.service.TripNoteService
-import com.lion.wandertrip.util.BotNavScreenName
-import com.lion.wandertrip.util.ScheduleScreenName
 import com.lion.wandertrip.util.TripNoteScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -59,6 +52,8 @@ class TripNoteDetailViewModel @Inject constructor(
     val textFieldTripNoteScheduleDocId = mutableStateOf(" ")
     // 여행기 사진 uri
     val showImageUri = mutableStateOf(mutableListOf<Uri?>())
+    // 스크랩 수
+    val textFieldTripNoteScrap = mutableStateOf(" ")
 
     // 휴지통 아이콘을 보여줄 것인지에 대한 상태 변수
     val showTopAppBarDeleteMenuState = mutableStateOf(false)
@@ -111,6 +106,7 @@ class TripNoteDetailViewModel @Inject constructor(
             textFieldTripNoteSubject.value = tripNoteModel.tripNoteTitle
             textFieldTripNoteContent.value = tripNoteModel.tripNoteContent
             textFieldTripNoteScheduleDocId.value = tripNoteModel.tripScheduleDocumentId
+            textFieldTripNoteScrap.value = tripNoteModel.tripNoteScrapCount.toString()
 
             // 만약 작성자와 로그인한 사용자가 같다면 메뉴를 보여준다.
             if(tripNoteModel.userNickname == tripApplication.loginUserModel.userNickName){
@@ -223,9 +219,10 @@ class TripNoteDetailViewModel @Inject constructor(
 
     }
 
-    // 일정 담기 아이콘
-    fun bringTripNote(){
-        tripApplication.navHostController.navigate(TripNoteScreenName.TRIP_NOTE_SELECT_DOWN.name)
+    // 일정 담기 아이콘 해당 여행기의 일정 문서id와 여행기 문서id를 전달해줌
+    fun bringTripNote(tripNoteScheduleDocId: MutableState<String>, documentId : String) {
+        val tripNoteScheduleDocId = tripNoteScheduleDocId.value
+        tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_SELECT_DOWN.name}/${tripNoteScheduleDocId}/${documentId}")
     }
 
     // 닉네임 클릭하면 그 사람 여행기 리스트 화면으로 이동

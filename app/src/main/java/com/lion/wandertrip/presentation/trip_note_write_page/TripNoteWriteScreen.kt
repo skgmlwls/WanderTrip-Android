@@ -4,6 +4,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +47,7 @@ import com.lion.a02_boardcloneproject.component.CustomOutlinedTextField
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.a02_boardcloneproject.component.LikeLionOutlinedTextFieldEndIconMode
 import com.lion.wandertrip.component.BlueButton
+import com.lion.wandertrip.component.LottieLoadingIndicator
 import com.lion.wandertrip.presentation.trip_note_write_page.component.AddImageButton
 import com.lion.wandertrip.ui.theme.NanumSquareRound
 import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
@@ -67,6 +69,9 @@ fun TripNoteWriteScreen(
     }
 
     val scheduleTitleState = remember { mutableStateOf(tripScheduleTitle) }
+
+    // 에러 상태 추가
+    val scheduleTitleError = remember { mutableStateOf("") }
 
     // tripNoteWriteViewModel에 tripScheduleTitle 값을 설정
     tripNoteWriteViewModel.tripScheduleTitle.value = scheduleTitleState.value
@@ -110,10 +115,19 @@ fun TripNoteWriteScreen(
 
                 Text(
                     text = "${scheduleTitleState.value}",
-                    // text = tripNoteWriteViewModel.scheduleTitleState.value,
                     fontFamily = NanumSquareRound,
                     fontSize = 22.sp,
                     modifier = Modifier.padding(start = 11.dp, top = 0.dp)
+                )
+            }
+
+            // 에러 메시지 표시
+            if (scheduleTitleError.value.isNotEmpty()) {
+                Text(
+                    text = scheduleTitleError.value,
+                    color = Color.Red,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(start = 0.dp, top = 4.dp)
                 )
             }
 
@@ -240,8 +254,15 @@ fun TripNoteWriteScreen(
                         tripNoteWriteViewModel.tripNoteContentIsError.value = false
                     }
 
+                    // 일정 선택 확인
+                    if (scheduleTitleState.value.isEmpty()) {
+                        scheduleTitleError.value = "일정을 선택해 주세요."
+                    } else {
+                        scheduleTitleError.value = ""
+                    }
+
                     // 제목과 내용이 모두 비어 있지 않으면 tripNoteDoneClick 호출
-                    if (tripNoteWriteViewModel.tripNoteTitle.value.isNotEmpty() && tripNoteWriteViewModel.tripNoteContent.value.isNotEmpty()) {
+                    if (tripNoteWriteViewModel.tripNoteTitle.value.isNotEmpty() && tripNoteWriteViewModel.tripNoteContent.value.isNotEmpty() && scheduleTitleState.value.isNotEmpty() ){
                         tripNoteWriteViewModel.tripNoteDoneClick()
                     }
                 }
@@ -249,25 +270,23 @@ fun TripNoteWriteScreen(
 
             Spacer(modifier = Modifier.padding(top = 15.dp))
 
-            // 프로그레스 바 표시
-            if (tripNoteWriteViewModel.isProgressVisible.value) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize() // 화면 크기를 모두 채움
-                        .padding(13.dp), // 여백을 추가할 수 있음
-                    contentAlignment = Alignment.Center // 내용 중앙 정렬
-                ) {
-                    LinearProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth() // 가로로 꽉 차게
-                            .height(3.dp), // 프로그레스 바의 두께
-                        color = Color.Blue // 프로그레스 바 색상
-                    )
-                }
-            }
-
-
-            Spacer(modifier = Modifier.padding(top = 30.dp))
         }
+
+        // 프로그레스 비행기
+        if (tripNoteWriteViewModel.isProgressVisible.value) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize() // 화면 전체를 덮음
+                    .clickable(enabled = false) {} // 클릭 방지
+                    .padding(13.dp),
+                contentAlignment = Alignment.Center // 내용 중앙 정렬
+            ) {
+                LottieLoadingIndicator(
+                )
+            }
+        }
+
+
+        Spacer(modifier = Modifier.padding(top = 30.dp))
     }
 }

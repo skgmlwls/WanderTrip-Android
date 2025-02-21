@@ -2,6 +2,8 @@ package com.lion.wandertrip.repository
 
 import android.net.Uri
 import android.util.Log
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.storage.FirebaseStorage
@@ -49,19 +51,28 @@ class TripNoteRepository@Inject constructor() {
         val firestore = FirebaseFirestore.getInstance()
         val collectionReference = firestore.collection("TripNoteReplyData")
 
+        // 컬렉션에서 첫 번째 문서를 제한하여 가져온다 (최대 1개 문서)
+        val data = collectionReference.limit(1).get().await()
+
+        // 컬렉션이 비어있다면 빈 리스트를 반환
+        if (data.isEmpty) {
+            val resultList = mutableListOf<Map<String, *>>()
+            return  resultList
+        }
+
         // 데이터를 가져온다.
         val result =
             collectionReference
                 .whereEqualTo("tripNoteDocumentId", documentId)
-//                .orderBy("tripNoteTimeStamp", Query.Direction.DESCENDING)
                 .get()
                 .await()
 
         // 반환할 리스트
         val resultList = mutableListOf<Map<String, *>>()
 
+
         // 데이터의 수 만큼 반환한다
-        val sortedResult = result.documents.sortedByDescending { it.getTimestamp("tripNoteTimeStamp")}
+        val sortedResult = result.documents.sortedByDescending { it.getTimestamp("replyTimeStamp")?.toDate() }
 
             // 데이터의 수 만큼 반환한다.
             sortedResult.forEach {
@@ -132,6 +143,56 @@ class TripNoteRepository@Inject constructor() {
         return resultList
     }
 
+    // 일정 담아가면 그 카운트 증가시키기
+    suspend fun addTripNoteScrapCount(documentId: String){
+        // documentId에 해당하는 여행기 문서 찾기
+        val firestore = FirebaseFirestore.getInstance()
+        val collectionReference = firestore.collection("TripNoteData")
+        val documentReference = collectionReference.document(documentId)
+
+        // 카운트 1씩 증가시키기
+        documentReference.update("tripNoteScrapCount", FieldValue.increment(1))
+            .await()
+    }
+
+    // 닉네임을 통해 유저의 다가오는 일정 리스트를 가져오는 메서드
+    suspend fun gettingUpcomingScheduleList(userNickName: String): MutableList<Map<String, *>> {
+        val firestore = FirebaseFirestore.getInstance()
+        val collectionReference = firestore.collection("TripSchedule")
+
+        // 현재 시간 가져오기
+        val currentTime = Timestamp.now()
+
+        // 닉네임 필터링으로 데이터 가져오기
+        val nicknameFilteredResult =
+            collectionReference
+                .whereEqualTo("userNickName", userNickName)
+                .get()
+                .await()
+
+        // 반환할 리스트
+        val resultList = mutableListOf<Map<String, *>>()
+
+        // 닉네임 필터링된 데이터 중에서 날짜 조건을 만족하는 데이터만 추가
+        nicknameFilteredResult.forEach {
+            val tripScheduleVO = it.toObject(TripScheduleVO::class.java)
+
+            // scheduleStartDate가 현재 시간보다 큰 경우만 추가
+            if (tripScheduleVO.scheduleStartDate > currentTime) {
+                val map = mapOf(
+                    // 문서의 id
+                    "documentId" to it.id,
+                    // 데이터를 가지고 있는 객체
+                    "tripScheduleVO" to tripScheduleVO,
+                )
+                resultList.add(map)
+            }
+        }
+
+        return resultList
+    }
+
+
     // 닉네임을 통해 다른 사람 여행기 리스트를 가져온다
     suspend fun gettingOtherTripNoteList(otherNickName : String): MutableList<Map<String, *>> {
         val firestore = FirebaseFirestore.getInstance()
@@ -160,15 +221,6 @@ class TripNoteRepository@Inject constructor() {
     }
 
 
-//    // 여행기 문서 id를 통해 데이터 가져오기
-//    suspend fun selectTripNoteDataOneById(documentId:String) : TripNoteVO{
-//        val firestore = FirebaseFirestore.getInstance()
-//        val collectionReference = firestore.collection("TripNoteData")
-//        val documentReference = collectionReference.document(documentId)
-//        val documentSnapShot = documentReference.get().await()
-//        val tripNoteVO = documentSnapShot.toObject(TripNoteVO::class.java)!!
-//        return tripNoteVO
-//    }
 
     suspend fun selectTripNoteDataOneById(documentId: String): TripNoteVO? {
         val firestore = FirebaseFirestore.getInstance()
@@ -257,7 +309,7 @@ class TripNoteRepository@Inject constructor() {
         imageReference.delete().await()
     }
 
-    // hj
+
     // 닉변 시 사용하는 메서드,
     // TripNoteData 컬렉션에서 기존 닉네임을 새로운 닉네임으로 변경
     suspend fun changeTripNoteNickname(oldNickName: String, newNickName: String) {

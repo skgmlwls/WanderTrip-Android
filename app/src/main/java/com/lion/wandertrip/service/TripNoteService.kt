@@ -73,7 +73,7 @@ class TripNoteService @Inject constructor(val tripNoteRepository: TripNoteReposi
         return tripNoteList
     }
 
-
+    // 내 여행일정 가져오기
     suspend fun gettingUserScheduleList(userNickName : String) : MutableList<TripScheduleModel>{
         // 여행기 정보를 가져온다.
         val tripNoteList = mutableListOf<TripScheduleModel>()
@@ -88,6 +88,29 @@ class TripNoteService @Inject constructor(val tripNoteRepository: TripNoteReposi
 
         return tripNoteList
     }
+
+    // 내 다가오는 여행 일정 가져오기
+    suspend fun gettingUpcomingScheduleList(userNickName : String) : MutableList<TripScheduleModel>{
+        // 여행기 정보를 가져온다.
+        val tripNoteList = mutableListOf<TripScheduleModel>()
+        val resultList = tripNoteRepository.gettingUpcomingScheduleList(userNickName)
+
+        resultList.forEach {
+            val tripNoteVO = it["tripScheduleVO"] as TripScheduleVO
+            // val documentId = it["documentId"] as String
+            val tripNoteModel = tripNoteVO.toTripScheduleModel()
+            tripNoteList.add(tripNoteModel)
+        }
+
+        return tripNoteList
+    }
+
+    // 일정 담아가면 담아가기 카운트 증가시키기
+    suspend fun addTripNoteScrapCount(documentId: String){
+        tripNoteRepository.addTripNoteScrapCount(documentId)
+    }
+
+
 
     // 해당 사람의 여행기 리스트 가져오기
     suspend fun gettingOtherTripNoteList(otherNickName : String) : MutableList<TripNoteModel>{
