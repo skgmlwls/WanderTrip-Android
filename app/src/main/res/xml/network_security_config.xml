@@ -9,4 +9,9 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">api.visitkorea.or.kr</domain>
     </domain-config>
+
+    <!-- 'apis.data.go.kr' 도메인에 대해서도 HTTP 트래픽을 허용 -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">apis.data.go.kr</domain>
+    </domain-config>
 </network-security-config>

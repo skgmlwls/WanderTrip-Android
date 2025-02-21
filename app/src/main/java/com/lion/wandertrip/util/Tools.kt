@@ -487,11 +487,11 @@ class Tools {
                         // 시군구 코드가 주어진 경우 해당 구 리턴
                         "구명: $subAreaName"
                     } else {
-                        "해당 시군구를 찾을 수 없습니다."
+                        ""
                     }
                 }
             } else {
-                "해당 지역을 찾을 수 없습니다."
+                ""
             }
         }
 
@@ -523,7 +523,7 @@ class Tools {
 
             // 현재 저장된 리스트 가져오기
             val currentList = getRecentItemList(context).toMutableList()
-            // Log.d("test100","currentList : $currentList")
+             Log.d("test100","currentList : $currentList")
 
             // 리스트의 크기가 20을 넘으면 가장 오래된 항목(19번)을 삭제
             if (currentList.size >= 20) {

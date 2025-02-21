@@ -25,6 +25,8 @@ fun MyInfoScreen(myInfoViewModel: MyInfoViewModel = hiltViewModel()) {
         myInfoViewModel.gettingUserModel()
         // 화면 열때 리스트 가져오기
         myInfoViewModel.getTripScheduleList()
+        // 최근 본 목록 가져오기
+        myInfoViewModel.getRecentTripItemList()
     }
     val userModel = myInfoViewModel.userModelValue.value
     Scaffold { paddingValues ->
@@ -50,7 +52,7 @@ fun MyInfoScreen(myInfoViewModel: MyInfoViewModel = hiltViewModel()) {
 
             // 최근 게시글 리스트
             HorizontalRecentPostsList(
-                RecentPostsDummyData.recentPostsDummyDataList,
+                myInfoViewModel.recentTripItemList,
                 myInfoViewModel
             )
 

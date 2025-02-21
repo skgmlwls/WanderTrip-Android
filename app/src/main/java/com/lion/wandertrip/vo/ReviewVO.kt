@@ -5,7 +5,7 @@ import com.lion.wandertrip.model.ReviewModel
 
 class ReviewVO {
     var reviewDocId: String = ""
-    var contentDocId: String = ""
+    var contentsDocId: String = ""
     var reviewWriterNickname: String = ""
     var reviewContent: String = ""
     var reviewTimeStamp: Timestamp = Timestamp.now()
@@ -18,7 +18,7 @@ class ReviewVO {
     fun toReviewItemModel(): ReviewModel {
         val reviewItemModel = ReviewModel()
         reviewItemModel.reviewDocId = reviewDocId
-        reviewItemModel.contentDocId = contentDocId
+        reviewItemModel.contentsDocId = contentsDocId
         reviewItemModel.reviewWriterNickname = reviewWriterNickname
         reviewItemModel.reviewContent = reviewContent
         reviewItemModel.reviewTimeStamp = reviewTimeStamp

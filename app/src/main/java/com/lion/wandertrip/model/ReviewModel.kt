@@ -5,7 +5,7 @@ import com.lion.wandertrip.vo.ReviewVO
 
 class ReviewModel(
     var reviewDocId: String = "",    // 리뷰 문서 ID
-    var contentDocId: String = "",   // 컨텐츠 문서 ID
+    var contentsDocId: String = "",   // 컨텐츠 문서 ID
     var reviewWriterNickname: String = "", // 작성자 닉네임
     var reviewContent: String = "",  // 리뷰 내용
     var reviewTimeStamp: Timestamp = Timestamp.now(), // 리뷰 작성 시간
@@ -17,7 +17,7 @@ class ReviewModel(
     fun toReviewItemVO(): ReviewVO {
         val reviewItemVO = ReviewVO()
         reviewItemVO.reviewDocId = reviewDocId
-        reviewItemVO.contentDocId = contentDocId
+        reviewItemVO.contentsDocId = contentsDocId
         reviewItemVO.reviewWriterNickname = reviewWriterNickname
         reviewItemVO.reviewContent = reviewContent
         reviewItemVO.reviewTimeStamp = reviewTimeStamp

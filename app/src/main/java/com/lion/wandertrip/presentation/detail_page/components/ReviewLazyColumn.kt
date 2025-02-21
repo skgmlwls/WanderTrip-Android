@@ -55,7 +55,7 @@ fun ReviewLazyColumn(detailViewModel: DetailViewModel) {
                     ImageVector.vectorResource(R.drawable.ic_add_24px),
                     iconButtonOnClick = {
                         // 리뷰 쓰기 화면 띄우기
-                        detailViewModel.onClickIconReviewWrite(contentModel.contentID,contentModel.detailTitle)
+                        detailViewModel.onClickIconReviewWrite(contentModel.contentId?:"",contentModel.title?:"")
                     })
             }
         }

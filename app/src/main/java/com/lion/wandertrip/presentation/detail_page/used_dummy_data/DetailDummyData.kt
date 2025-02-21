@@ -17,10 +17,6 @@ class DetailDummyData {
             detailHomepage= "https://plaza.seoul.go.kr/?doing_wp_cron=1701728399.7732338905334472656250",
         )
 
-       /* val recentItemDummy = SimpleItemModel(
-            contentID = "128968",
-            title = "서울광장",
-            contentType =*/
     }
 
 }

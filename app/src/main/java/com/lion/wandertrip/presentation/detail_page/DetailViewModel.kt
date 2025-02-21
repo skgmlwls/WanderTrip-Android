@@ -8,17 +8,26 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.DetailModel
 import com.lion.wandertrip.model.ReviewModel
+import com.lion.wandertrip.model.TripCommonItem
+import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.presentation.detail_page.used_dummy_data.DetailDummyData
 import com.lion.wandertrip.presentation.detail_page.used_dummy_data.ReviewDummyData
 import com.lion.wandertrip.presentation.detail_page.used_dummy_data.TripScheduleDummyData
+import com.lion.wandertrip.presentation.my_trip_page.components.TripItem
+import com.lion.wandertrip.service.TripCommonItemService
 import com.lion.wandertrip.util.MainScreenName
+import com.lion.wandertrip.util.Tools
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
@@ -26,8 +35,14 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class DetailViewModel @Inject constructor(@ApplicationContext context: Context) : ViewModel() {
+class DetailViewModel @Inject constructor(
+    @ApplicationContext context: Context,
+    val tripCommonItemService: TripCommonItemService
+) : ViewModel() {
     val tripApplication = context as TripApplication
+
+    // 소개 cityName
+    val cityNameValue = mutableStateOf("")
 
     // 소개 상태
     val isClickIntroState = mutableStateOf(true)
@@ -39,7 +54,7 @@ class DetailViewModel @Inject constructor(@ApplicationContext context: Context) 
     val isClickReviewState = mutableStateOf(false)
 
     // 컨텐트 모델
-    val contentModelValue = mutableStateOf(DetailModel())
+    val contentModelValue = mutableStateOf(TripCommonItem())
 
     // 리뷰 필터 시트 관리 상태 변수
     val isReviewOptionSheetOpen = mutableStateOf(false)
@@ -90,9 +105,6 @@ class DetailViewModel @Inject constructor(@ApplicationContext context: Context) 
     val isShownAddScheduleIconValue = mutableStateOf(false)
 
 
-
-
-
     // 리스트 길이로 맵을 초기화 메서드
     fun addMap() {
         tripScheduleList.forEachIndexed { index, tripScheduleModel ->
@@ -111,10 +123,10 @@ class DetailViewModel @Inject constructor(@ApplicationContext context: Context) 
 
 
     // Schedule 카드가 눌릴때 메서드
-    fun onClickIconScheduleCard(clickPos: Int,scheduleDaysSize : Int) {
+    fun onClickIconScheduleCard(clickPos: Int, scheduleDaysSize: Int) {
         // 날짜별 인덱스 bool 값 담는 맵 초기화
         addScheduleDatePickerMap(scheduleDaysSize)
-        Log.d("test100"," map : $scheduleDatePickerStateMap")
+        Log.d("test100", " map : $scheduleDatePickerStateMap")
         // 한번이라도 메뉴가 클릭된적이 없다면
         if (!isMenuOpened.value) {
             menuStateMap[clickPos] = true
@@ -189,8 +201,14 @@ class DetailViewModel @Inject constructor(@ApplicationContext context: Context) 
     }
 
     // 컨텐트 ID 로 모델 가져오기
-    fun getContentModel() {
-        contentModelValue.value = DetailDummyData.detailDummyModel
+    fun getContentModel(contentID :String) {
+        viewModelScope.launch {
+            val work1 = async(Dispatchers.IO){
+                tripCommonItemService.getTripCommonItem(contentID,null)
+            }
+            contentModelValue.value = work1.await()!!
+
+        }
     }
 
     // 소개 버튼 리스너
@@ -231,15 +249,11 @@ class DetailViewModel @Inject constructor(@ApplicationContext context: Context) 
         tripApplication.navHostController.popBackStack()
     }
 
-    // 홈페이지 따는 정규식
-    fun getHomePage() {
-        val inputString =
-            """<a href="https://plaza.seoul.go.kr/?doing_wp_cron=1701728399.7732338905334472656250" target="_blank" title="새창 : 홈페이지로 이동">https://plaza.seoul.go.kr</a>"""
-        val regex = "https://[\\S]+".toRegex()  // https:로 시작하는 URL을 찾는 정규식
-        val match = regex.find(inputString)
+    fun getHomePage(inputStr: String): String {
+        val regex = "https://[\\S]+(?=\")".toRegex()  // https://로 시작하고 "로 끝나는 URL을 찾는 정규식
+        val match = regex.find(inputStr)
 
-        val homepageUrl = match?.value
-        println(homepageUrl)  // "https://plaza.seoul.go.kr"
+        return match?.value ?: ""
     }
 
     // 홈페이지 클릭 시 브라우저로 열기
@@ -250,6 +264,12 @@ class DetailViewModel @Inject constructor(@ApplicationContext context: Context) 
             tripApplication.startActivity(intent)
         }
     }
+
+    //  contentID를 이용해서 TripItemModel 가져오는 메서드
+    fun gettingTripItem() {
+
+    }
+
 
     // 전화 클릭 시 전화 앱 켜기
     fun onClickTextTel(telNum: String) {
@@ -296,7 +316,6 @@ class DetailViewModel @Inject constructor(@ApplicationContext context: Context) 
         isRatingDesc.value = true
         filterStateStringValue.value = "별점 높은순"
         getFilteredReviewList()
-
     }
 
     // 리뷰 쓰기 버튼 리스너
@@ -307,6 +326,12 @@ class DetailViewModel @Inject constructor(@ApplicationContext context: Context) 
     // 리뷰 수정 버튼 리스너
     fun onClickIconReviewModify(contentID: String, reviewDocID: String) {
         tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_DETAIL_REVIEW_MODIFY.name}/${contentID}/${reviewDocID}")
+    }
+
+    fun gettingCityName( areaCode: String, siGunGuCode: String,) {
+        Log.d("test","areaCode : $areaCode")
+        cityNameValue.value = Tools.getAreaDetails(areaCode,siGunGuCode)
+
     }
 
     // timeStamp -> String 변환
@@ -344,6 +369,7 @@ class DetailViewModel @Inject constructor(@ApplicationContext context: Context) 
 
         return dateFormat.format(date)
     }
+
     // TimeStamp -> 요일 출력
     fun convertToDayOfWeekFromTimestamp(timestamp: Timestamp): String {
         // Timestamp를 Date로 변환

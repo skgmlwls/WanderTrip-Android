@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.detail_page
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -45,7 +46,8 @@ import com.lion.wandertrip.util.CustomFont
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewModel()) {
-    detailViewModel.getContentModel()
+    Log.d("test","contentID : $contentID")
+    detailViewModel.getContentModel(contentID)
     Scaffold(
         topBar = {
             CustomTopAppBar(
@@ -116,9 +118,11 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
 
             // 뷰페이저 항목
             if (detailViewModel.isClickIntroState.value)
+                // 소개 페이지
                 item { IntroColumn(detailViewModel) }
             if (detailViewModel.isClickBasicInfoState.value)
                 item {
+                    // 기본 정보 페이지
                     Column {
                         Text("기본정보", fontSize = 30.sp, fontFamily = CustomFont.customFontBold)
                         Spacer(modifier = Modifier.height(32.dp)) // 간격
@@ -129,6 +133,7 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
 
             if (detailViewModel.isClickReviewState.value)
                 item {
+                    // 후기 페이지
                     ReviewLazyColumn(detailViewModel)
                 }
 
