@@ -1,4 +1,4 @@
-package com.lion.wandertrip.presentation.bottom.home_page.components
+package com.lion.wandertrip.model
 
 import com.lion.wandertrip.util.ContentTypeId
 

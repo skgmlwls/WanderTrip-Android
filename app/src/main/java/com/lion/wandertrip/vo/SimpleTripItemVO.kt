@@ -1,6 +1,6 @@
 package com.lion.wandertrip.vo
 
-import com.lion.wandertrip.presentation.bottom.home_page.components.SimpleTripItemModel
+import com.lion.wandertrip.model.SimpleTripItemModel
 import com.lion.wandertrip.util.ContentTypeId
 
 data class SimpleTripItemVO (
