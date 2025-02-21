@@ -165,16 +165,16 @@ class Tools {
             fileOutputStream.close()
         }
          // timeStamp -> String 변환
-             private fun convertToDate(timeStamp: Timestamp): String {
-                 // Firestore Timestamp를 Date 객체로 변환
-                 val date = timeStamp.toDate()
+         private fun convertToDate(timeStamp: Timestamp): String {
+             // Firestore Timestamp를 Date 객체로 변환
+             val date = timeStamp.toDate()
 
-                 // 한국 시간대 (Asia/Seoul)로 설정
-                 val dateFormat = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA)
-                 dateFormat.timeZone = TimeZone.getTimeZone("Asia/Seoul")
+             // 한국 시간대 (Asia/Seoul)로 설정
+             val dateFormat = SimpleDateFormat("yyyy년 MM월 dd일", Locale.KOREA)
+             dateFormat.timeZone = TimeZone.getTimeZone("Asia/Seoul")
 
-                 return dateFormat.format(date)
-             }
+             return dateFormat.format(date)
+         }
 
          // 날짜 타입 변경 String-> Timestamp
              // DB에 넣을때 오후 12시로 넣기위해, kst(한국시간 오후 12시) -> utc(세계기준시간 으로 변환)

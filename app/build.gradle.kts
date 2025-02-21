@@ -107,4 +107,7 @@ dependencies {
     // Lottie 애니메이션
     implementation("com.airbnb.android:lottie-compose:5.2.0")
 
+    // Shimmer 라이브러리
+    implementation("com.valentinilk.shimmer:compose-shimmer:1.0.3")// 버전 예시
+
 }

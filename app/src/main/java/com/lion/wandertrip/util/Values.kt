@@ -316,6 +316,8 @@ enum class ScheduleScreenName{
     SCHEDULE_SELECT_ITEM_SCREEN,
     // 함께 하는 친구 목록 화면
     SCHEDULE_DETAIL_FRIENDS_SCREEN,
+    // 일정 항목 후기 화면
+    SCHEDULE_ITEM_REVIEW_SCREEN,
 }
 
 enum class TripNoteScreenName{

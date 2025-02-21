@@ -1,5 +1,6 @@
 package com.lion.wandertrip.service
 
+import android.graphics.Bitmap
 import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -48,6 +49,27 @@ class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
     suspend fun removeTripScheduleItem(scheduleDocId: String, itemDocId: String, itemDate: Timestamp) {
         Log.d("removeTripScheduleItem", "scheduleDocId: $scheduleDocId, itemDocId: $itemDocId")
         tripScheduleRepository.removeTripScheduleItem(scheduleDocId, itemDocId)
+    }
+
+    // 일정 항목 문서 id로 일정 항목 가져 오기
+    suspend fun getScheduleItemByDocId(tripScheduleDocId: String, scheduleItemDocId: String,): ScheduleItem? {
+        val scheduleItemVO = tripScheduleRepository.getScheduleItemByDocId(tripScheduleDocId, scheduleItemDocId) ?: return null
+        return scheduleItemVO.toScheduleItemModel()
+    }
+
+    // 일정 항목 업데이트
+    suspend fun updateScheduleItem(
+        tripScheduleDocId: String,
+        scheduleItemDocId: String,
+        updatedItem: ScheduleItem
+    ) {
+        val updatedItemVO = updatedItem.toScheduleItemVO()
+        tripScheduleRepository.updateScheduleItem(tripScheduleDocId, scheduleItemDocId, updatedItemVO)
+    }
+
+    // 단일 Bitmap 업로드 -> 다운 로드 URL
+    suspend fun uploadBitmapListToFirebase(bitmaps: List<Bitmap>): List<String> {
+        return tripScheduleRepository.uploadBitmapListToFirebase(bitmaps)
     }
 
     // 공공 데이터 관련 ///////////////////////////////////////////////////////////////////////////////
