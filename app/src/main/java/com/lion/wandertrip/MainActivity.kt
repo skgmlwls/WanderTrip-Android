@@ -1,5 +1,7 @@
 package com.lion.wandertrip
 
+import android.app.appsearch.SearchResult
+import android.app.appsearch.SearchResults
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -34,6 +36,7 @@ import com.lion.wandertrip.presentation.schedule_detail_friends.ScheduleDetailFr
 import com.lion.wandertrip.presentation.schedule_detail_page.ScheduleDetailScreen
 import com.lion.wandertrip.presentation.schedule_select_item.ScheduleSelectItemScreen
 import com.lion.wandertrip.presentation.search_page.SearchScreen
+import com.lion.wandertrip.presentation.search_result_page.SearchResultScreen
 import com.lion.wandertrip.presentation.start_page.StartScreen
 import com.lion.wandertrip.presentation.trip_note_other_schedule_page.TripNoteOtherScheduleScreen
 import com.lion.wandertrip.presentation.trip_note_schedule_page.TripNoteScheduleScreen
@@ -92,8 +95,13 @@ fun MyApp() {
             UserSignUpStep2Screen(userDocId = userDocId)
         }
         composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name) { UserSignUpStep1Screen() }
-        composable(MainScreenName.MAIN_SCREEN_SEARCH.name) { SearchScreen() }
         composable(MainScreenName.MAIN_SCREEN_USER_INFO.name) {UserInfoScreen()}
+
+        composable("${MainScreenName.MAIN_SCREEN_SEARCH_RESULT.name}/{contentId}") { backStackEntry ->
+            val contentId = backStackEntry.arguments?.getString("contentId") ?: "default_id"
+            SearchResultScreen(contentId)
+        }
+        composable(MainScreenName.MAIN_SCREEN_SEARCH.name) { SearchScreen() }
 
 //        // 여행기 메인 화면
 //        composable(
