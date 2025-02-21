@@ -98,10 +98,10 @@ dependencies {
     implementation("com.squareup.moshi:moshi-kotlin:1.13.0")
     implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
 
+
     // kotlinx.serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0") // ✅ JSON 직렬화 라이브러리 추가
     implementation("com.squareup.okhttp3:okhttp:4.9.3") // ✅ OkHttp 추가
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0") // ✅ Retrofit 변환기 추가
-
 
 }

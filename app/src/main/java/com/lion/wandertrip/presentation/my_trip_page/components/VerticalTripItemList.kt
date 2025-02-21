@@ -39,7 +39,6 @@ fun VerticalTripItemList(myTripViewModel: MyTripViewModel) {
     Column(modifier = Modifier.fillMaxSize()
         .verticalScroll(rememberScrollState()) // 스크롤 가능하게 설정
         .padding(16.dp)) {
-
         // 다가오는 여행
         if(myTripViewModel.upComingTripList.size!=0)
         Column  {
@@ -102,9 +101,12 @@ fun TripItem(trip: TripScheduleModel,myTripViewModel: MyTripViewModel,pos : Int)
         }
         else{
             Row{
-                CustomIconButton(icon = ImageVector.vectorResource(R.drawable.ic_calendar_month_24px))
-                CustomIconButton(icon = ImageVector.vectorResource(R.drawable.ic_delete_24px))
-
+                // 여행 날짜 수정
+                CustomIconButton(icon = ImageVector.vectorResource(R.drawable.ic_calendar_month_24px), iconButtonOnClick = {})
+                // 여행 삭제
+                CustomIconButton(icon = ImageVector.vectorResource(R.drawable.ic_delete_24px), iconButtonOnClick = {
+                    myTripViewModel.onClickIconDeleteTrip(trip.tripScheduleDocId)
+                })
             }
         }
 

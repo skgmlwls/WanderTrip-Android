@@ -57,12 +57,28 @@ class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
 
     // hj
     // 내 스케줄 가져오기
-    suspend fun gettingMyTripSchedules(userID:String) :MutableList<TripScheduleModel>{
-        val voList = tripScheduleRepository.gettingMyTripSchedules(userID)
+    suspend fun gettingMyTripSchedules(userNickName:String) :MutableList<TripScheduleModel>{
+        Log.d("test100","gettingMyTripSchedules")
+
+        val voList = tripScheduleRepository.gettingMyTripSchedules(userNickName)
         val result = mutableListOf<TripScheduleModel>()
         voList.forEach {
             result.add(it.toTripScheduleModel())
         }
         return result
+    }
+
+    //hj
+    //닉네임 바꿀 때 사용하기
+    // 닉변 전 게시물의 닉네임을 변경한 닉네임으로 update
+    suspend fun changeTripScheduleNickName(oldNickName: String, newNickName: String) {
+        tripScheduleRepository.changeTripScheduleNickName(oldNickName,newNickName)
+    }
+
+    // hj
+    // 여행 삭제
+    suspend fun deleteTripScheduleByDocId(docId : String) {
+
+        tripScheduleRepository.deleteTripScheduleByDocId(docId)
     }
 }

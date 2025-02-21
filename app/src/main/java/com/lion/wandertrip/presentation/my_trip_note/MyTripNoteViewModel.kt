@@ -1,22 +1,33 @@
 package com.lion.wandertrip.presentation.my_trip_note
 
 import android.content.Context
+import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.presentation.my_trip_note.used_dummy_data.TripNoteListDummyData
+import com.lion.wandertrip.service.TripNoteService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
-class MyTripNoteViewModel @Inject constructor(@ApplicationContext context: Context) : ViewModel() {
-
+class MyTripNoteViewModel @Inject constructor(
+    @ApplicationContext context: Context,
+    val tripNoteService: TripNoteService
+) : ViewModel() {
     // 컨텍스트
     val tripApplication = context as TripApplication
 
@@ -32,12 +43,25 @@ class MyTripNoteViewModel @Inject constructor(@ApplicationContext context: Conte
     // 메뉴 상태 관리 변수
     var isMenuOpened = mutableStateOf(false)
 
+    // 보여줄 이미지의 Uri
+    val showImageUri = mutableStateOf<Uri?>(null)
+
+    // 인덱스에 uri를 넣는 맵
+    val uriMap = mutableStateMapOf<Int,Uri?>()
+
+
     // 리스트 가져오기
     fun getTripNoteList() {
-        tripNoteList.addAll(
-            TripNoteListDummyData.tripNoteDummyData
-        )
-        addMap()
+        Log.d("test10","getTripNoteList")
+        viewModelScope.launch {
+            val work1 = async(Dispatchers.IO) {
+                tripNoteService.gettingOtherTripNoteList(tripApplication.loginUserModel.userNickName)
+            }
+            tripNoteList.clear()
+            tripNoteList.addAll(work1.await())
+            addMap()
+            settingUriMap()
+        }
     }
 
 
@@ -64,17 +88,46 @@ class MyTripNoteViewModel @Inject constructor(@ApplicationContext context: Conte
         }
     }
 
-        // 뒤로가기
-        fun onClickNavIconBack() {
-            tripApplication.navHostController.popBackStack()
-        }
+    // 뒤로가기
+    fun onClickNavIconBack() {
+        tripApplication.navHostController.popBackStack()
+    }
 
-        // 며칠전인지 계산하기
-        fun calculationDate(date: Timestamp): Int {
-            val now = Timestamp.now()
-            val diffInMillis = now.seconds * 1000 + now.nanoseconds / 1_000_000 -
-                    (date.seconds * 1000 + date.nanoseconds / 1_000_000)
+    // 며칠전인지 계산하기
+    fun calculationDate(date: Timestamp): Int {
+        val now = Timestamp.now()
+        val diffInMillis = now.seconds * 1000 + now.nanoseconds / 1_000_000 -
+                (date.seconds * 1000 + date.nanoseconds / 1_000_000)
 
-            return TimeUnit.MILLISECONDS.toDays(diffInMillis).toInt()
+        return TimeUnit.MILLISECONDS.toDays(diffInMillis).toInt()
+    }
+
+    // 경로명으로 uri 리턴받는 메서드
+    suspend fun fetchImageUri(imagePath: String): Uri {
+        return withContext(Dispatchers.IO) {
+            tripNoteService.gettingImage(imagePath) // 이미지 URI 가져오기
         }
+    }
+    // map 에 파일경로가 있는 model 만 uri 객체를 만들어 담는다
+    fun settingUriMap() {
+        CoroutineScope(Dispatchers.Main).launch {
+            tripNoteList.forEachIndexed { index, tripNoteModel ->
+                if(tripNoteModel.tripNoteImage.size!=0){
+                    uriMap[index] = fetchImageUri(tripNoteModel.tripNoteImage.first())
+                }else{
+                    uriMap[index]= null
+                }
+            }
+        }
+    }
+
+    // 여행기 삭제 메서드
+    fun deleteTripNoteByDocId(tripDocId: String) {
+        viewModelScope.launch {
+            // Firestore에서 삭제 요청 후 결과 확인
+            tripNoteService.deleteTripNoteData(tripDocId)
+            // 삭제 성공 시 리스트 다시 가져오기
+            getTripNoteList()
+        }
+    }
 }

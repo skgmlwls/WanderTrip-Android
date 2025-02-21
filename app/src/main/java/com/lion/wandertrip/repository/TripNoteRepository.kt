@@ -256,4 +256,29 @@ class TripNoteRepository@Inject constructor() {
         val imageReference = FirebaseStorage.getInstance().reference.child("image/$imageFileName")
         imageReference.delete().await()
     }
+
+    // hj
+    // 닉변 시 사용하는 메서드,
+    // TripNoteData 컬렉션에서 기존 닉네임을 새로운 닉네임으로 변경
+    suspend fun changeTripNoteNickname(oldNickName: String, newNickName: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        val collRef = firestore.collection("TripNoteData")
+
+        try {
+            val querySnapshot = collRef.whereEqualTo("userNickname", oldNickName).get().await()
+
+            if (querySnapshot.isEmpty) {
+                Log.d("test100", "변경할 닉네임($oldNickName)이 존재하지 않습니다.")
+                return
+            }
+
+            for (document in querySnapshot.documents) {
+                val docRef = collRef.document(document.id)
+                docRef.update("userNickname", newNickName).await()
+            }
+        } catch (e: Exception) {
+            Log.e("test100", "닉네임 변경 중 오류 발생: $e", e)
+        }
+    }
+
 }

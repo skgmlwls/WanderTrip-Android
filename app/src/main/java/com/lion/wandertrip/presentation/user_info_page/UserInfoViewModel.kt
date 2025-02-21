@@ -8,9 +8,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lion.wandertrip.TripApplication
+import com.lion.wandertrip.service.TripNoteService
+import com.lion.wandertrip.service.TripScheduleService
 import com.lion.wandertrip.service.UserService
-import com.lion.wandertrip.util.BotNavScreenName
-import com.lion.wandertrip.util.MainScreenName
 import com.lion.wandertrip.util.Tools
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -24,6 +24,8 @@ import javax.inject.Inject
 class UserInfoViewModel @Inject constructor(
     @ApplicationContext context: Context,
     val userService: UserService,
+    val tripScheduleService: TripScheduleService,
+    val tripNoteService: TripNoteService,
 ) : ViewModel() {
     val tripApplication = context as TripApplication
 
@@ -39,17 +41,8 @@ class UserInfoViewModel @Inject constructor(
     // 앨범이나 사진에서 이미지를 받아왔는지 상태 관리 변수
     val isImagePicked = mutableStateOf(false)
 
-    // appplication 에서 이미지를 가져왔는지 상태 관리 변수
-    val hasProfileImage = mutableStateOf(false)
-
-
     // 네비게이션 아이콘을 누르면 호출되는 메서드
     fun onClickNavIconBack() {
-        tripApplication.navHostController.popBackStack()
-    }
-
-    // 체크 메뉴 아이콘을 누르면 호출되는 메서드
-    fun onClickMenuIconCheck() {
         tripApplication.navHostController.popBackStack()
     }
 
@@ -59,54 +52,58 @@ class UserInfoViewModel @Inject constructor(
         CoroutineScope(Dispatchers.Main).launch {
             val userModel = tripApplication.loginUserModel
             var imageUri = userModel.userProfileImageURL
+            val oldNickName = userModel.userNickName
+            var newNickName = ""
 
-            Log.d("test100", "현재 유저 이미지 URL: $imageUri")
 
             if (isImagePicked.value) {
                 // 새로운 이미지 파일명 생성
                 imageUri = "image_${System.currentTimeMillis()}.jpg"
-                Log.d("test100", "새로운 이미지 파일명: $imageUri")
 
                 // 이미지 저장 (파일 경로 설정)
                 Tools.saveBitmap(tripApplication, imageBitmapState.value!!)
-                Log.d("test100", "이미지 저장 완료")
             }
 
             // 닉네임 업데이트
             userModel.userNickName = textFieldUserNicknameValue.value
+            newNickName = textFieldUserNicknameValue.value
+
             userModel.userProfileImageURL = imageUri
-            Log.d("test100", "닉네임 변경: ${userModel.userNickName}")
 
             // 병렬로 Firestore에 이미지와 사용자 데이터 업데이트
             val filePath = tripApplication.getExternalFilesDir(null).toString()
-            Log.d("test100", "외부 저장소 경로: $filePath")
 
-            val uploadJob = async(Dispatchers.IO) {
+            val work1 = async(Dispatchers.IO) {
                 if (isImagePicked.value) {
-                    Log.d("test100", "이미지 업로드 시작")
                     userService.uploadImage("$filePath/uploadTemp.jpg", imageUri)
-                    Log.d("test100", "이미지 업로드 완료")
                 }
             }
 
-            val updateUser = async(Dispatchers.IO) {
-                Log.d("test100", "사용자 데이터 업데이트 시작")
+            val work2 = async(Dispatchers.IO) {
                 userService.updateUserData(userModel)
-                Log.d("test100", "사용자 데이터 업데이트 완료")
             }
 
+            if(oldNickName!= newNickName){
+                val work3= async(Dispatchers.IO){
+                    tripNoteService.changeTripNoteNickname(oldNickName,newNickName)
+                }
+                val work4= async(Dispatchers.IO){
+                    tripScheduleService.changeTripScheduleNickName(oldNickName,newNickName)
+                }
+                work3.join()
+                work4.join()
+            }
+
+
             // 모든 작업 완료 후 업데이트
-            uploadJob.await()
-            updateUser.await()
-            Log.d("test100", "모든 업데이트 완료")
+            work1.await()
+            work2.await()
 
             // 업데이트된 데이터 저장
             tripApplication.loginUserModel = userModel
-            Log.d("test100", "유저 모델 업데이트 완료")
 
             // 뒤로 가기
             tripApplication.navHostController.popBackStack()
-            Log.d("test100", "화면 이동 완료")
         }
     }
 
