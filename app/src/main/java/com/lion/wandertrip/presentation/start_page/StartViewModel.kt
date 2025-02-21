@@ -4,7 +4,11 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.lion.wandertrip.TripApplication
+import com.lion.wandertrip.model.RecentTripItemModel
+import com.lion.wandertrip.presentation.start_page.used_dummy_data.RecentDummyData
 import com.lion.wandertrip.service.UserService
 import com.lion.wandertrip.util.BotNavScreenName
 import com.lion.wandertrip.util.MainScreenName
@@ -25,7 +29,7 @@ class StartViewModel @Inject constructor(
     // 로그인 중입니다를 위한 상태 관리 변수
     val showLoginMessageState = mutableStateOf(false)
 
-    // 로그인 중입니다를 위한 상태 관리 변수
+    // 카카오 로그인 중입니다를 위한 상태 관리 변수
     val showKakaoLoginMessageState = mutableStateOf(false)
 
     val tripApplication = context as TripApplication
@@ -66,7 +70,7 @@ class StartViewModel @Inject constructor(
                     // 로그인 화면으로 이동한다.
                     tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name)
                 }
-            } else if (kToken!=null) {
+            } else if (kToken != null) {
 
                 showKakaoLoginMessageState.value = true
 
@@ -95,4 +99,6 @@ class StartViewModel @Inject constructor(
             }
         }
     }
+
+
 }
