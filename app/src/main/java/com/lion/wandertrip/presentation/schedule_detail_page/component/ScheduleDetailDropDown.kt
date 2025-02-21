@@ -22,21 +22,21 @@ fun ScheduleDetailDropDawn(
             text = { Text("삭제") },
             onClick = {
                 // 삭제 기능 구현
-                onDismissRequest()
+                onDelete()
             }
         )
         DropdownMenuItem(
             text = { Text("후기") },
             onClick = {
                 // 후기 기능 구현
-                onDismissRequest()
+                onReview()
             }
         )
         DropdownMenuItem(
             text = { Text("위치조정") },
             onClick = {
                 // 위치조정 기능 구현
-                onDismissRequest()
+                onMove()
             }
         )
     }

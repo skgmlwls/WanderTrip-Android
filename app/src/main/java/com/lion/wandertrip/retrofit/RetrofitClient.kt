@@ -14,7 +14,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 
 object RetrofitClient {
     private const val BASE_URL = "https://apis.data.go.kr/B551011/KorService1/"
-
+    var gson= GsonBuilder().setLenient().create()
     private val json = Json {
         ignoreUnknownKeys = true // ✅ 응답에 예상치 못한 키가 있어도 무시
         isLenient = true // ✅ JSON 형식이 약간 틀려도 허용

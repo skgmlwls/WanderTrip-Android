@@ -103,5 +103,8 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.9.3") // ✅ OkHttp 추가
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0") // ✅ Retrofit 변환기 추가
 
+    // Lottie 애니메이션
+    implementation("com.airbnb.android:lottie-compose:5.2.0")
+
 
 }

@@ -267,7 +267,20 @@ fun MyApp() {
         composable(RouletteScreenName.ROULETTE_CITY_SELECT_SCREEN.name) { RouletteCitySelectScreen(navController = rememberNavHostController) }
 
         // 룰렛 일정 화면
-        composable(RouletteScreenName.ROULETTE_ITEM_SCREEN.name) { RouletteItemScreen(navController = rememberNavHostController) }
+        composable(
+            route = "${RouletteScreenName.ROULETTE_ITEM_SCREEN.name}?" +
+                    "tripScheduleDocId={tripScheduleDocId}&areaName={areaName}&areaCode={areaCode}",
+            arguments = listOf(
+                navArgument("tripScheduleDocId") { type = NavType.StringType },
+                navArgument("areaName") { type = NavType.StringType },
+                navArgument("areaCode") { type = NavType.LongType }
+            )
+        ) {
+            val tripScheduleDocId = it.arguments?.getString("tripScheduleDocId") ?: ""
+            val areaName = it.arguments?.getString("areaName") ?: ""
+            val areaCode = it.arguments?.getInt("areaCode") ?: 0
+            RouletteItemScreen(tripScheduleDocId, areaName, areaCode,navController = rememberNavHostController)
+        }
 
         // 룰렛 일정 항목 선택 화면
         composable(RouletteScreenName.ROULETTE_ITEM_SELECT_SCREEN.name) { RouletteItemSelectScreen(navController = rememberNavHostController) }

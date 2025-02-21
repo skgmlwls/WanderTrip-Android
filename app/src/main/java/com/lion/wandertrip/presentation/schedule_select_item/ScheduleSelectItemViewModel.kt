@@ -36,6 +36,9 @@ class ScheduleSelectItemViewModel @Inject constructor(
     // 여행지 항목 리스트
     val tripItemList = mutableStateListOf<TripItemModel>()
 
+    // 🔽 로딩 상태 추가
+    val isLoading = mutableStateOf(false)
+
     // 이전 화면 으로 이동 (일정 상세 화면)
     fun backScreen() {
         application.navHostController.popBackStack()
@@ -44,6 +47,8 @@ class ScheduleSelectItemViewModel @Inject constructor(
     // 여행지 항목 가져 오기
     fun loadTripItems(serviceKey: String, areaCode: String, contentTypeId: String) {
         viewModelScope.launch {
+            isLoading.value = true // ✅ 로딩 시작
+
             val tripItems = async(Dispatchers.IO) {
                 tripScheduleService.loadTripItems(serviceKey, areaCode, contentTypeId)
             }.await()
@@ -51,10 +56,8 @@ class ScheduleSelectItemViewModel @Inject constructor(
             if (tripItems != null) {
                 tripItemList.addAll(tripItems)
             }
-//            tripItemList.forEach {
-//                Log.d("ScheduleSelectItemViewModel", "loadTripItems: ${it.cat1}")
-//            }
-            Log.d("ScheduleSelectItemViewModel", "loadTripItems: ${tripItemList.size}")
+
+            isLoading.value = false // ✅ 로딩 완료
         }
     }
 
@@ -83,8 +86,11 @@ class ScheduleSelectItemViewModel @Inject constructor(
         }
     }
 
-    fun moveToRouletteItemScreen() {
-        application.navHostController.navigate(RouletteScreenName.ROULETTE_ITEM_SCREEN.name)
+    fun moveToRouletteItemScreen(tripScheduleDocId: String, areaName: String, areaCode: Int) {
+        application.navHostController.navigate(
+            "${RouletteScreenName.ROULETTE_ITEM_SCREEN.name}?" +
+                    "tripScheduleDocId=${tripScheduleDocId}&areaName=${areaName}&areaCode=${areaCode}"
+        )
     }
 
 

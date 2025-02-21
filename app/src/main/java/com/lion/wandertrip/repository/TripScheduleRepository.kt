@@ -91,6 +91,37 @@ class TripScheduleRepository {
         }
     }
 
+    // 일정 항목 삭제 후 itemIndex 재조정
+    suspend fun removeTripScheduleItem(scheduleDocId: String, itemDocId: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        val subCollectionRef = firestore.collection("TripSchedule")
+            .document(scheduleDocId)
+            .collection("TripScheduleItem")
+
+        // 삭제할 문서의 스냅샷을 가져와 itemIndex와 itemDate를 확인합니다.
+        val docSnapshot = subCollectionRef.document(itemDocId).get().await()
+        if (!docSnapshot.exists()) return
+
+        val deletedIndex = docSnapshot.getLong("itemIndex")?.toInt() ?: return
+        val deletedItemDate = docSnapshot.getTimestamp("itemDate") ?: return
+
+        // 해당 문서를 삭제합니다.
+        subCollectionRef.document(itemDocId).delete().await()
+
+        // 삭제한 문서와 동일한 itemDate를 가진, itemIndex가 삭제된 값보다 큰 모든 문서를 조회합니다.
+        val querySnapshot = subCollectionRef
+            .whereEqualTo("itemDate", deletedItemDate)
+            .whereGreaterThan("itemIndex", deletedIndex)
+            .get()
+            .await()
+
+        // 각 문서의 itemIndex를 1씩 감소시켜 재조정합니다.
+        for (doc in querySnapshot.documents) {
+            val currentIndex = doc.getLong("itemIndex")?.toInt() ?: continue
+            val newIndex = currentIndex - 1
+            subCollectionRef.document(doc.id).update("itemIndex", newIndex).await()
+        }
+    }
 
 
     // 공공 데이터 관련 //////////////////////////////////////////////////////////////////////////////
@@ -101,9 +132,12 @@ class TripScheduleRepository {
         val tripItemList = mutableListOf<TripItemVO>()
 
         try {
+            // ✅ API 호출 시작 시간
+            val apiStartTime = System.currentTimeMillis()
+
             val rawResponse = RetrofitClient.apiService.getItems(
                 serviceKey = serviceKey,
-                numOfRows = 100000,
+                numOfRows = 10000,
                 pageNo = 1,
                 mobileOS = "AND",
                 mobileApp = "WanderTrip",
@@ -114,6 +148,11 @@ class TripScheduleRepository {
                 contentTypeId = contentTypeId,
                 areaCode = areaCode,
             )
+
+            // ✅ API 응답 완료 시간 및 소요 시간 계산
+            val apiEndTime = System.currentTimeMillis()
+            val apiDuration = apiEndTime - apiStartTime
+            Log.d("API_RESPONSE_TIME", "API 응답 소요 시간: ${apiDuration}ms")
 
             // 🚀 응답 로그 출력
             Log.d("APIResponseRaw", "Response: $rawResponse")
@@ -128,9 +167,7 @@ class TripScheduleRepository {
 
             tripItemList.clear()
             tripItemList.addAll(tripItemVOs)
-            tripItemList.forEach {
-                Log.d("APIProcessedData", "저장된 데이터: ${it.title}")
-            }
+
             Log.d("APIProcessedData", "총 데이터 개수: ${tripItemList.size}")
 
         } catch (e: Exception) {
