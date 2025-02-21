@@ -1,35 +1,24 @@
 package com.lion.wandertrip.presentation.schedule_select_item.roulette_item
 
-import android.graphics.Paint
-import android.graphics.Typeface
 import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.Fill
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -42,12 +31,13 @@ import com.lion.wandertrip.presentation.schedule_select_item.roulette_item.compo
 import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 import com.lion.wandertrip.util.ScheduleScreenName
 import kotlinx.coroutines.launch
-import kotlin.math.cos
-import kotlin.math.sin
 import kotlin.random.Random
 
 @Composable
 fun RouletteItemScreen(
+    tripScheduleDocId : String,
+    areaName: String,
+    areaCode: Int,
     navController: NavHostController,
     scheduleSelectItemViewModel: ScheduleSelectItemViewModel = hiltViewModel(
         navController.getBackStackEntry(
@@ -79,7 +69,7 @@ fun RouletteItemScreen(
         topBar = {
             CustomTopAppBar(
                 title = "룰렛 돌리기",
-                navigationIconImage = androidx.compose.material.icons.Icons.Filled.ArrowBack,
+                navigationIconImage = Icons.Filled.ArrowBack,
                 navigationIconOnClick = { navController.popBackStack() }
             )
         }
@@ -93,7 +83,7 @@ fun RouletteItemScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Box(contentAlignment = Alignment.Center) {
-                
+
                 // 룰렛
                 RouletteWheelForTripItems(
                     items = viewModel.rouletteItemList,
@@ -179,6 +169,13 @@ fun RouletteItemScreen(
                         Button(
                             onClick = {
                                 showDialog = false
+                                viewModel.addTripItemToSchedule(
+                                    tripItemModel = selectedItem!!,
+                                    tripScheduleDocId = scheduleSelectItemViewModel.tripScheduleDocId.value,
+                                    areaName = areaName,
+                                    areaCode = areaCode,
+                                    scheduleDate = scheduleSelectItemViewModel.scheduleDate.value,
+                                )
                             }
                         ) {
                             Text("결정 하기")

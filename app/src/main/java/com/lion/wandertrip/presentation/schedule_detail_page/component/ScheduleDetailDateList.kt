@@ -170,7 +170,13 @@ fun ScheduleDetailDateList(
                                 ScheduleDetailDropDawn(
                                     expanded = expanded,
                                     onDismissRequest = { expanded = false },
-                                    onDelete = { /* 삭제 기능 구현 */ },
+                                    onDelete = {
+                                        viewModel.removeTripScheduleItem(
+                                            viewModel.tripScheduleDocId.value,
+                                            scheduleItem.itemDocId,
+                                            scheduleItem.itemDate
+                                        )
+                                    },
                                     onReview = { /* 후기 기능 구현 */ },
                                     onMove = { /* 위치조정 기능 구현 */ }
                                 )
@@ -186,7 +192,6 @@ fun ScheduleDetailDateList(
                 ) {
                     OutlinedButton(
                         onClick = {
-                            Log.d("ScheduleDetailDateList", "${tripSchedule.scheduleDateList[index]}")
                             viewModel.moveToScheduleSelectItemScreen(
                                 ContentTypeId.TOURIST_ATTRACTION.contentTypeCode,
                                 tripSchedule.scheduleDateList[index]
