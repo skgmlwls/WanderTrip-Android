@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.my_trip_note.components
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +38,7 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.LifecycleCoroutineScope
 import coil.compose.rememberImagePainter
 import com.lion.a02_boardcloneproject.component.CustomIconButton
 import com.lion.wandertrip.R
@@ -43,13 +47,15 @@ import com.lion.wandertrip.presentation.my_trip_note.MyTripNoteViewModel
 import com.lion.wandertrip.util.CustomFont
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
-fun VerticalTripNoteList(myTripNoteViewModel: MyTripNoteViewModel) {
+fun VerticalTripNoteList(tripNoteList : MutableList<TripNoteModel>,myTripNoteViewModel: MyTripNoteViewModel) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
-        items(myTripNoteViewModel.tripNoteList) { tripNoteModel ->
+        items(tripNoteList) { tripNoteModel ->
             val index = myTripNoteViewModel.tripNoteList.indexOf(tripNoteModel)
             TripNoteItem(tripNote = tripNoteModel, pos = index, myTripNoteViewModel)
         }
@@ -80,17 +86,16 @@ fun TripNoteItem(tripNote: TripNoteModel, pos: Int, myTripNoteViewModel: MyTripN
 
             Column(modifier = Modifier.padding(horizontal = 10.dp)) {
                 // 여행기 대표 이미지
+                if(myTripNoteViewModel.uriMap[pos]!=null)
                 GlideImage(
-                    imageModel = tripNote.tripNoteImage.first(),
+                    imageModel = myTripNoteViewModel.uriMap[pos],
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height((sH / 9).dp),  // 이미지 둥글게 만들기
-                    circularReveal = CircularReveal(duration = 250), // 애니메이션 효과 원형 모양으로 이미지 로드
+                        .height((sH / 9).dp),
+                    circularReveal = CircularReveal(duration = 250),
                     placeHolder = ImageBitmap.imageResource(R.drawable.img_image_holder),
                 )
-
-
                 // 아이콘과 텍스트
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -151,11 +156,18 @@ fun TripNoteItem(tripNote: TripNoteModel, pos: Int, myTripNoteViewModel: MyTripN
                         }
                         Spacer(modifier = Modifier.width(10.dp))
                         if (!myTripNoteViewModel.menuStateMap[pos]!!) {
+                            // 메뉴 아이콘
                             CustomIconButton(iconButtonOnClick = {
                                 myTripNoteViewModel.onClickIconMenu(pos)
                             }, icon = Icons.Default.MoreVert)
                         } else {
-                            CustomIconButton(iconButtonOnClick = {}, icon = ImageVector.vectorResource(R.drawable.ic_delete_24px))
+                            // 삭제 아이콘
+                            CustomIconButton(
+                                iconButtonOnClick = {
+                                    myTripNoteViewModel.deleteTripNoteByDocId(tripNote.tripNoteDocumentId)
+                                },
+                                icon = ImageVector.vectorResource(R.drawable.ic_delete_24px)
+                            )
                             // 수정 할 거면 밑에 수정 아이콘 추가
                         }
                     }

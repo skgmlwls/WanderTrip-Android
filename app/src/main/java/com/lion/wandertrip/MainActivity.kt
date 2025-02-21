@@ -4,6 +4,7 @@ import android.app.appsearch.SearchResult
 import android.app.appsearch.SearchResults
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -35,6 +36,8 @@ import com.lion.wandertrip.presentation.schedule_city_select.city_roulette.roule
 import com.lion.wandertrip.presentation.schedule_detail_friends.ScheduleDetailFriendsScreen
 import com.lion.wandertrip.presentation.schedule_detail_page.ScheduleDetailScreen
 import com.lion.wandertrip.presentation.schedule_select_item.ScheduleSelectItemScreen
+import com.lion.wandertrip.presentation.schedule_select_item.roulette_item.RouletteItemScreen
+import com.lion.wandertrip.presentation.schedule_select_item.roulette_item.roulette_item_select.RouletteItemSelectScreen
 import com.lion.wandertrip.presentation.search_page.SearchScreen
 import com.lion.wandertrip.presentation.search_result_page.SearchResultScreen
 import com.lion.wandertrip.presentation.start_page.StartScreen
@@ -45,6 +48,7 @@ import com.lion.wandertrip.presentation.user_info_page.UserInfoScreen
 import com.lion.wandertrip.presentation.user_login_page.UserLoginScreen
 import com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step1_page.UserSignUpStep1Screen
 import com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step2_page.UserSignUpStep2Screen
+import com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step3_page.UserSignUpStep3Screen
 import com.lion.wandertrip.ui.theme.WanderTripTheme
 import com.lion.wandertrip.util.BotNavScreenName
 import com.lion.wandertrip.util.MainScreenName
@@ -89,12 +93,22 @@ fun MyApp() {
         composable(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) { MainScreen() }
         composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP1.name) { UserSignUpStep1Screen() }
         composable(
-            route = "${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name}/{userDocId}"
+            route = "${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name}/{userDocId}/{fromWhere}"
         ) { backStackEntry ->
             val userDocId = backStackEntry.arguments?.getString("userDocId") ?: ""
-            UserSignUpStep2Screen(userDocId = userDocId)
+            val fromWhere = backStackEntry.arguments?.getString("fromWhere") ?: ""
+            UserSignUpStep2Screen(userDocId = userDocId, fromWhere = fromWhere)
         }
         composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name) { UserSignUpStep1Screen() }
+
+        // 카카오 가입
+        composable("${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name}/{kakaoToken}") {
+                backStackEntry ->
+            val kakaoToken = backStackEntry.arguments?.getString("kakaoToken")?:""
+            UserSignUpStep3Screen(kakaoToken = kakaoToken)
+        }
+
+        composable(MainScreenName.MAIN_SCREEN_SEARCH.name) { SearchScreen() }
         composable(MainScreenName.MAIN_SCREEN_USER_INFO.name) {UserInfoScreen()}
 
         composable("${MainScreenName.MAIN_SCREEN_SEARCH_RESULT.name}/{contentId}") { backStackEntry ->
@@ -124,17 +138,27 @@ fun MyApp() {
 
         // 여행기 작성 화면
         composable(
-            route = "${TripNoteScreenName.TRIP_NOTE_WRITE.name}/{scheduleTitle}"
+            route = "${TripNoteScreenName.TRIP_NOTE_WRITE.name}/{scheduleTitle}/{scheduleDocId}"
         ){
             val scheduleTitle = it.arguments?.getString("scheduleTitle") ?:  ""
-            TripNoteWriteScreen(scheduleTitle = scheduleTitle)
+            val scheduleDocId = it.arguments?.getString("scheduleDocId") ?: ""
+            TripNoteWriteScreen(tripScheduleTitle = scheduleTitle, scheduleDocId = scheduleDocId)
         }
 
         // 여행기 페이지에서 다른 사람 여행기 보기
-        composable(TripNoteScreenName.TRIP_NOTE_OTHER_SCHEDULE.name) { TripNoteOtherScheduleScreen() }
+        // composable(TripNoteScreenName.TRIP_NOTE_OTHER_SCHEDULE.name) { TripNoteOtherScheduleScreen() }
+        composable(
+            route = "${TripNoteScreenName.TRIP_NOTE_OTHER_SCHEDULE.name}/{otherNickName}"
+        ){
+            val otherNickName = it.arguments?.getString("otherNickName") ?:  ""
+            TripNoteOtherScheduleScreen(otherNickName = otherNickName)
+        }
+
+        // 여행기에서 다른 사람 일정 다운
         composable(TripNoteScreenName.TRIP_NOTE_SELECT_DOWN.name) { TripNoteSelectDownScreen() }
 
 
+        // 여행기에서 일정 가져오기
         composable(TripNoteScreenName.TRIP_NOTE_SCHEDULE.name) { TripNoteScheduleScreen() }
 
 
@@ -257,6 +281,25 @@ fun MyApp() {
 
         // 룰렛 도시 항목 추가 화면
         composable(RouletteScreenName.ROULETTE_CITY_SELECT_SCREEN.name) { RouletteCitySelectScreen(navController = rememberNavHostController) }
+
+        // 룰렛 일정 화면
+        composable(
+            route = "${RouletteScreenName.ROULETTE_ITEM_SCREEN.name}?" +
+                    "tripScheduleDocId={tripScheduleDocId}&areaName={areaName}&areaCode={areaCode}",
+            arguments = listOf(
+                navArgument("tripScheduleDocId") { type = NavType.StringType },
+                navArgument("areaName") { type = NavType.StringType },
+                navArgument("areaCode") { type = NavType.LongType }
+            )
+        ) {
+            val tripScheduleDocId = it.arguments?.getString("tripScheduleDocId") ?: ""
+            val areaName = it.arguments?.getString("areaName") ?: ""
+            val areaCode = it.arguments?.getInt("areaCode") ?: 0
+            RouletteItemScreen(tripScheduleDocId, areaName, areaCode,navController = rememberNavHostController)
+        }
+
+        // 룰렛 일정 항목 선택 화면
+        composable(RouletteScreenName.ROULETTE_ITEM_SELECT_SCREEN.name) { RouletteItemSelectScreen(navController = rememberNavHostController) }
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         // 리뷰 작성 화면

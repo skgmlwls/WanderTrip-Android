@@ -93,7 +93,7 @@ class DetailViewModel @Inject constructor(@ApplicationContext context: Context) 
 
 
 
-    // 리스트 길이로 맵을 초기화
+    // 리스트 길이로 맵을 초기화 메서드
     fun addMap() {
         tripScheduleList.forEachIndexed { index, tripScheduleModel ->
             menuStateMap[index] = false
@@ -110,7 +110,7 @@ class DetailViewModel @Inject constructor(@ApplicationContext context: Context) 
     }
 
 
-    // Schedule 카드가 눌릴때
+    // Schedule 카드가 눌릴때 메서드
     fun onClickIconScheduleCard(clickPos: Int,scheduleDaysSize : Int) {
         // 날짜별 인덱스 bool 값 담는 맵 초기화
         addScheduleDatePickerMap(scheduleDaysSize)
@@ -131,7 +131,7 @@ class DetailViewModel @Inject constructor(@ApplicationContext context: Context) 
         isShownAddScheduleIconValue.value = false
     }
 
-    // schedule 날짜 눌릴때 리스너
+    // schedule 날짜 눌릴때 리스너 메서드
     fun onClickScheduleDateCard(clickPos: Int) {
         // 한번이라도 메뉴가 클릭된적이 없다면
         if (!scheduleDatePickerIsClick.value) {

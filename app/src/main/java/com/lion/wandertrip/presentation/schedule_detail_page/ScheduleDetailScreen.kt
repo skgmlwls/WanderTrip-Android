@@ -1,12 +1,17 @@
 package com.lion.wandertrip.presentation.schedule_detail_page
 
 import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -16,9 +21,15 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.lion.wandertrip.component.LottieLoadingIndicator
 import com.lion.wandertrip.presentation.schedule_detail_page.component.ScheduleDetailDateList
 import com.lion.wandertrip.ui.theme.NanumSquareRound
 
@@ -30,61 +41,53 @@ fun ScheduleDetailScreen(
     areaCode: Int,
     viewModel: ScheduleDetailViewModel = hiltViewModel(),
 ) {
-    // 초기 세팅
+    val isFirstLaunch = rememberSaveable { mutableStateOf(true) } // ✅ 처음 실행 여부 저장
+    val isLoading by viewModel.isLoading // ✅ 로딩 상태 가져오기
+
     LaunchedEffect(Unit) {
-        // 초기 데이터 세팅
         viewModel.addAreaData(tripScheduleDocId, areaName, areaCode)
-        // 이미 데이터가 없다면 불러오기
-        if (viewModel.tripScheduleItems.isEmpty()) {
+        if (isFirstLaunch.value) { // ✅ 처음 실행될 때만 실행
             viewModel.getTripSchedule()
+            isFirstLaunch.value = false // ✅ 이후에는 실행되지 않도록 설정
         }
     }
 
-    Log.d("ScheduleDetailScreen", "일정 문서 ID : $tripScheduleDocId")
-    Log.d("ScheduleDetailScreen", "도시 이름 : $areaName")
-    Log.d("ScheduleDetailScreen", "도시 코드 : $areaCode")
-    Log.d("ScheduleDetailScreen", "날짜 리스트 : ${viewModel.tripSchedule.value.scheduleDateList}")
-
-    Scaffold(
-        containerColor = Color.White,
-        topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.White // ✅ 투명색 적용
-                ),
-                title = {
-                    Text(text = "일정 상세", fontFamily = NanumSquareRound) // ✅ 제목 설정
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { viewModel.backScreen() }
-                    ) {
-                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "뒤로 가기")
-                    }
-                },
-                actions = {
-                    IconButton(
-                        onClick = { viewModel.moveToScheduleDetailFriendsScreen("abcd") }
-                    ) {
-                        Icon(imageVector = Icons.Filled.People, contentDescription = "함께 하는 사람 목록")
-                    }
-                },
-            )
-        }
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(it)
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            containerColor = Color.White,
+            topBar = {
+                TopAppBar(
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = Color.White
+                    ),
+                    title = {
+                        Text(text = "일정 상세", fontFamily = NanumSquareRound)
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { viewModel.backScreen() }) {
+                            Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "뒤로 가기")
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { viewModel.moveToScheduleDetailFriendsScreen("abcd") }) {
+                            Icon(imageVector = Icons.Filled.People, contentDescription = "함께 하는 사람 목록")
+                        }
+                    },
+                )
+            }
         ) {
-//            Text(text = "도시 이름 : $areaName")
-//            Text(text = "도시 코드 : $areaCode")
-            ScheduleDetailDateList(
-                viewModel = viewModel,
-                tripSchedule = viewModel.tripSchedule.value,
-                // TimeStamp 를 변환 하는 함수 타입 전달
-                formatTimestampToDate = { timestamp -> viewModel.formatTimestampToDate(timestamp) }
-            )
+            Column(modifier = Modifier.padding(it)) {
+                ScheduleDetailDateList(
+                    viewModel = viewModel,
+                    tripSchedule = viewModel.tripSchedule.value,
+                    formatTimestampToDate = { timestamp -> viewModel.formatTimestampToDate(timestamp) }
+                )
+            }
+        }
+
+        // ✅ 로딩 화면 추가 (투명 오버레이)
+        if (isLoading) {
+            LottieLoadingIndicator() // ✅ 로딩 애니메이션
         }
     }
-
 }

@@ -339,6 +339,10 @@ enum class RouletteScreenName{
     ROULETTE_CITY_SCREEN,
     // 룰렛 도시 항목 추가 화면
     ROULETTE_CITY_SELECT_SCREEN,
+    // 룰렛 일정 항목 화면
+    ROULETTE_ITEM_SCREEN,
+    // 룰렛 일정 항목 추가 화면
+    ROULETTE_ITEM_SELECT_SCREEN,
 }
 
 enum class TripItemCat2(val catCode: String, val catName: String) {

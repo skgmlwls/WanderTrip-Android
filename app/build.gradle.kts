@@ -5,6 +5,7 @@ plugins {
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
+    kotlin("plugin.serialization") version "2.0.0" // (본인의 Kotlin 버전에 맞게 조정)
 }
 
 android {
@@ -90,5 +91,20 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
+
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2") // lifecycleScope
+
+    // Moshi
+    implementation("com.squareup.moshi:moshi-kotlin:1.13.0")
+    implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
+
+
+    // kotlinx.serialization
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0") // ✅ JSON 직렬화 라이브러리 추가
+    implementation("com.squareup.okhttp3:okhttp:4.9.3") // ✅ OkHttp 추가
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0") // ✅ Retrofit 변환기 추가
+
+    // Lottie 애니메이션
+    implementation("com.airbnb.android:lottie-compose:5.2.0")
 
 }

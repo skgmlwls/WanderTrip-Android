@@ -45,6 +45,7 @@ class ScheduleDetailViewModel @Inject constructor(
     val tripSchedule = mutableStateOf(TripScheduleModel())
     val tripScheduleItems = mutableStateListOf<ScheduleItem>()
 
+    val isLoading = mutableStateOf(false) // ✅ 로딩 상태 추가
 
     // Firestore 리스너 (변경 감지용)
     private var scheduleItemsListener: ListenerRegistration? = null
@@ -82,9 +83,12 @@ class ScheduleDetailViewModel @Inject constructor(
     // 일정 상세 정보 가져오기
     fun getTripSchedule() {
         viewModelScope.launch {
+            isLoading.value = true // ✅ 로딩 시작
+
             val work1 = async(Dispatchers.IO) {
                 tripScheduleService.getTripSchedule(tripScheduleDocId.value)
             }.await()
+
             if (work1 != null) {
                 tripSchedule.value = work1
             } else {
@@ -93,6 +97,18 @@ class ScheduleDetailViewModel @Inject constructor(
 
             // Firestore Snapshot Listener 활성화
             observeTripScheduleItems()
+
+            isLoading.value = false // ✅ 로딩 완료
+        }
+    }
+
+    // 일정 항목 삭제 후 itemIndex 재조정
+    fun removeTripScheduleItem(scheduleDocId: String, itemDocId: String, itemDate: Timestamp) {
+        Log.d("removeTripScheduleItem", "scheduleDocId: $scheduleDocId, itemDocId: $itemDocId")
+        viewModelScope.launch {
+            val work1 = async(Dispatchers.IO) {
+                tripScheduleService.removeTripScheduleItem(scheduleDocId, itemDocId, itemDate)
+            }.await()
         }
     }
 

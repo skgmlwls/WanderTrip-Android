@@ -38,17 +38,29 @@ class TripNoteWriteViewModel @Inject constructor(
     // TopAppBar의 타이틀
     val topAppBarTitle = mutableStateOf("여행기 작성")
 
-    // 여행기 제목
-    val tripNoteTitle = mutableStateOf("")
+    // 여행기 제목, 에러
+    var tripNoteTitle = mutableStateOf("")
+    val tripNoteTitleError = mutableStateOf("")
+    val tripNoteTitleIsError = mutableStateOf(false)
 
-    // 여행기 내용
+    // 여행기 내용, 에러
     val tripNoteContent = mutableStateOf("")
+    val tripNoteContentError = mutableStateOf("")
+    val tripNoteContentIsError = mutableStateOf(false)
+
+    // 일정 제목
+    var tripScheduleTitle = mutableStateOf("")
+
+    // 일정 문서 id
+    var scheduleDocId = ("")
+
 
     // Bitmap
     val tripNotePreviewBitmap = mutableStateListOf<Bitmap?>()
 
     // 저장할 이미지 경로 리스트
     val tripNoteImages = mutableListOf<String>()
+
 
     // 뒤로 가기 버튼
     fun navigationButtonClick(){
@@ -77,13 +89,18 @@ class TripNoteWriteViewModel @Inject constructor(
         val tripNoteTimeStamp = Timestamp.now()
 
         // 나중에 받아와야함
-        val tripScheduleDocumentId = ""
+        // tripScheduleTitle 로 아이디 찾아서..
+        // val tripScheduleDocumentId = ""
 
         // 로그인한 사용자의 닉네임
         val userNickname = tripApplication.loginUserModel.userNickName
 
+
         // 저장
         CoroutineScope(Dispatchers.Main).launch {
+
+
+
             // 이미지가 첨부되어 있다면
             if (tripNotePreviewBitmap != null) {
 
@@ -112,7 +129,7 @@ class TripNoteWriteViewModel @Inject constructor(
             tripNoteModel.tripNoteContent = tripNoteContent
             tripNoteModel.tripNoteImage = tripNoteImages
             tripNoteModel.tripNoteTimeStamp = tripNoteTimeStamp
-            tripNoteModel.tripScheduleDocumentId = tripScheduleDocumentId
+            tripNoteModel.tripScheduleDocumentId = scheduleDocId
             tripNoteModel.userNickname = userNickname
 
             try {
@@ -130,8 +147,6 @@ class TripNoteWriteViewModel @Inject constructor(
             // 여행기 상세에 documentId 전달하기
             tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_DETAIL.name}/${documentId}")
                 tripApplication.navHostController.popBackStack()
-//                tripApplication.navHostController.navigate("${BotNavScreenName.BOT_NAV_SCREEN_TRIP_NOTE.name}/${documentId}")
-//                tripApplication.navHostController.popBackStack()
 
 
         } catch (e: Exception) {
@@ -139,7 +154,6 @@ class TripNoteWriteViewModel @Inject constructor(
             isProgressVisible.value = false
             // 에러 메시지 표시 (옵션)
         }
-            // tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_DETAIL.name}/${documentId}")
         }
 
     }

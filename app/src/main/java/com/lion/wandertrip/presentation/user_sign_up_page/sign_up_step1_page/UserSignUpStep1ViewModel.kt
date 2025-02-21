@@ -110,7 +110,7 @@ class UserSignUpStep1ViewModel @Inject constructor(
         }
 
         if(!isCheckUserNickName.value){
-            textFieldUserJoinStep1NickNameErrorText.value = "아이디 중복 확인을 해주세요"
+            textFieldUserJoinStep1NickNameErrorText.value = "닉네임 중복 확인을 해주세요"
             textFieldUserJoinStep1NickNameIsError.value = true
             isError = true
         }

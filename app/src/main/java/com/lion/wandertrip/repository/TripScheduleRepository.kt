@@ -9,6 +9,7 @@ import com.lion.wandertrip.vo.ScheduleItemVO
 import com.lion.wandertrip.vo.TripItemVO
 import com.lion.wandertrip.vo.TripScheduleVO
 import kotlinx.coroutines.tasks.await
+import kotlinx.serialization.json.Json
 
 class TripScheduleRepository {
 
@@ -84,12 +85,43 @@ class TripScheduleRepository {
             // ✅ Firestore에 저장
             newItemRef.set(scheduleItemVO).await()
 
-            println("✅ 새로운 여행지 추가 완료: ${scheduleItemVO.itemTitle} (index: $newItemIndex)")
+            println("새로운 여행지 추가 완료: ${scheduleItemVO.itemTitle} (index: $newItemIndex)")
         } catch (e: Exception) {
-            println("❌ Firestore 추가 실패: ${e.message}")
+            println("Firestore 추가 실패: ${e.message}")
         }
     }
 
+    // 일정 항목 삭제 후 itemIndex 재조정
+    suspend fun removeTripScheduleItem(scheduleDocId: String, itemDocId: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        val subCollectionRef = firestore.collection("TripSchedule")
+            .document(scheduleDocId)
+            .collection("TripScheduleItem")
+
+        // 삭제할 문서의 스냅샷을 가져와 itemIndex와 itemDate를 확인합니다.
+        val docSnapshot = subCollectionRef.document(itemDocId).get().await()
+        if (!docSnapshot.exists()) return
+
+        val deletedIndex = docSnapshot.getLong("itemIndex")?.toInt() ?: return
+        val deletedItemDate = docSnapshot.getTimestamp("itemDate") ?: return
+
+        // 해당 문서를 삭제합니다.
+        subCollectionRef.document(itemDocId).delete().await()
+
+        // 삭제한 문서와 동일한 itemDate를 가진, itemIndex가 삭제된 값보다 큰 모든 문서를 조회합니다.
+        val querySnapshot = subCollectionRef
+            .whereEqualTo("itemDate", deletedItemDate)
+            .whereGreaterThan("itemIndex", deletedIndex)
+            .get()
+            .await()
+
+        // 각 문서의 itemIndex를 1씩 감소시켜 재조정합니다.
+        for (doc in querySnapshot.documents) {
+            val currentIndex = doc.getLong("itemIndex")?.toInt() ?: continue
+            val newIndex = currentIndex - 1
+            subCollectionRef.document(doc.id).update("itemIndex", newIndex).await()
+        }
+    }
 
 
     // 공공 데이터 관련 //////////////////////////////////////////////////////////////////////////////
@@ -100,9 +132,12 @@ class TripScheduleRepository {
         val tripItemList = mutableListOf<TripItemVO>()
 
         try {
+            // ✅ API 호출 시작 시간
+            val apiStartTime = System.currentTimeMillis()
+
             val rawResponse = RetrofitClient.apiService.getItems(
                 serviceKey = serviceKey,
-                numOfRows = 100000,
+                numOfRows = 10000,
                 pageNo = 1,
                 mobileOS = "AND",
                 mobileApp = "WanderTrip",
@@ -114,11 +149,16 @@ class TripScheduleRepository {
                 areaCode = areaCode,
             )
 
+            // ✅ API 응답 완료 시간 및 소요 시간 계산
+            val apiEndTime = System.currentTimeMillis()
+            val apiDuration = apiEndTime - apiStartTime
+            Log.d("API_RESPONSE_TIME", "API 응답 소요 시간: ${apiDuration}ms")
+
             // 🚀 응답 로그 출력
             Log.d("APIResponseRaw", "Response: $rawResponse")
 
             // JSON 파싱
-            val apiResponse = RetrofitClient.gson.fromJson(rawResponse, ApiResponse::class.java)
+            val apiResponse = Json.decodeFromString<ApiResponse>(rawResponse)
             val items = apiResponse.response.body?.items?.item ?: emptyList()
 
             // ✅ 변환을 TripItemVO 내부에서 처리
@@ -127,9 +167,7 @@ class TripScheduleRepository {
 
             tripItemList.clear()
             tripItemList.addAll(tripItemVOs)
-            tripItemList.forEach {
-                Log.d("APIProcessedData", "저장된 데이터: ${it.title}")
-            }
+
             Log.d("APIProcessedData", "총 데이터 개수: ${tripItemList.size}")
 
         } catch (e: Exception) {
@@ -139,5 +177,83 @@ class TripScheduleRepository {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // hj
+    // 내 여행 목록 가져오기
+    suspend fun gettingMyTripSchedules(userNickName: String): MutableList<TripScheduleVO> {
+        val firestore = FirebaseFirestore.getInstance()
+        val collRef = firestore.collection("TripSchedule")
+
+        val tripSchedules = mutableListOf<TripScheduleVO>()
+
+        try {
+            // userID가 일치하는 문서를 가져오기 위한 쿼리
+            val querySnapshot = collRef.whereEqualTo("userNickName", userNickName).get().await()
+
+            // 가져온 문서를 TripScheduleVO로 변환하여 리스트에 추가
+            for (document in querySnapshot.documents) {
+                val tripSchedule = document.toObject(TripScheduleVO::class.java)
+                if (tripSchedule != null) {
+                    tripSchedules.add(tripSchedule)
+                }
+            }
+
+            // 쿼리 결과 로그 출력 (디버그용)
+            Log.d("test100", "userID: $userNickName")
+
+        } catch (e: Exception) {
+            // 예외가 발생하면 에러 메시지 로그 출력
+            Log.e("test100", "에러남: $userNickName, $e", e)
+        }
+
+        // 결과 반환
+        return tripSchedules
+    }
+    // hj
+    //닉네임 바꿀 때 사용하기
+    // 닉변 전 게시물의 닉네임을 변경한 닉네임으로 update
+    suspend fun changeTripScheduleNickName(oldNickName: String, newNickName: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        val collRef = firestore.collection("TripSchedule")
+
+        try {
+            val querySnapshot = collRef.whereEqualTo("userNickName", oldNickName).get().await()
+
+            if (querySnapshot.isEmpty) {
+                Log.d("test100", "변경할 닉네임($oldNickName)이 존재하지 않습니다.")
+                return
+            }
+
+            for (document in querySnapshot.documents) {
+                val docRef = collRef.document(document.id)
+                docRef.update("userNickName", newNickName).await()
+            }
+        } catch (e: Exception) {
+            Log.e("test100", "닉네임 변경 중 오류 발생: $e", e)
+        }
+    }
+    // hj
+    // 여행 삭제
+    suspend fun deleteTripScheduleByDocId(docId : String) {
+        val firestore = FirebaseFirestore.getInstance()
+        val collRef = firestore.collection("TripSchedule")
+
+        try {
+            val querySnapshot = collRef.whereEqualTo("tripScheduleDocId", docId).get().await()
+
+            if (querySnapshot.isEmpty) {
+                Log.d("test100", "($docId)이 존재하지 않습니다.")
+                return
+            }
+
+            for (document in querySnapshot.documents) {
+                val docRef = collRef.document(document.id)
+                docRef.delete().await()
+            }
+        } catch (e: Exception) {
+            Log.e("test100", "닉네임 변경 중 오류 발생: $e", e)
+        }
+    }
+
 
 }

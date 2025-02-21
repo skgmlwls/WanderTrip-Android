@@ -17,18 +17,19 @@ import com.lion.wandertrip.util.BotNavScreenName
 import com.lion.wandertrip.util.MainScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineStart
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 import javax.inject.Inject
 import kotlin.io.encoding.ExperimentalEncodingApi
 import android.util.Base64
+import androidx.lifecycle.viewModelScope
 import com.lion.wandertrip.util.LoginResult
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 
 @HiltViewModel
@@ -115,10 +116,10 @@ class UserLoginViewModel @Inject constructor(
                     // 만약 자동로그인이 체크되어 있다면
                     if(checkBoxAutoLoginValue.value){
                         CoroutineScope(Dispatchers.Main).launch{
-                            val work1 = async(Dispatchers.IO){
+                            val work3 = async(Dispatchers.IO){
                                 userService.updateUserAutoLoginToken(tripApplication, loginUserModel.userDocId)
                             }
-                            work1.join()
+                            work3.join()
                         }
                     }
 
@@ -137,44 +138,57 @@ class UserLoginViewModel @Inject constructor(
     fun onClickButtonKakaoLogin() {
         // 키해시 값 불러오기
         // getHashKey()
-        createKakaoToken()
+        // 토큰값 가져오기
+
+        //viewModelScope는 자동으로 취소됨
+        //✔ viewModelScope는 ViewModel이 clear() 될 때 자동으로 취소돼!
+        //✔ CoroutineScope(Dispatchers.Main).launch {}로 만든 코루틴은 Activity나 Fragment가 종료되어도 계속 실행될 수 있음 → 메모리 누수 위험 🚨
+        //✔ viewModelScope는 ViewModel이 사라지면 자동으로 코루틴을 정리하므로 안정적
+
+        viewModelScope.launch {
+            val work1 = async(Dispatchers.IO) {
+                createKakaoToken()
+            }
+            val kToken = work1.await()
+            Log.d("test100", "kToken: $kToken")
+            if(kToken!=""){
+                tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name}/$kToken")
+            }
+
+        }
     }
 
+
     // 카카오 로그인 토큰 받아오기
-    fun createKakaoToken() {
-        // 로그인 조합 예제
-        // 카카오계정으로 로그인 공통 callback 구성
-        // 카카오톡으로 로그인 할 수 없어 카카오계정으로 로그인할 경우 사용됨
-        // 카카오 로그인이든, 카카오 계정 로그인이든 사용할 콜백함수
+    suspend fun createKakaoToken(): String? = suspendCoroutine { continuation ->
         val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
-            // 에러가 없어야 카카오 켸정으로 로그인 성공함
             if (error != null) {
                 Log.e("test100", "카카오계정으로 로그인 실패", error)
+                continuation.resume(null) // 실패 시 null 반환
             } else if (token != null) {
                 Log.i("test100", "카카오계정으로 로그인 성공 ${token.accessToken}")
+                continuation.resume(token.accessToken) // 성공 시 토큰 반환
             }
         }
 
-        // 카카오톡이 설치되어 있으면 카카오톡으로 로그인, 아니면 카카오계정으로 로그인
         if (UserApiClient.instance.isKakaoTalkLoginAvailable(tripApplication)) {
             UserApiClient.instance.loginWithKakaoTalk(tripApplication) { token, error ->
                 if (error != null) {
                     Log.e("test100", "카카오톡으로 로그인 실패", error)
 
-                    // 사용자가 카카오톡 설치 후 디바이스 권한 요청 화면에서 로그인을 취소한 경우,
-                    // 의도적인 로그인 취소로 보고 카카오계정으로 로그인 시도 없이 로그인 취소로 처리 (예: 뒤로 가기)
                     if (error is ClientError && error.reason == ClientErrorCause.Cancelled) {
+                        continuation.resume(null) // 로그인 취소 시 null 반환
                         return@loginWithKakaoTalk
                     }
 
-                    // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인 시도
+                    // 카카오 계정 로그인 시도
                     UserApiClient.instance.loginWithKakaoAccount(tripApplication, callback = callback)
                 } else if (token != null) {
                     Log.i("test100", "카카오톡으로 로그인 성공 ${token.accessToken}")
+                    continuation.resume(token.accessToken) // 성공 시 토큰 반환
                 }
             }
         } else {
-            // 카카오 계정으로 로그인
             UserApiClient.instance.loginWithKakaoAccount(tripApplication, callback = callback)
         }
     }

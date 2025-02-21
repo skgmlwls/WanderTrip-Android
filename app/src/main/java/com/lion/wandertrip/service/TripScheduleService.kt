@@ -2,11 +2,13 @@ package com.lion.wandertrip.service
 
 import android.util.Log
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FirebaseFirestore
 import com.lion.wandertrip.model.ScheduleItem
 import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.repository.TripScheduleRepository
 import com.lion.wandertrip.vo.ScheduleItemVO
+import kotlinx.coroutines.tasks.await
 
 class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
 
@@ -42,6 +44,11 @@ class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
         tripScheduleRepository.addTripItemToSchedule(docId, scheduleDate, scheduleItemVO)
     }
 
+    // 일정 항목 삭제 후 itemIndex 재조정
+    suspend fun removeTripScheduleItem(scheduleDocId: String, itemDocId: String, itemDate: Timestamp) {
+        Log.d("removeTripScheduleItem", "scheduleDocId: $scheduleDocId, itemDocId: $itemDocId")
+        tripScheduleRepository.removeTripScheduleItem(scheduleDocId, itemDocId)
+    }
 
     // 공공 데이터 관련 ///////////////////////////////////////////////////////////////////////////////
 
@@ -55,4 +62,30 @@ class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // hj
+    // 내 스케줄 가져오기
+    suspend fun gettingMyTripSchedules(userNickName:String) :MutableList<TripScheduleModel>{
+        Log.d("test100","gettingMyTripSchedules")
+
+        val voList = tripScheduleRepository.gettingMyTripSchedules(userNickName)
+        val result = mutableListOf<TripScheduleModel>()
+        voList.forEach {
+            result.add(it.toTripScheduleModel())
+        }
+        return result
+    }
+
+    //hj
+    //닉네임 바꿀 때 사용하기
+    // 닉변 전 게시물의 닉네임을 변경한 닉네임으로 update
+    suspend fun changeTripScheduleNickName(oldNickName: String, newNickName: String) {
+        tripScheduleRepository.changeTripScheduleNickName(oldNickName,newNickName)
+    }
+
+    // hj
+    // 여행 삭제
+    suspend fun deleteTripScheduleByDocId(docId : String) {
+
+        tripScheduleRepository.deleteTripScheduleByDocId(docId)
+    }
 }
