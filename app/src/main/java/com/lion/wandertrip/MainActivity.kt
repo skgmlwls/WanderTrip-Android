@@ -1,5 +1,7 @@
 package com.lion.wandertrip
 
+import android.app.appsearch.SearchResult
+import android.app.appsearch.SearchResults
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -39,6 +41,7 @@ import com.lion.wandertrip.presentation.schedule_select_item.ScheduleSelectItemS
 import com.lion.wandertrip.presentation.schedule_select_item.roulette_item.RouletteItemScreen
 import com.lion.wandertrip.presentation.schedule_select_item.roulette_item.roulette_item_select.RouletteItemSelectScreen
 import com.lion.wandertrip.presentation.search_page.SearchScreen
+import com.lion.wandertrip.presentation.search_result_page.SearchResultScreen
 import com.lion.wandertrip.presentation.start_page.StartScreen
 import com.lion.wandertrip.presentation.trip_note_other_schedule_page.TripNoteOtherScheduleScreen
 import com.lion.wandertrip.presentation.trip_note_schedule_page.TripNoteScheduleScreen
@@ -98,6 +101,7 @@ fun MyApp() {
             val fromWhere = backStackEntry.arguments?.getString("fromWhere") ?: ""
             UserSignUpStep2Screen(userDocId = userDocId, fromWhere = fromWhere)
         }
+        composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name) { UserSignUpStep1Screen() }
 
         // 카카오 가입
         composable("${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name}/{kakaoToken}") {
@@ -109,6 +113,19 @@ fun MyApp() {
         composable(MainScreenName.MAIN_SCREEN_SEARCH.name) { SearchScreen() }
         composable(MainScreenName.MAIN_SCREEN_USER_INFO.name) {UserInfoScreen()}
 
+        composable("${MainScreenName.MAIN_SCREEN_SEARCH_RESULT.name}/{contentId}") { backStackEntry ->
+            val contentId = backStackEntry.arguments?.getString("contentId") ?: "default_id"
+            SearchResultScreen(contentId)
+        }
+        composable(MainScreenName.MAIN_SCREEN_SEARCH.name) { SearchScreen() }
+
+//        // 여행기 메인 화면
+//        composable(
+//            route = "${BotNavScreenName.BOT_NAV_SCREEN_TRIP_NOTE.name}/{documentId}"
+//        ){
+//            val documentId = it.arguments?.getString("documentId") ?:  ""
+//            TripNoteScreen(documentId = documentId)
+//        }
 
         composable(BotNavScreenName.BOT_NAV_SCREEN_TRIP_NOTE.name) { TripNoteScreen() }
 
