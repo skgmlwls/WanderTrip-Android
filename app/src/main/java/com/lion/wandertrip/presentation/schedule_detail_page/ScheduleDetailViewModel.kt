@@ -146,6 +146,18 @@ class ScheduleDetailViewModel @Inject constructor(
         )
     }
 
+    // 일정 항목 후기 화면으로 이동
+    fun moveToScheduleItemReviewScreen(
+        tripScheduleDocId: String,
+        scheduleItemDocId: String,
+        scheduleItemTitle: String,
+    ) {
+        application.navHostController.navigate(
+            ScheduleScreenName.SCHEDULE_ITEM_REVIEW_SCREEN.name +
+                    "/$tripScheduleDocId/$scheduleItemDocId/$scheduleItemTitle"
+        )
+    }
+
     // 이전 화면 으로 이동 (메인 일정 화면)
     fun backScreen() {
         application.navHostController.popBackStack()

@@ -38,6 +38,7 @@ import com.lion.a02_boardcloneproject.component.CustomOutlinedTextField
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.wandertrip.R
 import com.lion.wandertrip.component.BlueButton
+import com.lion.wandertrip.component.LottieLoadingIndicator
 import com.lion.wandertrip.util.Tools
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
@@ -147,6 +148,8 @@ fun UserInfoScreen(userInfoViewModel: UserInfoViewModel = hiltViewModel()) {
                 }
 
             }
+            if(userInfoViewModel.isLoading.value)
+            LottieLoadingIndicator()
 
             Spacer(modifier = Modifier.height(40.dp)) // 하단 여백
         }

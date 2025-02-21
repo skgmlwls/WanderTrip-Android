@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.lion.wandertrip.presentation.start_page.used_dummy_data.RecentDummyData
 
 @Composable
 fun StartScreen(startViewModel: StartViewModel = hiltViewModel()){

@@ -59,7 +59,7 @@ class TripNoteWriteViewModel @Inject constructor(
     val tripNotePreviewBitmap = mutableStateListOf<Bitmap?>()
 
     // 저장할 이미지 경로 리스트
-    val tripNoteImages = mutableListOf<String>()
+    val tripNoteImages = mutableStateListOf<String>()
 
 
     // 뒤로 가기 버튼
@@ -88,13 +88,9 @@ class TripNoteWriteViewModel @Inject constructor(
         var tripNoteImage = "none"
         val tripNoteTimeStamp = Timestamp.now()
 
-        // 나중에 받아와야함
-        // tripScheduleTitle 로 아이디 찾아서..
-        // val tripScheduleDocumentId = ""
 
         // 로그인한 사용자의 닉네임
         val userNickname = tripApplication.loginUserModel.userNickName
-
 
         // 저장
         CoroutineScope(Dispatchers.Main).launch {

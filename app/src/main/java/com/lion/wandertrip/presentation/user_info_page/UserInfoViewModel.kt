@@ -41,6 +41,9 @@ class UserInfoViewModel @Inject constructor(
     // 앨범이나 사진에서 이미지를 받아왔는지 상태 관리 변수
     val isImagePicked = mutableStateOf(false)
 
+    // 로딩 상태 변수
+    val isLoading = mutableStateOf(false)
+
     // 네비게이션 아이콘을 누르면 호출되는 메서드
     fun onClickNavIconBack() {
         tripApplication.navHostController.popBackStack()
@@ -50,6 +53,8 @@ class UserInfoViewModel @Inject constructor(
     // 유저 정보 수정 메서드
     fun onClickIconCheck() {
         CoroutineScope(Dispatchers.Main).launch {
+            // 로딩상태 변경
+            isLoading.value=true
             val userModel = tripApplication.loginUserModel
             var imageUri = userModel.userProfileImageURL
             val oldNickName = userModel.userNickName
@@ -98,6 +103,7 @@ class UserInfoViewModel @Inject constructor(
             // 모든 작업 완료 후 업데이트
             work1.await()
             work2.await()
+            isLoading.value=false
 
             // 업데이트된 데이터 저장
             tripApplication.loginUserModel = userModel
@@ -108,7 +114,7 @@ class UserInfoViewModel @Inject constructor(
     }
 
 
-
+    // 프로필 이미지 가져오기
     fun hasImageInApplication(){
         if(tripApplication.loginUserModel.userProfileImageURL!=""){
             viewModelScope.launch {

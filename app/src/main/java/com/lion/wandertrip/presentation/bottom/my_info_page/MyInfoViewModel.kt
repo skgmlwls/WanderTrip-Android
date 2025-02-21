@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lion.wandertrip.TripApplication
+import com.lion.wandertrip.model.RecentTripItemModel
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.model.UserModel
 import com.lion.wandertrip.service.TripScheduleService
@@ -36,7 +37,11 @@ class MyInfoViewModel @Inject constructor(
     // 보여줄 이미지의 Uri
     val showImageUri = mutableStateOf<Uri?>(null)
 
+    // 최근 일정 목록
     val recentScheduleList = mutableStateListOf<TripScheduleModel>()
+
+    // 최근 본 아이템 목록
+    val recentTripItemList = mutableStateListOf<RecentTripItemModel>()
 
     // 프로필 편집
     fun onClickTextUserInfoModify() {

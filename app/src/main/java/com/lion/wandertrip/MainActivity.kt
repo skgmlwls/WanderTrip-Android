@@ -4,12 +4,13 @@ import android.app.appsearch.SearchResult
 import android.app.appsearch.SearchResults
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -35,6 +36,7 @@ import com.lion.wandertrip.presentation.schedule_city_select.city_roulette.Roule
 import com.lion.wandertrip.presentation.schedule_city_select.city_roulette.roulette_city_select.RouletteCitySelectScreen
 import com.lion.wandertrip.presentation.schedule_detail_friends.ScheduleDetailFriendsScreen
 import com.lion.wandertrip.presentation.schedule_detail_page.ScheduleDetailScreen
+import com.lion.wandertrip.presentation.schedule_item_review.ScheduleItemReviewScreen
 import com.lion.wandertrip.presentation.schedule_select_item.ScheduleSelectItemScreen
 import com.lion.wandertrip.presentation.schedule_select_item.roulette_item.RouletteItemScreen
 import com.lion.wandertrip.presentation.schedule_select_item.roulette_item.roulette_item_select.RouletteItemSelectScreen
@@ -146,7 +148,6 @@ fun MyApp() {
         }
 
         // 여행기 페이지에서 다른 사람 여행기 보기
-        // composable(TripNoteScreenName.TRIP_NOTE_OTHER_SCHEDULE.name) { TripNoteOtherScheduleScreen() }
         composable(
             route = "${TripNoteScreenName.TRIP_NOTE_OTHER_SCHEDULE.name}/{otherNickName}"
         ){
@@ -155,7 +156,15 @@ fun MyApp() {
         }
 
         // 여행기에서 다른 사람 일정 다운
-        composable(TripNoteScreenName.TRIP_NOTE_SELECT_DOWN.name) { TripNoteSelectDownScreen() }
+        // composable(TripNoteScreenName.TRIP_NOTE_SELECT_DOWN.name) { TripNoteSelectDownScreen() }
+        composable(
+            route = "${TripNoteScreenName.TRIP_NOTE_SELECT_DOWN.name}/{tripNoteScheduleDocId}/{documentId}"
+        ){
+            val tripNoteScheduleDocId = it.arguments?.getString("tripNoteScheduleDocId") ?:  ""
+            val documentId = it.arguments?.getString("documentId") ?:  ""
+
+            TripNoteSelectDownScreen(tripNoteScheduleDocId = tripNoteScheduleDocId, documentId = documentId)
+        }
 
 
         // 여행기에서 일정 가져오기
@@ -252,6 +261,21 @@ fun MyApp() {
         ) {
             val scheduleDocId = it.arguments?.getString("scheduleDocId") ?: ""
             ScheduleDetailFriendsScreen(scheduleDocId)
+        }
+
+        composable(
+            route = ScheduleScreenName.SCHEDULE_ITEM_REVIEW_SCREEN.name +
+                    "/{tripScheduleDocId}/{scheduleItemDocId}/{scheduleItemTitle}",
+            arguments = listOf(
+                navArgument("tripScheduleDocId") { type = NavType.StringType },
+                navArgument("scheduleItemDocId") { type = NavType.StringType },
+                navArgument("scheduleItemTitle") { type = NavType.StringType },
+            )
+        ) {
+            val tripScheduleDocId = it.arguments?.getString("tripScheduleDocId") ?: ""
+            val scheduleItemDocId = it.arguments?.getString("scheduleItemDocId") ?: ""
+            val scheduleItemTitle = it.arguments?.getString("scheduleItemTitle") ?: ""
+            ScheduleItemReviewScreen(tripScheduleDocId, scheduleItemDocId, scheduleItemTitle)
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////////
