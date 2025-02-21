@@ -180,7 +180,7 @@ class TripScheduleRepository {
 
     // hj
     // 내 여행 목록 가져오기
-    suspend fun gettingMyTripSchedules(userID: String): MutableList<TripScheduleVO> {
+    suspend fun gettingMyTripSchedules(userNickName: String): MutableList<TripScheduleVO> {
         val firestore = FirebaseFirestore.getInstance()
         val collRef = firestore.collection("TripSchedule")
 
@@ -188,7 +188,7 @@ class TripScheduleRepository {
 
         try {
             // userID가 일치하는 문서를 가져오기 위한 쿼리
-            val querySnapshot = collRef.whereEqualTo("userID", userID).get().await()
+            val querySnapshot = collRef.whereEqualTo("userNickName", userNickName).get().await()
 
             // 가져온 문서를 TripScheduleVO로 변환하여 리스트에 추가
             for (document in querySnapshot.documents) {
@@ -199,14 +199,61 @@ class TripScheduleRepository {
             }
 
             // 쿼리 결과 로그 출력 (디버그용)
-            Log.d("test100", "userID: $userID")
+            Log.d("test100", "userID: $userNickName")
 
         } catch (e: Exception) {
             // 예외가 발생하면 에러 메시지 로그 출력
-            Log.e("test100", "에러남: $userID, $e", e)
+            Log.e("test100", "에러남: $userNickName, $e", e)
         }
 
         // 결과 반환
         return tripSchedules
     }
+    // hj
+    //닉네임 바꿀 때 사용하기
+    // 닉변 전 게시물의 닉네임을 변경한 닉네임으로 update
+    suspend fun changeTripScheduleNickName(oldNickName: String, newNickName: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        val collRef = firestore.collection("TripSchedule")
+
+        try {
+            val querySnapshot = collRef.whereEqualTo("userNickName", oldNickName).get().await()
+
+            if (querySnapshot.isEmpty) {
+                Log.d("test100", "변경할 닉네임($oldNickName)이 존재하지 않습니다.")
+                return
+            }
+
+            for (document in querySnapshot.documents) {
+                val docRef = collRef.document(document.id)
+                docRef.update("userNickName", newNickName).await()
+            }
+        } catch (e: Exception) {
+            Log.e("test100", "닉네임 변경 중 오류 발생: $e", e)
+        }
+    }
+    // hj
+    // 여행 삭제
+    suspend fun deleteTripScheduleByDocId(docId : String) {
+        val firestore = FirebaseFirestore.getInstance()
+        val collRef = firestore.collection("TripSchedule")
+
+        try {
+            val querySnapshot = collRef.whereEqualTo("tripScheduleDocId", docId).get().await()
+
+            if (querySnapshot.isEmpty) {
+                Log.d("test100", "($docId)이 존재하지 않습니다.")
+                return
+            }
+
+            for (document in querySnapshot.documents) {
+                val docRef = collRef.document(document.id)
+                docRef.delete().await()
+            }
+        } catch (e: Exception) {
+            Log.e("test100", "닉네임 변경 중 오류 발생: $e", e)
+        }
+    }
+
+
 }

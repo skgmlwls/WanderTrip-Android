@@ -153,5 +153,9 @@ class TripNoteService @Inject constructor(val tripNoteRepository: TripNoteReposi
         tripNoteRepository.removeImageFile(imageFileName)
     }
 
-
+    // 닉변시 사용할 메서드
+    // 등록된 문서 닉네임 바꾸기
+    suspend fun changeTripNoteNickname(oldNickName: String, newNickName: String) {
+        tripNoteRepository.changeTripNoteNickname(oldNickName,newNickName)
+    }
 }

@@ -1,6 +1,7 @@
 package com.lion.wandertrip.presentation.trip_note_other_schedule_page
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -108,18 +109,35 @@ fun TripNoteOtherScheduleScreen(
                     modifier = Modifier.padding(bottom = 22.dp)
                 )
 
-                // 일정 목록 표시
+//                // 일정 목록 표시
+//                if (tripNoteOtherScheduleViewModel.tripNoteOtherScheduleList.isNotEmpty()) {
+//                    TripNoteOtherScheduleItemList(
+//                        dataList = tripNoteOtherScheduleViewModel.tripNoteOtherScheduleList,
+//                        viewModel = tripNoteOtherScheduleViewModel,
+//                        onRowClick = { position ->
+//                            val documentId = tripNoteOtherScheduleViewModel.tripNoteOtherScheduleDocIdList.toList()[position]
+//                            // Log를 이용해서 전달되는 값을 출력
+//                            Log.d("TripNote", "Position: $position, DocumentId: $documentId")
+//                            if (documentId != null) {
+//                                tripNoteOtherScheduleViewModel.goTripNoteDocId(documentId)
+//                            }
+//                        },
+//                        modifier = Modifier.padding(paddingValues)
+//                    )
+//                }
+
                 if (tripNoteOtherScheduleViewModel.tripNoteOtherScheduleList.isNotEmpty()) {
                     TripNoteOtherScheduleItemList(
                         dataList = tripNoteOtherScheduleViewModel.tripNoteOtherScheduleList,
                         viewModel = tripNoteOtherScheduleViewModel,
-                        onRowClick = { position ->
-                            val documentId = tripNoteOtherScheduleViewModel.tripNoteOtherScheduleDocIdList
-                            tripNoteOtherScheduleViewModel.goTripNoteDocId(documentId.toString())
+                        onRowClick = { documentId ->  // String을 전달받음
+                            Log.d("TripNote", "DocumentId: $documentId")
+                            tripNoteOtherScheduleViewModel.goTripNoteDocId(documentId)  // documentId를 사용하여 상세 페이지로 이동
                         },
                         modifier = Modifier.padding(paddingValues)
                     )
                 }
+
             }
         }
     )

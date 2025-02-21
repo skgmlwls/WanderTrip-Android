@@ -95,6 +95,7 @@ class UserSignUpStep3ViewModel @Inject constructor(
                 // userDocId 값을 받음
                 val userDocId = work1.await()
                 // 어플리케이션에 userModel 저장
+                userModel.userDocId = userDocId
                 tripApplication.loginUserModel = userModel
 
                 // SharedPreference에 저장한다.

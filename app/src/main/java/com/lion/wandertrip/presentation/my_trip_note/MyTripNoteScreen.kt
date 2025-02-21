@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.my_trip_note
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,6 +18,7 @@ import com.lion.wandertrip.presentation.my_trip_note.components.VerticalTripNote
 
 @Composable
 fun MyTripNoteScreen(myTripNoteViewModel: MyTripNoteViewModel = hiltViewModel()) {
+    Log.d("test100","MyTripNoteScreen")
     myTripNoteViewModel.getTripNoteList()
     Scaffold(
         topBar = {
@@ -33,7 +35,7 @@ fun MyTripNoteScreen(myTripNoteViewModel: MyTripNoteViewModel = hiltViewModel())
         Column (
             modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 10.dp)
         ){
-            VerticalTripNoteList(myTripNoteViewModel)
+            VerticalTripNoteList(myTripNoteViewModel.tripNoteList,myTripNoteViewModel)
         }
 
     }
