@@ -71,9 +71,9 @@ class TripNoteOtherScheduleViewModel @Inject constructor(
 
             // tripNoteOtherScheduleDocIdList에 documentId만 추출하여 담기
             tripNoteOtherScheduleDocIdList.clear()
-            tripNoteOtherScheduleDocIdList.addAll(recyclerViewList.map { it.second.tripNoteDocumentId })
+            tripNoteOtherScheduleDocIdList.addAll(recyclerViewList.map { it.second.tripNoteDocumentId }.toList())
             // tripNoteOtherScheduleDocIdList에 값이 제대로 들어갔는지 확인
-            Log.d("TripNote", "Document IDs: ${tripNoteOtherScheduleDocIdList}")
+            Log.d("TripNote", "Document IDs: ${tripNoteOtherScheduleDocIdList.toList()}")
 
 
         }
@@ -99,9 +99,16 @@ class TripNoteOtherScheduleViewModel @Inject constructor(
     }
 
     // 여행기 목록 클릭하면 상세 여행기로 이동하는 메서드
-    fun goTripNoteDocId(documentId: String){
-        tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_DETAIL.name}/${documentId}")
+    fun goTripNoteDocId(documentId: String?) {
+        // documentId가 null인지 체크
+        if (documentId != null) {
+            tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_DETAIL.name}/${documentId}")
+        } else {
+            Log.e("TripNote", "Document ID is null. Navigation aborted.")
+            // 필요한 경우 사용자에게 알림을 표시할 수 있음
+        }
     }
+
 
 
 

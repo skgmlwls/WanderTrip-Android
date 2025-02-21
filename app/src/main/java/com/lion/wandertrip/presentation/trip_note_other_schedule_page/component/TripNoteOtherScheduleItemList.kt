@@ -1,6 +1,7 @@
 package com.lion.wandertrip.presentation.trip_note_other_schedule_page.component
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Place
@@ -39,7 +41,7 @@ import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 fun TripNoteOtherScheduleItemList(
     dataList: SnapshotStateList<TripNoteModel?>,
     viewModel: TripNoteOtherScheduleViewModel = hiltViewModel(),
-    onRowClick: (String?) -> Unit = {}, // 클릭 이벤트 추가
+    onRowClick: (String) -> Unit = {}, // 클릭 이벤트 추가
     modifier: Modifier = Modifier // modifier 파라미터 추가
 ) {
     LazyColumn(
@@ -47,12 +49,17 @@ fun TripNoteOtherScheduleItemList(
             .fillMaxWidth()
             //.padding(top = 10.dp),
     ) {
-        items(dataList) { tripSchedule -> // 직접 데이터 항목을 사용하는 방식으로 변경
+        // items(dataList) { tripSchedule -> // 직접 데이터 항목을 사용하는 방식으로 변경
+        itemsIndexed(dataList) { index, tripSchedule ->
+
+            val documentId = viewModel.tripNoteOtherScheduleDocIdList.getOrNull(index)
+            Log.d("TripNotess", "Position: $index, DocumentId: $documentId")
 
 
             val tripScheduleA = tripSchedule?.tripScheduleDocumentId?.let { documentId ->
                 viewModel.getTripScheduleByDocumentId(documentId)
             }
+
 
 
 
@@ -71,7 +78,10 @@ fun TripNoteOtherScheduleItemList(
                             val position = dataList.indexOf(tripSchedule) // 클릭된 위치 확인
                             if (position != -1) {
                                 val documentId = viewModel.tripNoteOtherScheduleDocIdList[position]
-                                onRowClick(documentId) // 클릭 이벤트 처리
+                                Log.d("TripNote", "Position: $position, DocumentId: $documentId")
+                                if (documentId != null) {
+                                    onRowClick(documentId)
+                                } // 클릭 이벤트 처리
                             }
                         }, // 클릭 이벤트 적용
                     horizontalAlignment = Alignment.Start // 내부 정렬
