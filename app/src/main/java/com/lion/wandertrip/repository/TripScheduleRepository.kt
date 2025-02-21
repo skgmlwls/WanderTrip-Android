@@ -1,8 +1,11 @@
 package com.lion.wandertrip.repository
 
+import android.graphics.Bitmap
 import android.util.Log
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.lion.wandertrip.model.ScheduleItem
 import com.lion.wandertrip.retrofit.ApiResponse
 import com.lion.wandertrip.retrofit.RetrofitClient
 import com.lion.wandertrip.vo.ScheduleItemVO
@@ -10,6 +13,7 @@ import com.lion.wandertrip.vo.TripItemVO
 import com.lion.wandertrip.vo.TripScheduleVO
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.json.Json
+import java.io.ByteArrayOutputStream
 
 class TripScheduleRepository {
 
@@ -123,6 +127,91 @@ class TripScheduleRepository {
         }
     }
 
+    // 일정 항목 문서 id로 일정 항목 가져 오기
+    suspend fun getScheduleItemByDocId(tripScheduleDocId: String, scheduleItemDocId: String,): ScheduleItemVO? {
+        val firestore = FirebaseFirestore.getInstance()
+        val subCollectionRef = firestore.collection("TripSchedule")
+            .document(tripScheduleDocId)
+            .collection("TripScheduleItem")
+
+        return try {
+            val docSnapshot = subCollectionRef
+                .document(scheduleItemDocId)
+                .get()
+                .await()  // 코루틴 사용
+
+            if (docSnapshot.exists()) {
+                // Firestore 문서를 ScheduleItemVO로 매핑
+                docSnapshot.toObject(ScheduleItemVO::class.java)
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    // 일정 항목 업데이트
+    suspend fun updateScheduleItem(
+        tripScheduleDocId: String,
+        scheduleItemDocId: String,
+        updatedItem: ScheduleItemVO
+    ) {
+        val firestore = FirebaseFirestore.getInstance()
+        val subCollectionRef = firestore.collection("TripSchedule")
+            .document(tripScheduleDocId)
+            .collection("TripScheduleItem")
+
+        try {
+            // 해당 문서 참조
+            val docRef = subCollectionRef.document(scheduleItemDocId)
+
+            // Firestore update (부분 업데이트)
+            docRef.update(
+                mapOf(
+                    "itemReviewImagesURL" to updatedItem.itemReviewImagesURL,
+                    "itemReviewText" to updatedItem.itemReviewText
+                )
+            ).await()
+
+            // 필요하다면 추가 작업(로그, 리턴 등)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            // 예외 처리 로직
+        }
+    }
+
+
+    // 단일 Bitmap 업로드 -> 다운 로드 URL
+    suspend fun uploadBitmapListToFirebase(bitmaps: List<Bitmap>): List<String> {
+        val downloadUrls = mutableListOf<String>()
+        val storage = FirebaseStorage.getInstance()
+        val storageRef = storage.getReferenceFromUrl("gs://wandertrip-13b8b.firebasestorage.app")
+            .child("image")
+
+        // 개별 Bitmap마다 반복
+        for (bitmap in bitmaps) {
+            try {
+                val fileName = "image_${System.currentTimeMillis()}.jpg"
+                val imageRef = storageRef.child(fileName)
+
+                // Bitmap -> ByteArray
+                val baos = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+                val data = baos.toByteArray()
+
+                // 업로드 -> await
+                imageRef.putBytes(data).await()
+                val downloadUrl = imageRef.downloadUrl.await()
+                downloadUrls.add(downloadUrl.toString())
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // 실패 시 로깅만
+            }
+        }
+        return downloadUrls
+    }
 
     // 공공 데이터 관련 //////////////////////////////////////////////////////////////////////////////
 

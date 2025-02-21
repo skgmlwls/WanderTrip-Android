@@ -34,6 +34,7 @@ import com.lion.wandertrip.presentation.schedule_city_select.city_roulette.Roule
 import com.lion.wandertrip.presentation.schedule_city_select.city_roulette.roulette_city_select.RouletteCitySelectScreen
 import com.lion.wandertrip.presentation.schedule_detail_friends.ScheduleDetailFriendsScreen
 import com.lion.wandertrip.presentation.schedule_detail_page.ScheduleDetailScreen
+import com.lion.wandertrip.presentation.schedule_item_review.ScheduleItemReviewScreen
 import com.lion.wandertrip.presentation.schedule_select_item.ScheduleSelectItemScreen
 import com.lion.wandertrip.presentation.schedule_select_item.roulette_item.RouletteItemScreen
 import com.lion.wandertrip.presentation.schedule_select_item.roulette_item.roulette_item_select.RouletteItemSelectScreen
@@ -243,6 +244,21 @@ fun MyApp() {
         ) {
             val scheduleDocId = it.arguments?.getString("scheduleDocId") ?: ""
             ScheduleDetailFriendsScreen(scheduleDocId)
+        }
+
+        composable(
+            route = ScheduleScreenName.SCHEDULE_ITEM_REVIEW_SCREEN.name +
+                    "/{tripScheduleDocId}/{scheduleItemDocId}/{scheduleItemTitle}",
+            arguments = listOf(
+                navArgument("tripScheduleDocId") { type = NavType.StringType },
+                navArgument("scheduleItemDocId") { type = NavType.StringType },
+                navArgument("scheduleItemTitle") { type = NavType.StringType },
+            )
+        ) {
+            val tripScheduleDocId = it.arguments?.getString("tripScheduleDocId") ?: ""
+            val scheduleItemDocId = it.arguments?.getString("scheduleItemDocId") ?: ""
+            val scheduleItemTitle = it.arguments?.getString("scheduleItemTitle") ?: ""
+            ScheduleItemReviewScreen(tripScheduleDocId, scheduleItemDocId, scheduleItemTitle)
         }
 
         /////////////////////////////////////////////////////////////////////////////////////////////

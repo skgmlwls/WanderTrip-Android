@@ -1,11 +1,9 @@
 package com.lion.wandertrip.presentation.schedule_detail_page.component
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
@@ -19,7 +17,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.google.firebase.Timestamp
 import com.lion.a02_boardcloneproject.component.CustomDividerComponent
-import com.lion.a02_boardcloneproject.component.CustomOutlinedButton
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.presentation.schedule_detail_page.ScheduleDetailViewModel
 import com.lion.wandertrip.ui.theme.NanumSquareRound
@@ -135,7 +132,7 @@ fun ScheduleDetailDateList(
                                                 model = imageUrl,
                                                 contentDescription = "Review Image",
                                                 modifier = Modifier
-                                                    .size(100.dp)
+                                                    .size(80.dp)
                                                     .padding(start = 5.dp, end = 8.dp)
                                             )
                                         }
@@ -171,14 +168,24 @@ fun ScheduleDetailDateList(
                                     expanded = expanded,
                                     onDismissRequest = { expanded = false },
                                     onDelete = {
+                                        expanded = false
                                         viewModel.removeTripScheduleItem(
                                             viewModel.tripScheduleDocId.value,
                                             scheduleItem.itemDocId,
                                             scheduleItem.itemDate
                                         )
                                     },
-                                    onReview = { /* 후기 기능 구현 */ },
-                                    onMove = { /* 위치조정 기능 구현 */ }
+                                    onReview = {
+                                        expanded = false
+                                        viewModel.moveToScheduleItemReviewScreen(
+                                            viewModel.tripScheduleDocId.value,
+                                            scheduleItem.itemDocId,
+                                            scheduleItem.itemTitle,
+                                        )
+                                    },
+                                    onMove = {
+                                        expanded = false
+                                    }
                                 )
                             }
                         }
