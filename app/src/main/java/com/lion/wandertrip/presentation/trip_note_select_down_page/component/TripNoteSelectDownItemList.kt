@@ -33,7 +33,7 @@ import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 
 @Composable
 fun TripNoteSelectDownItemList(
-    dataList: List<TripScheduleModel>,
+    dataList: List<TripScheduleModel?>,
     viewModel: TripNoteSelectDownViewModel = hiltViewModel(),
     onRowClick: (TripScheduleModel) -> Unit = {}, // 클릭 이벤트 추가
     modifier: Modifier = Modifier // modifier 파라미터 추가
@@ -50,6 +50,9 @@ fun TripNoteSelectDownItemList(
             .padding(top = 10.dp),
     ) {
         items(dataList) { tripSchedule -> // 직접 데이터 항목을 사용하는 방식으로 변경
+
+            // tripSchedule이 null이 아닌 경우에만 처리
+            tripSchedule?.let { schedule ->
 
             val isSelected = selectedCardIndex.value == dataList.indexOf(tripSchedule) // 현재 카드가 선택된 카드인지 확인
 
@@ -126,6 +129,7 @@ fun TripNoteSelectDownItemList(
                                 .padding(end = 10.dp)
                         )
                     }
+                }
                 }
             }
         }

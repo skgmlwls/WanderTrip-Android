@@ -1,55 +1,35 @@
 package com.lion.wandertrip.presentation.trip_note_select_down_page
 
-import android.os.Build
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.a02_boardcloneproject.component.CustomAlertDialog
-import com.lion.a02_boardcloneproject.component.CustomIconButton
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
-import com.lion.wandertrip.R
 import com.lion.wandertrip.component.BlueButton
-import com.lion.wandertrip.presentation.trip_note_detail_page.TripNoteDetailViewModel
-import com.lion.wandertrip.presentation.trip_note_other_schedule_page.component.TripNoteOtherScheduleItemList
 import com.lion.wandertrip.presentation.trip_note_select_down_page.component.TripNoteSelectDownItemList
-import com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step2_page.UserSignUpStep2ViewModel
-import com.lion.wandertrip.ui.theme.NanumSquareRound
+
 
 
 @Composable
-fun TripNoteSelectDownScreen(tripNoteSelectDownViewModel: TripNoteSelectDownViewModel = hiltViewModel())
+fun TripNoteSelectDownScreen(
+    tripNoteScheduleDocId: String,
+    documentId : String,
+    tripNoteSelectDownViewModel: TripNoteSelectDownViewModel = hiltViewModel())
 {
     tripNoteSelectDownViewModel.gettingTripNoteDetailData()
 
@@ -57,6 +37,10 @@ fun TripNoteSelectDownScreen(tripNoteSelectDownViewModel: TripNoteSelectDownView
     val showDialogState = tripNoteSelectDownViewModel.showDialogState
     // 다이얼로그를 보여주는 상태 - 새 여행
     val showDialogStateNew = tripNoteSelectDownViewModel.showDialogStateNew
+    // 다이얼로그를 보여주는 상태 - 일정 담기할때 일정 안누름
+    val showDialogNotState = tripNoteSelectDownViewModel.showDialogNotState
+
+    val scheduleDocId = tripNoteSelectDownViewModel.scheduleDocId.value
 
     Scaffold(
         containerColor = Color.White,
@@ -114,7 +98,7 @@ fun TripNoteSelectDownScreen(tripNoteSelectDownViewModel: TripNoteSelectDownView
                         // 확인 버튼 클릭 시 동작
                         tripNoteSelectDownViewModel.onConfirmNewClick()
                         // 일정 제목 입력 화면으로 이동
-                        tripNoteSelectDownViewModel.goScheduleTitleButtonClick()
+                        tripNoteSelectDownViewModel.goScheduleTitleButtonClick(tripNoteScheduleDocId, documentId)
 
                     },
                     dismissButtonOnClick = {
@@ -140,7 +124,8 @@ fun TripNoteSelectDownScreen(tripNoteSelectDownViewModel: TripNoteSelectDownView
                 TripNoteSelectDownItemList(
                     dataList = tripNoteSelectDownViewModel.tripNoteMyScheduleList,
                     viewModel = tripNoteSelectDownViewModel,
-                    onRowClick = {
+                    onRowClick = {tripSchedule ->
+                        tripNoteSelectDownViewModel.gettingSelectId(tripSchedule.tripScheduleDocId)
                     },
                 )
             }
@@ -149,11 +134,33 @@ fun TripNoteSelectDownScreen(tripNoteSelectDownViewModel: TripNoteSelectDownView
 
             // 완료 버튼
             BlueButton(text = "완료",) {
-                tripNoteSelectDownViewModel.selectFinishButtonClick()
+                if(scheduleDocId.isEmpty()){
+                    tripNoteSelectDownViewModel.showDialogNotState.value = true
+                }
+                else {
+                    tripNoteSelectDownViewModel.showDialogState.value = true
+                }
             }
 
             // 다이얼로그 표시
-            if (showDialogState.value) {
+            if (tripNoteSelectDownViewModel.showDialogNotState.value) {
+                CustomAlertDialog(
+                    showDialogState = showDialogNotState,
+                    title = "일정 선택",
+                    text = "일정을 선택해주세요.",
+                    confirmButtonTitle = "확인",
+                    dismissButtonTitle = "취소",
+                    confirmButtonOnClick = {
+                        tripNoteSelectDownViewModel.onConfirmNotClick()
+                    },
+                    dismissButtonOnClick = {
+                        tripNoteSelectDownViewModel.onDismissNotClick()
+                    }
+                )
+            }
+
+            // 다이얼로그 표시
+            if (tripNoteSelectDownViewModel.showDialogState.value) {
                 CustomAlertDialog(
                     showDialogState = showDialogState,
                     title = "일정 선택",
@@ -163,8 +170,12 @@ fun TripNoteSelectDownScreen(tripNoteSelectDownViewModel: TripNoteSelectDownView
                     confirmButtonOnClick = {
                         // 확인 버튼 클릭 시 동작
                         tripNoteSelectDownViewModel.onConfirmClick()
-                        // 일정 제목 입력 화면으로 이동
-                        tripNoteSelectDownViewModel.goScheduleTitleButtonClick()
+                        // 일정 상세 입력 화면으로 이동
+                        tripNoteSelectDownViewModel.selectFinishButtonClick(
+                            tripNoteScheduleDocId,
+                            scheduleDocId,
+                            documentId
+                        )
 
                     },
                     dismissButtonOnClick = {
