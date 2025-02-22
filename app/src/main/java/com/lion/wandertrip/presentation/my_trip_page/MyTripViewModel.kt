@@ -38,7 +38,7 @@ class MyTripViewModel @Inject constructor(
     val menuStateMap = mutableStateMapOf<Int,Boolean>()
     // 화면 열때 리스트 가져오기
     fun getTripList() {
-        Log.d("test100","getTripList")
+        // Log.d("test100","getTripList")
         viewModelScope.launch {
             val work1 = async(Dispatchers.IO){
                 tripScheduleService.gettingMyTripSchedules(tripApplication.loginUserModel.userNickName)
@@ -54,14 +54,14 @@ class MyTripViewModel @Inject constructor(
     }
     // 리스트 길이로 맵을 초기화
     fun addMap() {
-        Log.d("test100","addMap")
+        // Log.d("test100","addMap")
         tripList.forEachIndexed { index, tripScheduleModel ->
             menuStateMap[index]=false
         }
     }
     // 필터를 사용해 다가올 리스트 가져오기
     fun getUpComingList() {
-        Log.d("test100","getUpComingList")
+        // Log.d("test100","getUpComingList")
         // 필터링하고 정렬된 리스트를 upComingTripList에 추가
         upComingTripList.clear()
         upComingTripList.addAll(
@@ -72,7 +72,7 @@ class MyTripViewModel @Inject constructor(
     }
     // 지난 여행 가져오기
     fun getPastList() {
-        Log.d("test100","getPastList")
+        // Log.d("test100","getPastList")
         pastTripList.clear()
         pastTripList.addAll(
             tripList
@@ -110,7 +110,7 @@ class MyTripViewModel @Inject constructor(
 
     // 여행 삭제 메서드
     fun onClickIconDeleteTrip(tripDocId:String) {
-        Log.d("test100","onClickIconDeleteTrip")
+        // Log.d("test100","onClickIconDeleteTrip")
         viewModelScope.launch {
             tripScheduleService.deleteTripScheduleByDocId(tripDocId)
             tripList.clear()

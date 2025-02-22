@@ -21,6 +21,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,7 +48,9 @@ import com.lion.wandertrip.util.CustomFont
 @Composable
 fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewModel()) {
     Log.d("test","contentID : $contentID")
-    detailViewModel.getContentModel(contentID)
+    LaunchedEffect(Unit) {
+        detailViewModel.getContentModel(contentID)
+    }
     Scaffold(
         topBar = {
             CustomTopAppBar(

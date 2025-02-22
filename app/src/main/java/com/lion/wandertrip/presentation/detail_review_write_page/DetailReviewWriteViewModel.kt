@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.ContentsModel
 import com.lion.wandertrip.model.ReviewModel
@@ -12,10 +11,7 @@ import com.lion.wandertrip.service.ContentsReviewService
 import com.lion.wandertrip.service.ContentsService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -72,7 +68,7 @@ class DetailReviewWriteViewModel @Inject constructor(
         return contentsDocId
     }
 
-    fun updateReview(contentId : String) {
+    fun addReviewAndupdateContents(contentId : String) {
         runBlocking {
             val contentDocId = addContentsReview(contentId)
             // 위에 끝날때까지 대기

@@ -94,13 +94,13 @@ class ContentsRepository {
             val contentsRef = db.collection("ContentsData").document(contentsDocId)
             val reviewsRef = contentsRef.collection("ContentsReview")
 
-            Log.d("test100", "updateContentRating ->평점 업데이트 시작: $contentsDocId")
+            // Log.d("test100", "updateContentRating ->평점 업데이트 시작: $contentsDocId")
 
             // 모든 리뷰 문서 가져오기
             val reviewsSnapshot = reviewsRef.get().await()
             val reviewCount = reviewsSnapshot.size() // 리뷰 개수 저장
 
-            Log.d("test100", "updateContentRating ->가져온 리뷰 개수: $reviewCount")
+            // Log.d("test100", "updateContentRating ->가져온 리뷰 개수: $reviewCount")
 
             // 리뷰가 없으면 ratingScore = 0으로 설정하고 리뷰 개수 반환
             if (reviewCount == 0) {
@@ -112,7 +112,7 @@ class ContentsRepository {
             // 모든 리뷰의 ratingScore 값 가져오기
             val ratingList = reviewsSnapshot.documents.mapNotNull { it.getDouble("reviewRatingScore") }
 
-            Log.d("test100", "updateContentRating ->가져온 평점 리스트: $ratingList")
+            // Log.d("test100", "updateContentRating ->가져온 평점 리스트: $ratingList")
 
             // 평균 계산
             val avgRating = if (ratingList.isNotEmpty()) {
@@ -121,15 +121,12 @@ class ContentsRepository {
                 0.0
             }
 
-            Log.d("test100", "계산된 평균 평점: $avgRating")
+            // Log.d("test100", "계산된 평균 평점: $avgRating")
 
             // Firestore 문서 업데이트 (평균 평점)
             contentsRef.update("ratingScore", avgRating).await()
 
-            Log.d(
-                "test100",
-                "컨텐츠 평점 업데이트 성공: $contentsDocId, 평균 평점: $avgRating, 리뷰 개수: $reviewCount"
-            )
+            // Log.d("test100", "컨텐츠 평점 업데이트 성공: $contentsDocId, 평균 평점: $avgRating, 리뷰 개수: $reviewCount")
 
             return reviewCount
         } catch (e: Exception) {

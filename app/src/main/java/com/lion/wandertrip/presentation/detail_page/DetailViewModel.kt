@@ -332,12 +332,15 @@ class DetailViewModel @Inject constructor(
 
     // 리뷰 리스트 가져오기
     fun getReviewList() {
+        Log.d("Test100","getReviewList")
+
         reviewList.clear()
         viewModelScope.launch {
             val work1 = async(Dispatchers.IO) {
                 contentsReviewService.getAllReviewsWithContents(contentModelValue.value.contentId!!)
             }
             val list = work1.await()
+            Log.d("Test100","list$: ${list}")
             reviewList.addAll(list)
         }
     }

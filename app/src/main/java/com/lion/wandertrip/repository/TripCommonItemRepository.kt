@@ -10,7 +10,7 @@ class TripCommonItemRepository(private val api: TripCommonItemInterface) {
         contentId: String,
         contentTypeId: String?
     ): TripCommonItem? {
-        Log.d("test100", "TripCommonItemRepository: Starting API call")
+        // Log.d("test100", "TripCommonItemRepository: Starting API call")
 
         return try {
             val response = api.getCommonTripItem(
@@ -32,14 +32,14 @@ class TripCommonItemRepository(private val api: TripCommonItemInterface) {
             )
 
             if (response.isSuccessful) {
-                Log.d("test100", "API request was successful")
-                Log.d("test100", "Response Body: ${response.body()}")
+                // Log.d("test100", "API request was successful")
+                // Log.d("test100", "Response Body: ${response.body()}")
 
                 // 응답이 성공적이라면, 응답 데이터에서 필요한 정보를 추출하여 TripCommonItem으로 매핑
                 response.body()?.let { apiResponse ->
                     val item = apiResponse.response.body.items.item.firstOrNull() // 첫 번째 항목을 가져옵니다.
                     // 매핑하여 반환
-                    Log.d("test","item: $item")
+                   // Log.d("test","item: $item")
                     item?.let {
                         TripCommonItem(
                             contentId = it.contentId,
