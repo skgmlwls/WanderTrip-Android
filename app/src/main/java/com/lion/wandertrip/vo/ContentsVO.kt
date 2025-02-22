@@ -7,7 +7,7 @@ import com.lion.wandertrip.model.ReviewModel
 class ContentsVO {
     var contentDocId: String = ""
     var contentId: String = ""
-    var ratingScore: String = ""
+    var ratingScore: Float = 0.0f
     var reviewList: List<ReviewVO> = emptyList()
 
     fun toDetailReviewModel(): ContentsModel {

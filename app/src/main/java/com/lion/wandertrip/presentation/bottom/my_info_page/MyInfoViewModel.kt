@@ -102,6 +102,7 @@ class MyInfoViewModel @Inject constructor(
 
     }
 
+
     // 화면 열 때 최근 본 목록 가져오기
     fun getRecentTripItemList() {
         recentTripItemList.clear()

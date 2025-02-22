@@ -12,11 +12,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.wandertrip.presentation.start_page.used_dummy_data.RecentDummyData
+import com.lion.wandertrip.util.Tools
 
 @Composable
 fun StartScreen(startViewModel: StartViewModel = hiltViewModel()){
 
     startViewModel.autoLoginProcess()
+   /* RecentDummyData.recentItemDummyDataList.forEach {
+        Tools.addRecentItemList(startViewModel.tripApplication,it)
+
+    }*/
 
     if(startViewModel.showLoginMessageState.value) {
         Scaffold {

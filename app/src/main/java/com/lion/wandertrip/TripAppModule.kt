@@ -1,10 +1,12 @@
 package com.lion.wandertrip
 
 import com.lion.wandertrip.repository.ContentsRepository
+import com.lion.wandertrip.repository.ContentsReviewRepository
 import com.lion.wandertrip.repository.TripCommonItemRepository
 import com.lion.wandertrip.repository.TripScheduleRepository
 import com.lion.wandertrip.repository.UserRepository
 import com.lion.wandertrip.retrofit_for_practice.TripCommonItemInterface
+import com.lion.wandertrip.service.ContentsReviewService
 import com.lion.wandertrip.service.ContentsService
 import com.lion.wandertrip.service.TripCommonItemService
 import com.lion.wandertrip.service.TripScheduleService
@@ -80,19 +82,20 @@ object TripAppModule {
     fun tripCommonItemServiceProvider(repository: TripCommonItemRepository): TripCommonItemService {
         return TripCommonItemService(repository)
     }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // Contents
+    // contents
 
     @Provides
     @Singleton
-    fun contentReviewRepositoryProvider(): ContentsRepository {
+    fun contentsRepositoryProvider(): ContentsRepository {
         return ContentsRepository()
     }
 
     @Provides
     @Singleton
-    fun contentReviewServiceProvider(
+    fun contentsServiceProvider(
         contentsRepository: ContentsRepository
     ): ContentsService {
         return ContentsService(contentsRepository)
@@ -100,7 +103,25 @@ object TripAppModule {
 
     //////////////////////////////////////////////////////////////////////////////////////
 
-    // contentsReview
+
+    // ContentsReview
+
+    @Provides
+    @Singleton
+    fun contentsReviewRepositoryProvider(): ContentsReviewRepository {
+        return ContentsReviewRepository()
+    }
+
+    @Provides
+    @Singleton
+    fun contentsReviewServiceProvider(
+        contentsReviewRepository: ContentsReviewRepository
+    ): ContentsReviewService {
+        return ContentsReviewService(contentsReviewRepository)
+    }
+
+
+
 
 
 }

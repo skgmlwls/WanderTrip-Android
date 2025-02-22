@@ -18,6 +18,7 @@ import com.lion.wandertrip.presentation.bottom.my_info_page.components.Horizonta
 import com.lion.wandertrip.presentation.bottom.my_info_page.components.ProfileCardBasicImage
 import com.lion.wandertrip.presentation.bottom.my_info_page.components.ProfileCardHasProfileImage
 import com.lion.wandertrip.presentation.bottom.my_info_page.used_dummy_data.RecentPostsDummyData
+import com.lion.wandertrip.util.Tools
 
 @Composable
 fun MyInfoScreen(myInfoViewModel: MyInfoViewModel = hiltViewModel()) {

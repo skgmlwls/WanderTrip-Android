@@ -69,10 +69,11 @@ fun DetailReviewWriteScreen(
                 title = contentTitle,
                 menuItems = {
                     // 작성 완료 아이콘
+                    if(detailReviewWriteViewModel.reviewContentValue.value!="")
                     CustomIconButton(
                         ImageVector.vectorResource(R.drawable.ic_check_24px),
                         iconButtonOnClick = {
-                            detailReviewWriteViewModel.onClickNavIconBack()
+                            detailReviewWriteViewModel.updateReview(contentID)
                         }
                     )
                 },
