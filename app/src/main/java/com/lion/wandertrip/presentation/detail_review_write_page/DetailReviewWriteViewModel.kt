@@ -10,11 +10,9 @@ import androidx.lifecycle.viewModelScope
 import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.ContentsModel
 import com.lion.wandertrip.model.ReviewModel
-import com.lion.wandertrip.model.UserWriteReviewModel
 import com.lion.wandertrip.service.ContentsReviewService
 import com.lion.wandertrip.service.ContentsService
 import com.lion.wandertrip.service.UserService
-import com.lion.wandertrip.service.UserWriteReviewService
 import com.lion.wandertrip.util.Tools
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -31,7 +29,6 @@ class DetailReviewWriteViewModel @Inject constructor(
     private val contentsReviewService: ContentsReviewService,
     val contentsService: ContentsService,
     val userService: UserService,
-    val userWriteReviewService: UserWriteReviewService
 ) : ViewModel() {
     val tripApplication = context as TripApplication
 
@@ -116,8 +113,6 @@ class DetailReviewWriteViewModel @Inject constructor(
         }
 
 
-        // 리뷰 문서를 작성했다면, 유저 컬렉션의 작성한 리뷰 서브컬렉션에 컨텐츠 문서 아이디, 컨텐츠 아이디
-        addUserWriteReview(contentsDocId, contentId)
         return contentsDocId
     }
 
@@ -139,17 +134,6 @@ class DetailReviewWriteViewModel @Inject constructor(
             tripApplication.navHostController.popBackStack()
 
         }
-    }
-
-    // 유저가 쓴 리뷰 목록에 현재 리뷰를 추가한다.
-    fun addUserWriteReview(contentDocId: String, contentsId: String) {
-        val userWriteReviewModel = UserWriteReviewModel()
-        userWriteReviewModel.contentsDocId = contentDocId
-        userWriteReviewModel.contentsId = contentsId
-        userWriteReviewService.addUserWriteReview(
-            tripApplication.loginUserModel.userDocId,
-            userWriteReviewModel
-        )
     }
 
     fun uploadImageInFireStore(contentId : String) {

@@ -9,7 +9,6 @@ import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.ReviewModel
 import com.lion.wandertrip.presentation.detail_review_modify_page.used_dummy_data.ReviewModifyModelDummyData
 import com.lion.wandertrip.service.ContentsReviewService
-import com.lion.wandertrip.service.UserWriteReviewService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers

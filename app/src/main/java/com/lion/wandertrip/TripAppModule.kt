@@ -5,14 +5,12 @@ import com.lion.wandertrip.repository.ContentsReviewRepository
 import com.lion.wandertrip.repository.TripCommonItemRepository
 import com.lion.wandertrip.repository.TripScheduleRepository
 import com.lion.wandertrip.repository.UserRepository
-import com.lion.wandertrip.repository.UserWriteReviewRepository
 import com.lion.wandertrip.retrofit_for_practice.TripCommonItemInterface
 import com.lion.wandertrip.service.ContentsReviewService
 import com.lion.wandertrip.service.ContentsService
 import com.lion.wandertrip.service.TripCommonItemService
 import com.lion.wandertrip.service.TripScheduleService
 import com.lion.wandertrip.service.UserService
-import com.lion.wandertrip.service.UserWriteReviewService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -123,23 +121,6 @@ object TripAppModule {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // UserWriteReview
-
-    @Provides
-    @Singleton
-    fun userWriteReviewRepositoryProvider(): UserWriteReviewRepository {
-        return UserWriteReviewRepository()
-    }
-
-    @Provides
-    @Singleton
-    fun userWriteReviewServiceProvider(
-        userWriteReviewRepository: UserWriteReviewRepository
-    ): UserWriteReviewService {
-        return UserWriteReviewService(userWriteReviewRepository)
-    }
-
 
 
 }
