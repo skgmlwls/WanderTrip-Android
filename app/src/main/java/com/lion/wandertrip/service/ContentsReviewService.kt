@@ -1,10 +1,11 @@
 package com.lion.wandertrip.service
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
-import androidx.core.graphics.rotationMatrix
 import com.lion.wandertrip.model.ReviewModel
 import com.lion.wandertrip.repository.ContentsReviewRepository
-import com.lion.wandertrip.vo.ReviewVO
 
 class ContentsReviewService(val contentsReviewRepository: ContentsReviewRepository) {
 
@@ -61,25 +62,49 @@ class ContentsReviewService(val contentsReviewRepository: ContentsReviewReposito
             return result // 성공한 경우 true 반환
         } catch (e: Exception) {
              // 예외 발생 시 로그에 오류 메시지 출력
-             Log.e("test100", "리뷰 등록 실패: $contentsId", e)
+             Log.e("ContentsReviewService", "리뷰 등록 실패: $contentsId", e)
             return ""
          }
     }
 
     // 리뷰 수정하기
-    suspend fun modifyContentsReview(contentsID: String, reviewVO: ReviewVO): Boolean {
+    suspend fun modifyContentsReview(contentsDocID: String, reviewModel: ReviewModel): Boolean {
         return try {
-            // 리뷰 수정 요청을 위한 repository 메서드 호출
-            val result = contentsReviewRepository.modifyContentsReview(contentsID, reviewVO)
+            // 리뷰 수정 요청을 위한 repository 메서드 호출 전 로그 추가
+            //Log.d("ContentsReviewService", "리뷰 수정 시작: contentsDocID = $contentsDocID, reviewModel = $reviewModel")
+
+            // 리뷰 수정 요청
+            val result = contentsReviewRepository.modifyContentsReview(contentsDocID, reviewModel.toReviewItemVO())
+
+            // 성공 로그
+            if (result) {
+               // Log.d("ContentsReviewService", "리뷰 수정 성공: contentsDocID = $contentsDocID, reviewDocId = ${reviewModel.reviewDocId}")
+            } else {
+                //Log.d("ContentsReviewService", "리뷰 수정 실패 (기타): contentsDocID = $contentsDocID")
+            }
 
             result // 성공한 경우 true 반환
         } catch (e: Exception) {
-            // 예외 발생 시 로그에 오류 메시지 출력
-            Log.e("test100", "리뷰 수정 실패: $contentsID", e)
+            // 예외 발생 시 에러 로그에 구체적인 메시지 출력
+            Log.e("test100", "리뷰 수정 실패: contentsDocID = $contentsDocID", e)
+            // 예외를 출력하여 문제 파악에 도움을 줍니다.
+            Log.e("test100", "에러 메시지: ${e.message}")
+            Log.e("test100", "스택 트레이스: ${Log.getStackTraceString(e)}")
 
             // 실패 시 false 반환
             false
         }
+    }
+
+
+    // 이미지 데이터를 서버로 업로드 하는 메서드
+    suspend fun uploadReviewImage(sourceFilePath: List<String>, serverFilePath: MutableList<String>, contentsId: String) {
+        contentsReviewRepository.uploadReviewImage(sourceFilePath,serverFilePath,contentsId)
+    }
+
+    // 이미지 Uri 리스트를 가져오는 함수
+    suspend fun gettingReviewImage(imageFileNameList: List<String>,contentsId: String): List<Uri> {
+        return contentsReviewRepository.gettingReviewImage(imageFileNameList,contentsId)
     }
 
 }

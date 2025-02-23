@@ -7,9 +7,7 @@ class ContentsModel(
     var contentId: String = "",      // 컨텐츠 ID
     var ratingScore: Float = 0.0f,    // 평균 별점
     var reviewList: List<ReviewModel> = emptyList() // 리뷰 리스트 (서브 컬렉션)
-    // 저장 한 유저 목록 서브컬렉션
 
-    // 리뷰 남긴 유저 목록 서브컬렉션
 ) {
     fun toDetailReviewVO(): ContentsVO {
         val detailReviewVO = ContentsVO()

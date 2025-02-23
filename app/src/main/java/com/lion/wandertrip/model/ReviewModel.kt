@@ -12,7 +12,9 @@ class ReviewModel(
     var reviewRatingScore: Float = 0.0f,  // 리뷰 별점 // 별점은 플롯으로
     var reviewImageList: List<String> = emptyList(), // 리뷰 이미지 리스트
     var reviewTitle :String = "",// 리뷰 제목
-    var reviewState : Int = 1 // 리뷰 상태 1: 노출 , 2: 삭제됨
+    var reviewState : Int = 1, // 리뷰 상태 1: 노출 , 2: 삭제됨
+    var reviewWriterProfileImgURl : String ="",
+    var contentsId : String = ""
 ) {
     fun toReviewItemVO(): ReviewVO {
         val reviewItemVO = ReviewVO()
@@ -25,6 +27,8 @@ class ReviewModel(
         reviewItemVO.reviewImageList = reviewImageList
         reviewItemVO.reviewTitle = reviewTitle
         reviewItemVO.reviewState = reviewState
+        reviewItemVO.reviewWriterProfileImgURl = reviewWriterProfileImgURl
+        reviewItemVO.contentsId = contentsId
         return reviewItemVO
     }
 }

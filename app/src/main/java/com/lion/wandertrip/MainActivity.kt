@@ -2,7 +2,6 @@ package com.lion.wandertrip
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -17,7 +16,7 @@ import com.lion.wandertrip.presentation.bottom.trip_note_page.TripNoteScreen
 import androidx.navigation.navArgument
 import com.google.firebase.Timestamp
 import com.lion.wandertrip.presentation.detail_page.DetailScreen
-import com.lion.wandertrip.presentation.detail_review_modify.DetailReviewModifyScreen
+import com.lion.wandertrip.presentation.detail_review_modify_page.DetailReviewModifyScreen
 import com.lion.wandertrip.presentation.detail_review_write_page.DetailReviewWriteScreen
 import com.lion.wandertrip.presentation.google_map_page.GoogleMapScreen
 import com.lion.wandertrip.presentation.trip_note_detail_page.TripNoteDetailScreen

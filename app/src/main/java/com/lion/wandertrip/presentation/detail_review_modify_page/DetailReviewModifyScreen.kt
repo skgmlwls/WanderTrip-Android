@@ -1,4 +1,4 @@
-package com.lion.wandertrip.presentation.detail_review_modify
+package com.lion.wandertrip.presentation.detail_review_modify_page
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -26,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +45,6 @@ import com.lion.a02_boardcloneproject.component.CustomIconButton
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.wandertrip.R
 import com.lion.wandertrip.component.CustomDraggableRatingBar
-import com.lion.wandertrip.presentation.detail_review_write_page.DetailReviewWriteViewModel
 import com.lion.wandertrip.presentation.detail_review_write_page.components.CustomBasicTextField
 import com.lion.wandertrip.util.CustomFont
 import com.skydoves.landscapist.CircularReveal
@@ -57,28 +57,34 @@ fun DetailReviewModifyScreen(
     reviewDocID: String,
     detailReviewModifyViewModel: DetailReviewModifyViewModel = hiltViewModel()
 ) {
-    detailReviewModifyViewModel.getReviewModel()
+    // Log.d("DRMS","DetailReviewModifyScreen")
     val focusManager = LocalFocusManager.current
     val reviewModelValue = detailReviewModifyViewModel.reviewModel.value
-    // 가져온 모델 별점 세팅
-    detailReviewModifyViewModel.settingRatingScore(reviewModelValue.reviewRatingScore)
-    // 가져온 모델 내용 세팅
-    detailReviewModifyViewModel.settingReviewContent(reviewModelValue.reviewContent)
-    // 이미지 세팅
-    detailReviewModifyViewModel.settingReviewImgList(reviewModelValue.reviewImageList.toMutableStateList())
+    // getReviewModel을 LaunchedEffect로 감싸기
+    LaunchedEffect(contentDocID, reviewDocID) {
+        // 컴포저블이 처음 로드될 때만 실행되도록 설정
+        detailReviewModifyViewModel.getReviewModel(contentDocID, reviewDocID)
 
+    }
+    // 첫 모델은 null 상태고 -> 로드된후 모델이 바뀌니까 바뀌고 나서 실행한다.
+    // 모델이 로드된 후, 별점, 내용, 이미지 등을 설정
+    LaunchedEffect(reviewModelValue) {
+        detailReviewModifyViewModel.settingRatingScore(reviewModelValue.reviewRatingScore)
+        detailReviewModifyViewModel.settingReviewContent(reviewModelValue.reviewContent)
+        detailReviewModifyViewModel.settingReviewImgList(reviewModelValue.reviewImageList.toMutableStateList())
+    }
 
     val scrollState = rememberScrollState()
     Scaffold(
         topBar = {
             CustomTopAppBar(
-                title = reviewModelValue.reviewTitle,
+                title = detailReviewModifyViewModel.reviewModel.value.reviewTitle,
                 menuItems = {
                     // 작성 완료 아이콘
                     CustomIconButton(
                         ImageVector.vectorResource(R.drawable.ic_check_24px),
                         iconButtonOnClick = {
-                            detailReviewModifyViewModel.onClickNavIconBack()
+                            detailReviewModifyViewModel.onClickIconCheckModifyReview()
                         }
                     )
                 },
@@ -148,7 +154,7 @@ fun DetailReviewModifyScreen(
                     )
                 }
                 // 예제 이미지 리스트
-                reviewModelValue.reviewImageList.forEachIndexed { idx, imageRes ->
+                detailReviewModifyViewModel.reviewModel.value.reviewImageList.forEachIndexed { idx, imageRes ->
                     Box(){
                         GlideImage(
                             imageModel = imageRes,

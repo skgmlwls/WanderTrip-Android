@@ -1,4 +1,4 @@
-package com.lion.wandertrip.presentation.detail_review_modify.used_dummy_data
+package com.lion.wandertrip.presentation.detail_review_modify_page.used_dummy_data
 
 import com.google.firebase.Timestamp
 import com.lion.wandertrip.model.ReviewModel

@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
@@ -14,7 +15,6 @@ import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.ReviewModel
 import com.lion.wandertrip.model.TripCommonItem
 import com.lion.wandertrip.model.TripScheduleModel
-import com.lion.wandertrip.presentation.detail_page.used_dummy_data.ReviewDummyData
 import com.lion.wandertrip.presentation.detail_page.used_dummy_data.TripScheduleDummyData
 import com.lion.wandertrip.service.ContentsReviewService
 import com.lion.wandertrip.service.ContentsService
@@ -26,6 +26,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
@@ -71,6 +72,15 @@ class DetailViewModel @Inject constructor(
     // 일정추가 바텀시트 일정추가 아이콘 상태
     val isShownAddScheduleIconValue = mutableStateOf(false)
 
+    // 로딩 상태 변수
+    val isLoading = mutableStateOf(false)
+
+
+    fun setState() {
+        Log.d("test100","state : $isLoading")
+        isLoading.value = true
+        Log.d("test100","state : $isLoading")
+    }
 
     // 컨텐트 ID 로 모델 가져오기
     fun getContentModel(contentID: String) {
@@ -143,7 +153,7 @@ class DetailViewModel @Inject constructor(
     fun onClickIconScheduleCard(clickPos: Int, scheduleDaysSize: Int) {
         // 날짜별 인덱스 bool 값 담는 맵 초기화
         addScheduleDatePickerMap(scheduleDaysSize)
-        Log.d("test100", " map : $scheduleDatePickerStateMap")
+        // Log.d("test100", " map : $scheduleDatePickerStateMap")
         // 한번이라도 메뉴가 클릭된적이 없다면
         if (!isMenuOpened.value) {
             menuStateMap[clickPos] = true
@@ -330,18 +340,22 @@ class DetailViewModel @Inject constructor(
     // 정렬 상태 : 별점 높은순 , 별점 기준 내림차순
     val isRatingDesc = mutableStateOf(true)
 
-    // 리뷰 리스트 가져오기
-    fun getReviewList() {
-        Log.d("Test100","getReviewList")
+    // 리뷰 사진 관리 map
+    val reviewImageUrlMap = mutableStateMapOf<Int,List<Uri>>()
 
+    // 리뷰가져오기
+    // 동기실행
+    fun getReviewList() {
         reviewList.clear()
         viewModelScope.launch {
-            val work1 = async(Dispatchers.IO) {
+            val list = withContext(Dispatchers.IO) {
                 contentsReviewService.getAllReviewsWithContents(contentModelValue.value.contentId!!)
             }
-            val list = work1.await()
-            Log.d("Test100","list$: ${list}")
+
             reviewList.addAll(list)
+
+            // 데이터 로딩이 완료된 후 필터링 실행
+            getFilteredReviewList()
         }
     }
 
@@ -366,6 +380,41 @@ class DetailViewModel @Inject constructor(
             filteredReviewList.addAll(
                 reviewList.sortedByDescending { it.reviewRatingScore }
             )
+        }
+
+    }
+
+    // 이미지 uri로 변경
+    fun getUri(filterReviewList : MutableList<ReviewModel>) {
+        // url map 초기화
+        reviewImageUrlMap.clear()
+
+        // 로그 추가: 함수가 호출되었는지 확인
+        Log.d("getUri", "getUri() 함수 호출됨, 이미지 URL 가져오기 시작")
+
+        viewModelScope.launch {
+            filterReviewList.forEachIndexed { index, reviewModel ->
+                Log.d("getUri", "$index 번째 리뷰에 대한 이미지 URL 가져오기 시작")
+
+                // 이미지 URL 리스트 가져오기
+                val urlList = contentsReviewService.gettingReviewImage(
+                    filterReviewList[index].reviewImageList.toList(),
+                    contentModelValue.value.contentId!!
+                )
+
+                // 로그: URL 리스트가 어떻게 나왔는지 확인
+                Log.d("getUri", "$index 번째 리뷰의 URL 리스트: $urlList")
+
+                // URL 맵에 추가
+                reviewImageUrlMap[index] = urlList.toMutableStateList()
+                Log.d("test100","map[$index] : $reviewImageUrlMap[$index]")
+            }
+
+            // 로그: 작업이 끝났는지 확인
+            Log.d("getUri", "모든 이미지 URL 가져오기 완료")
+
+            // 로딩 종료
+            isLoading.value = false
         }
     }
 
@@ -408,8 +457,8 @@ class DetailViewModel @Inject constructor(
     }
 
     // 리뷰 수정 버튼 리스너
-    fun onClickIconReviewModify(contentID: String, reviewDocID: String) {
-        tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_DETAIL_REVIEW_MODIFY.name}/${contentID}/${reviewDocID}")
+    fun onClickIconReviewModify(contentDocID: String, reviewDocID: String) {
+        tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_DETAIL_REVIEW_MODIFY.name}/${contentDocID}/${reviewDocID}")
     }
     // ------------------------------------------------------------------
 

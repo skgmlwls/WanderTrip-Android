@@ -44,15 +44,17 @@ fun IntroColumn(detailViewModel: DetailViewModel) {
     val sw = detailViewModel.tripApplication.screenWidth
     val sh = detailViewModel.tripApplication.screenHeight
     val contentValue = detailViewModel.contentModelValue.value
+
+    detailViewModel.gettingCityName(
+        detailViewModel.contentModelValue.value.areaCode ?: "",
+        detailViewModel.contentModelValue.value.siGunGuCode ?: "",
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(8.dp)
     ) {
-        detailViewModel.gettingCityName(
-            detailViewModel.contentModelValue.value.areaCode ?: "",
-            detailViewModel.contentModelValue.value.siGunGuCode ?: "",
-        )
         Text(
             text = contentValue.title ?: "",
             fontSize = 26.sp,

@@ -21,60 +21,68 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lion.a02_boardcloneproject.component.CustomIconButton
 import com.lion.wandertrip.R
+import com.lion.wandertrip.component.LottieLoadingIndicator
 import com.lion.wandertrip.presentation.detail_page.DetailViewModel
 
 @Composable
 fun ReviewLazyColumn(detailViewModel: DetailViewModel) {
     val sh = detailViewModel.tripApplication.screenHeight
-    // 최초 한 번만 실행
-    LaunchedEffect(Unit) {
-        detailViewModel.reviewList.clear()
+
+    LaunchedEffect(detailViewModel.reviewList) {
         detailViewModel.getReviewList()
         detailViewModel.getFilteredReviewList()
     }
+
+    LaunchedEffect(detailViewModel.filteredReviewList){
+        detailViewModel.getUri(detailViewModel.filteredReviewList)
+    }
     val contentModel = detailViewModel.contentModelValue.value
-    LazyColumn(
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth()
-            .height((sh / 3).dp)
-    ) {
-        item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween) {
+    if(detailViewModel.isLoading.value){
+        LottieLoadingIndicator()
+    }else{
+        LazyColumn(
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+                .height((sh / 3).dp)
+        ) {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        text = "리뷰 : ${detailViewModel.filteredReviewList.size}",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 30.sp
+                    )
+                    CustomIconButton(
+                        ImageVector.vectorResource(R.drawable.ic_add_24px),
+                        iconButtonOnClick = {
+                            // 리뷰 쓰기 화면 띄우기
+                            detailViewModel.onClickIconReviewWrite(contentModel.contentId?:"",contentModel.title?:"")
+                        })
+                }
+            }
+            item {
                 Text(
-                    text = "리뷰 : ${detailViewModel.filteredReviewList.size}",
+                    text = "${detailViewModel.filterStateStringValue.value} ▼",
+                    color = Color.Gray,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 30.sp
+                    modifier = Modifier
+                        .padding(vertical = 10.dp)
+                        .clickable {
+                            detailViewModel.onClickTextReviewFilter()
+                        }
                 )
-                CustomIconButton(
-                    ImageVector.vectorResource(R.drawable.ic_add_24px),
-                    iconButtonOnClick = {
-                        // 리뷰 쓰기 화면 띄우기
-                        detailViewModel.onClickIconReviewWrite(contentModel.contentId?:"",contentModel.title?:"")
-                    })
+            }
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                VerticalReviewList(detailViewModel)
             }
         }
-        item {
-            Text(
-                text = "${detailViewModel.filterStateStringValue.value} ▼",
-                color = Color.Gray,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .padding(vertical = 10.dp)
-                    .clickable {
-                        detailViewModel.onClickTextReviewFilter()
-                    }
-            )
-        }
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-        Log.d("test100", "VerticalReviewList 호출 : ")
-        item {
-            VerticalReviewList(detailViewModel)
-        }
+
     }
 
 

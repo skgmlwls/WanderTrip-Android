@@ -13,6 +13,9 @@ class ReviewVO {
     var reviewImageList: List<String> = emptyList()
     var reviewTitle :String = "" // 리뷰 제목
     var reviewState : Int = 1 // 리뷰 상태 1: 노출 , 2: 삭제됨
+    var reviewWriterProfileImgURl : String =""
+    var contentsId : String = ""
+
 
 
     fun toReviewItemModel(): ReviewModel {
@@ -26,6 +29,8 @@ class ReviewVO {
         reviewItemModel.reviewImageList = reviewImageList
         reviewItemModel.reviewTitle = reviewTitle
         reviewItemModel.reviewState = reviewState
+        reviewItemModel.reviewWriterProfileImgURl = reviewWriterProfileImgURl
+        reviewItemModel.contentsId = contentsId
         return reviewItemModel
     }
 }

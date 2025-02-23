@@ -36,7 +36,7 @@ import com.skydoves.landscapist.glide.GlideImage
 
 
 @Composable
-fun VerticalReviewList(myReviewViewModel: MyReviewViewModel) {
+fun VerticalMyReviewList(myReviewViewModel: MyReviewViewModel) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
