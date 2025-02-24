@@ -53,7 +53,7 @@ fun SearchResultScreen(
         filteredList.filter { it.cat2 == selectedCategoryCode }.groupBy { it.cat2 }
     }
 
-    // ✅ "맛집", "여행기" 등 특정 카테고리가 없으면 빈 메시지 표시
+    // ✅ 표시할 카테고리 리스트 (순서 유지)
     val requiredCategories = listOf("관광지", "숙소", "맛집", "여행기")
 
     Scaffold(containerColor = Color.White) { paddingValues ->
@@ -92,9 +92,9 @@ fun SearchResultScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // 🔹 검색된 카테고리 표시
-                categorizedResults.forEach { (category, items) ->
+                requiredCategories.forEach { category ->
                     item {
+                        // ✅ 카테고리 제목
                         Text(
                             text = category,
                             fontSize = 20.sp,
@@ -103,26 +103,31 @@ fun SearchResultScreen(
                         )
                     }
 
-                    // 🔹 개별 `items()`로 처리
-                    items(items) { tripItem ->
-                        SearchItem(
-                            tripItem = tripItem,
-                            onItemClick = { searchViewModel.onClickToResult(tripItem.title) }
-                        )
-                        CustomDividerComponent(10.dp)
+                    // ✅ 해당 카테고리에 데이터가 있는 경우 표시
+                    categorizedResults[category]?.let { items ->
+                        items(items) { tripItem ->
+                            SearchItem(
+                                tripItem = tripItem,
+                                onItemClick = { searchViewModel.onClickToResult(tripItem.title) }
+                            )
+                            CustomDividerComponent(10.dp)
+                        }
+                    } ?: run {
+                        // ✅ 데이터가 없는 경우 "없음" 메시지 표시
+                        item {
+                            NoResultsMessage(category)
+                        }
                     }
 
-                    // 🔹 "더보기" 버튼 추가
+                    // ✅ "더보기" 버튼 추가
                     item {
                         MoreButton(category = category)
                     }
-                }
 
-                // ✅ 특정 카테고리가 없으면 "없음" 메시지 표시
-                requiredCategories.forEach { category ->
-                    if (!categorizedResults.containsKey(category)) {
+                    // ✅ 구분선 추가 (마지막 항목 제외)
+                    if (category != requiredCategories.last()) {
                         item {
-                            NoResultsMessage(category)
+                            CustomDividerComponent(16.dp)
                         }
                     }
                 }
@@ -130,6 +135,7 @@ fun SearchResultScreen(
         }
     }
 }
+
 
 
 @Composable
