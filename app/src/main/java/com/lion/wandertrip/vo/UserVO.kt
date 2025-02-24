@@ -15,7 +15,8 @@ class UserVO {
     var userTimeStamp: Timestamp = Timestamp.now()
     var userState: Int = 1
     var userKakaoToken : String = ""
-
+    var userScheduleList : List<String> = emptyList()  // 유저가 만든 일정 리스트
+    var invitedScheduleList : List<String> = emptyList() // 초대 받은 일정 리스트
 
     fun toUserModel(): UserModel {
         val userModel = UserModel()
@@ -30,6 +31,8 @@ class UserVO {
         userModel.userTimeStamp = userTimeStamp
         userModel.userState = userState
         userModel.userKakaoToken = userKakaoToken
+        userModel.userScheduleList = userScheduleList
+        userModel.invitedScheduleList = invitedScheduleList
         return userModel
     }
 }

@@ -3,9 +3,9 @@ package com.lion.wandertrip.repository
 import android.graphics.Bitmap
 import android.util.Log
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
-import com.lion.wandertrip.model.ScheduleItem
 import com.lion.wandertrip.retrofit.ApiResponse
 import com.lion.wandertrip.retrofit.RetrofitClient
 import com.lion.wandertrip.vo.ScheduleItemVO
@@ -182,7 +182,6 @@ class TripScheduleRepository {
         }
     }
 
-
     // 단일 Bitmap 업로드 -> 다운 로드 URL
     suspend fun uploadBitmapListToFirebase(bitmaps: List<Bitmap>): List<String> {
         val downloadUrls = mutableListOf<String>()
@@ -211,6 +210,41 @@ class TripScheduleRepository {
             }
         }
         return downloadUrls
+    }
+
+    // 위치 조정한 일정 항목 업데이트
+    suspend fun updateItemsPosition(tripScheduleDocId: String, updatedItems: List<ScheduleItemVO>) {
+        val firestore = FirebaseFirestore.getInstance()
+        val subCollectionRef = firestore.collection("TripSchedule")
+            .document(tripScheduleDocId)
+            .collection("TripScheduleItem")
+
+        val batch = firestore.batch()
+        updatedItems.forEach { scheduleItem ->
+            val docRef = subCollectionRef.document(scheduleItem.itemDocId)
+            // Firestore 업데이트 시, itemIndex를 1부터 시작하는 값으로 업데이트
+            batch.update(docRef, "itemIndex", scheduleItem.itemIndex)
+        }
+        batch.commit().await()
+    }
+
+    // 초대할 닉네임으로 유저 존재 여부 확인 후, 있으면 문서 ID 반환, 없으면 빈 문자열 반환
+    suspend fun addInviteUserByInviteNickname(scheduleDocId: String, inviteNickname: String): Boolean {
+        val firestore = FirebaseFirestore.getInstance().collection("UserData")
+        val querySnapshot = firestore
+            .whereEqualTo("userNickName", inviteNickname)
+            .get()
+            .await()
+
+        return if (!querySnapshot.isEmpty) {
+            // 검색된 첫 번째 문서 업데이트
+            val userDoc = querySnapshot.documents.first()
+            userDoc.reference.update("invitedScheduleList", FieldValue.arrayUnion(scheduleDocId))
+                .await()
+            true
+        } else {
+            false
+        }
     }
 
     // 공공 데이터 관련 //////////////////////////////////////////////////////////////////////////////
