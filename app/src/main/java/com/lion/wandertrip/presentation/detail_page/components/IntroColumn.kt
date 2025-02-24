@@ -44,22 +44,32 @@ fun IntroColumn(detailViewModel: DetailViewModel) {
     val sw = detailViewModel.tripApplication.screenWidth
     val sh = detailViewModel.tripApplication.screenHeight
     val contentValue = detailViewModel.contentModelValue.value
+
+    detailViewModel.gettingCityName(
+        detailViewModel.contentModelValue.value.areaCode ?: "",
+        detailViewModel.contentModelValue.value.siGunGuCode ?: "",
+    )
+
     Column(
-        modifier = Modifier.fillMaxSize().padding(8.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
     ) {
         Text(
-            text = contentValue.detailTitle,
+            text = contentValue.title ?: "",
             fontSize = 26.sp,
             fontFamily = CustomFont.customFontBold,
         )
 
         Spacer(modifier = Modifier.height(16.dp)) // 간격
 
-       CustomRatingBar(contentValue.detailRating)
+        // 잠시보류
+        CustomRatingBar(4.5f)
 
         Spacer(modifier = Modifier.height(16.dp)) // 간격
 
         // 로케이션 아이콘과 텍스트
+        if(detailViewModel.cityNameValue.value!="")
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -71,18 +81,22 @@ fun IntroColumn(detailViewModel: DetailViewModel) {
                 tint = Color.Gray
             )
             // model 에 area코드, sigungu code 없어 못가져옴 추가할지 버릴지 선택해야함
-            Text("서울 중구", fontSize = 16.sp, fontFamily = CustomFont.customFontRegular)
+            Text(
+                detailViewModel.cityNameValue.value,
+                fontSize = 16.sp,
+                fontFamily = CustomFont.customFontRegular
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp)) // 간격
 
         // 이미지 (전체 width, 높이는 300dp)
         GlideImage(
-            imageModel = contentValue.detailImage,
+            imageModel = contentValue.firstImage,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
-                .height((sh/9).dp)
+                .height((sh / 9).dp)
                 .clip(RoundedCornerShape(8.dp)),  // 이미지 둥글게 만들기
             circularReveal = CircularReveal(duration = 250),
             placeHolder = ImageBitmap.imageResource(R.drawable.img_image_holder),
@@ -95,15 +109,22 @@ fun IntroColumn(detailViewModel: DetailViewModel) {
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier.fillMaxWidth()
         ) {
-            DetailColumnIconAndText(ImageVector.vectorResource(R.drawable.ic_heart_filled_24px),"저장하기")
-            DetailColumnIconAndText(ImageVector.vectorResource(R.drawable.ic_calendar_add_on_24px),"일정추가")
+            DetailColumnIconAndText(
+                ImageVector.vectorResource(R.drawable.ic_heart_filled_24px),
+                "저장하기"
+            )
+            DetailColumnIconAndText(
+                ImageVector.vectorResource(R.drawable.ic_calendar_add_on_24px),
+                "일정추가"
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp)) // 간격
 
+        // TODO
         // 지역 소개 (길게)
         Text(
-            text = contentValue.detailDescription,
+            text = detailViewModel.contentModelValue.value.overview!!,
             fontSize = 16.sp,
             fontFamily = CustomFont.customFontRegular
         )

@@ -175,17 +175,6 @@ class UserRepository {
         documentReference.update(updateMap).await()
     }
 
-    // 이미지 데이터를 서버로 업로드 하는 메서드
-    suspend fun uploadImage(sourceFilePath: String, serverFilePath: String) {
-        // 저장되어 있는 이미지의 경로
-        val file = File(sourceFilePath)
-        val fileUri = Uri.fromFile(file)
-        // 업로드 한다.
-        val firebaseStorage = FirebaseStorage.getInstance()
-        val childReference = firebaseStorage.reference.child("userProfileImage/$serverFilePath")
-        childReference.putFile(fileUri).await()
-    }
-
     // userDocID 로 user 정보 가져오기
     suspend fun getUserByUserDocId(userDocId: String): UserVO? {
         val firestore = FirebaseFirestore.getInstance()
@@ -212,17 +201,28 @@ class UserRepository {
         }
     }
 
+    // 이미지 데이터를 서버로 업로드 하는 메서드
+    suspend fun uploadImage(sourceFilePath: String, serverFilePath: String) {
+        // 저장되어 있는 이미지의 경로
+        val file = File(sourceFilePath)
+        val fileUri = Uri.fromFile(file)
+        // 업로드 한다.
+        val firebaseStorage = FirebaseStorage.getInstance()
+        val childReference = firebaseStorage.reference.child("userProfileImage/$serverFilePath")
+        childReference.putFile(fileUri).await()
+    }
+
     // 이미지 Uri 가져온다.
     // 이미지 데이터를 가져온다.
     suspend fun gettingImage(imageFileName: String): Uri {
-        Log.d("gettingImage", "이미지 파일명을 받음: $imageFileName")
+        // Log.d("gettingImage", "이미지 파일명을 받음: $imageFileName")
 
         val storageReference = FirebaseStorage.getInstance().reference
-        Log.d("gettingImage", "Firebase Storage 레퍼런스 초기화됨")
+        // Log.d("gettingImage", "Firebase Storage 레퍼런스 초기화됨")
 
         // 파일명을 지정하여 이미지 데이터를 가져온다.
         val childStorageReference = storageReference.child("userProfileImage/$imageFileName")
-        Log.d("gettingImage", "이미지 파일 경로: userProfileImage/$imageFileName")
+        // Log.d("gettingImage", "이미지 파일 경로: userProfileImage/$imageFileName")
 
         try {
             val imageUri = childStorageReference.downloadUrl.await()

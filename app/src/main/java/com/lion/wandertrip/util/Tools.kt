@@ -5,13 +5,11 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageDecoder
 import android.graphics.Matrix
-import android.graphics.drawable.BitmapDrawable
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
-import android.widget.ImageView
 import androidx.compose.runtime.MutableState
 import androidx.core.content.FileProvider
 import com.google.firebase.Timestamp
@@ -135,6 +133,37 @@ class Tools {
             }
         }
 
+        // 여러 사진을 한번에 가져와 담는 메서드 hj
+        fun getAlbumDataList(context: Context, previewUris: List<Uri>, previewBitmap: MutableList<Bitmap?>) {
+            previewUris.forEach { previewUri ->
+                val bitmap: Bitmap? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    val source = ImageDecoder.createSource(context.contentResolver, previewUri)
+                    ImageDecoder.decodeBitmap(source)
+                } else {
+                    var resultBitmap: Bitmap? = null
+                    val projection = arrayOf(MediaStore.Images.Media.DATA)
+
+                    context.contentResolver.query(previewUri, projection, null, null, null)?.use { cursor ->
+                        if (cursor.moveToFirst()) {
+                            val columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                            val filePath = cursor.getString(columnIndex)
+                            resultBitmap = BitmapFactory.decodeFile(filePath)
+                        }
+                    }
+
+                    resultBitmap
+                }
+
+                bitmap?.let {
+                    val resizedBitmap = resizeBitmap(1024, it)
+                    previewBitmap.add(resizedBitmap)  // 리스트에 추가
+                }
+            }
+        }
+
+
+
+
         fun takeAlbumDataList(context: Context, previewUri: Uri?, previewBitmap: MutableList<Bitmap?>) {
             // 가져온 사진이 있다면
             if (previewUri != null) {
@@ -162,6 +191,34 @@ class Tools {
             val filePath = context.getExternalFilesDir(null).toString()
             // 저장할 파일의 경로
             val file = File("${filePath}/uploadTemp.jpg")
+            // 파일로 저장한다.
+            val fileOutputStream = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
+            fileOutputStream.flush()
+            fileOutputStream.close()
+        }
+
+        fun saveBitmaps(context: Context, bitmap: Bitmap, fileName: String) {
+            val filePath = context.getExternalFilesDir(null).toString()
+            val file = File("$filePath/$fileName")
+            val fileOutputStream = FileOutputStream(file)
+
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
+            fileOutputStream.flush()
+            fileOutputStream.close()
+
+            Log.d("saveBitmap", "Saved file: ${file.absolutePath}, Exists: ${file.exists()}")
+        }
+
+
+
+        // 이미지 뷰에 있는 이미지를 파일로 저장한다.
+        // 이미지 뷰에 있는 이미지를 파일로 저장한다.
+        fun saveBitmapList(context: Context, bitmap: Bitmap, index: Int) {
+            // 외부 저장소의 경로를 가져온다.
+            val filePath = context.getExternalFilesDir(null).toString()
+            // 저장할 파일의 경로 (인덱스를 포함한 파일 이름)
+            val file = File("${filePath}/${index}_uploadTemp.jpg")
             // 파일로 저장한다.
             val fileOutputStream = FileOutputStream(file)
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
@@ -487,11 +544,11 @@ class Tools {
                         // 시군구 코드가 주어진 경우 해당 구 리턴
                         "구명: $subAreaName"
                     } else {
-                        "해당 시군구를 찾을 수 없습니다."
+                        ""
                     }
                 }
             } else {
-                "해당 지역을 찾을 수 없습니다."
+                ""
             }
         }
 
@@ -523,7 +580,7 @@ class Tools {
 
             // 현재 저장된 리스트 가져오기
             val currentList = getRecentItemList(context).toMutableList()
-            // Log.d("test100","currentList : $currentList")
+             Log.d("test100","currentList?? : $currentList")
 
             // 리스트의 크기가 20을 넘으면 가장 오래된 항목(19번)을 삭제
             if (currentList.size >= 20) {

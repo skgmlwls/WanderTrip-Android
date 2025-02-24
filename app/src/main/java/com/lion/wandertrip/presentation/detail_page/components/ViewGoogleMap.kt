@@ -62,11 +62,11 @@ fun ViewGoogleMap(detailViewModel: DetailViewModel) {
 
     // 권한을 사용하지 않아서 위 코드 전부 주석처리함 내위치 사용하지않아 권한 필요없음
         val contentModel = detailViewModel.contentModelValue.value
-        val lat = contentModel.detailLat
-        val long = contentModel.detailLong
+        val lat = contentModel.mapLat
+        val long = contentModel.mapLng
 
         val cameraPositionState = rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(LatLng(lat, long), 14f)
+            position = CameraPosition.fromLatLngZoom(LatLng(lat!!.toDouble(), long!!.toDouble()), 14f)
         }
         val uiSettings = remember {
             MapUiSettings(
@@ -83,7 +83,7 @@ fun ViewGoogleMap(detailViewModel: DetailViewModel) {
                 properties = properties,
                 uiSettings = uiSettings
             ) {
-                Marker(state = MarkerState(position = LatLng(lat, long)))
+                Marker(state = MarkerState(position = LatLng(lat!!.toDouble(), long!!.toDouble())))
             }
         }
     //}

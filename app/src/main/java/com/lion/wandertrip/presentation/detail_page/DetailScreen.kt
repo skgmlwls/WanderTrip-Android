@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.detail_page
 
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,6 +21,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,6 +34,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.a02_boardcloneproject.component.CustomIconButton
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.wandertrip.R
+import com.lion.wandertrip.component.LottieLoadingIndicator
 import com.lion.wandertrip.presentation.detail_page.components.BasicInfoDescriptionColumn
 import com.lion.wandertrip.presentation.detail_page.components.BottomSheetAddSchedule
 import com.lion.wandertrip.presentation.detail_page.components.BottomSheetReviewFilter
@@ -45,7 +48,10 @@ import com.lion.wandertrip.util.CustomFont
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewModel()) {
-    detailViewModel.getContentModel()
+    Log.d("test", "contentID : $contentID")
+    LaunchedEffect(Unit) {
+        detailViewModel.getContentModel(contentID)
+    }
     Scaffold(
         topBar = {
             CustomTopAppBar(
@@ -73,6 +79,7 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
             )
         }
     ) {
+
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -116,9 +123,11 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
 
             // 뷰페이저 항목
             if (detailViewModel.isClickIntroState.value)
+            // 소개 페이지
                 item { IntroColumn(detailViewModel) }
             if (detailViewModel.isClickBasicInfoState.value)
                 item {
+                    // 기본 정보 페이지
                     Column {
                         Text("기본정보", fontSize = 30.sp, fontFamily = CustomFont.customFontBold)
                         Spacer(modifier = Modifier.height(32.dp)) // 간격
@@ -129,6 +138,7 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
 
             if (detailViewModel.isClickReviewState.value)
                 item {
+                    // 후기 페이지
                     ReviewLazyColumn(detailViewModel)
                 }
 
@@ -136,16 +146,16 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
                 Spacer(modifier = Modifier.height(32.dp)) // 간격
             }
         }
-
-        // 리뷰 필터 BottomSheet가 표시될 때의 설정
-        if (detailViewModel.isReviewOptionSheetOpen.value) {
-         BottomSheetReviewFilter(detailViewModel)
-        }
-
-        // 일정 추가 BottomSheet가 표시될 때의 설정
-        if (detailViewModel.isAddScheduleSheetOpen.value) {
-            BottomSheetAddSchedule(detailViewModel)
-        }
-
     }
+
+    // 리뷰 필터 BottomSheet가 표시될 때의 설정
+    if (detailViewModel.isReviewOptionSheetOpen.value) {
+        BottomSheetReviewFilter(detailViewModel)
+    }
+
+    // 일정 추가 BottomSheet가 표시될 때의 설정
+    if (detailViewModel.isAddScheduleSheetOpen.value) {
+        BottomSheetAddSchedule(detailViewModel)
+    }
+
 }

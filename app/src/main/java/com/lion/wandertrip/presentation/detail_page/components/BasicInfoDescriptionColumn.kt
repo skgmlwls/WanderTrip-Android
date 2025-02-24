@@ -21,10 +21,11 @@ fun BasicInfoDescriptionColumn(detailViewModel : DetailViewModel) {
                 modifier = Modifier.padding(end = 4.dp)
             )
             Text(
-                detailViewModel.contentModelValue.value.detailAddress,
+                detailViewModel.contentModelValue.value.addr1?:"",
                 fontFamily = CustomFont.customFontRegular
             )
         }
+        if(detailViewModel.contentModelValue.value.tel !="")
         Row(modifier = Modifier.padding(vertical = 10.dp)) {
             Text(
                 "전화 : ",
@@ -32,13 +33,15 @@ fun BasicInfoDescriptionColumn(detailViewModel : DetailViewModel) {
                 modifier = Modifier.padding(end = 4.dp)
             )
             Text(
-                detailViewModel.contentModelValue.value.detailPhoneNumber,
+                detailViewModel.contentModelValue.value.tel?:"",
                 fontFamily = CustomFont.customFontRegular,
                 modifier = Modifier.clickable {
-                    detailViewModel.onClickTextTel(detailViewModel.contentModelValue.value.detailPhoneNumber)
+                    detailViewModel.onClickTextTel(detailViewModel.contentModelValue.value.tel?:"")
                 }
             )
         }
+        val homePage = detailViewModel.getHomePage(detailViewModel.contentModelValue.value.homepage?:"")
+        if(homePage!="")
         Row(modifier = Modifier.padding(vertical = 10.dp)) {
             Text(
                 "홈페이지 : ",
@@ -46,10 +49,11 @@ fun BasicInfoDescriptionColumn(detailViewModel : DetailViewModel) {
                 modifier = Modifier.padding(end = 4.dp)
             )
             Text(
-                detailViewModel.contentModelValue.value.detailHomepage,
+                homePage.toString(),
                 fontFamily = CustomFont.customFontRegular,
                 modifier = Modifier.clickable {
-                    detailViewModel.onClickTextHomepage(detailViewModel.contentModelValue.value.detailHomepage)
+
+                    detailViewModel.onClickTextHomepage(homePage.toString())
                 })
         }
     }
