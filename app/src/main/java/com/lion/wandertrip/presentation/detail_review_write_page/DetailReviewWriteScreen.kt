@@ -91,8 +91,7 @@ fun DetailReviewWriteScreen(
                         CustomIconButton(
                             ImageVector.vectorResource(R.drawable.ic_check_24px),
                             iconButtonOnClick = {
-                                detailReviewWriteViewModel.addReviewAndUpdateContents(contentID)
-                                detailReviewWriteViewModel.uploadImageInFireStore(contentID)
+                                detailReviewWriteViewModel.addContentsReview(contentID)
                             }
                         )
                 },

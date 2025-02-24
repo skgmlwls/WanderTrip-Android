@@ -198,16 +198,50 @@ class Tools {
             fileOutputStream.close()
         }
 
-        fun saveBitmaps(context: Context, bitmap: Bitmap, fileName: String) {
+        fun saveBitmaps(context: Context, bitmap: Bitmap, fileName: String): String {
+            // 외부 파일 경로 가져오기
             val filePath = context.getExternalFilesDir(null).toString()
+
+            // 로그: bitmap, fileName, filePath 값 확인
+            Log.d("bitmaps", "bitmap: $bitmap")  // 비트맵 객체 확인
+            Log.d("bitmaps", "fileName: $fileName")  // 파일 이름 확인
+            Log.d("bitmaps", "filePath: $filePath")  // 외부 저장 경로 확인
+
+            // 파일 경로와 이름을 결합하여 파일 객체 생성
             val file = File("$filePath/$fileName")
-            val fileOutputStream = FileOutputStream(file)
 
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
-            fileOutputStream.flush()
-            fileOutputStream.close()
+            // 로그: 파일 경로 확인
+            Log.d("bitmaps", "결합된 파일 경로: ${file.absolutePath}")
 
-            Log.d("saveBitmap", "Saved file: ${file.absolutePath}, Exists: ${file.exists()}")
+            try {
+                // 파일 출력 스트림 생성
+                val fileOutputStream = FileOutputStream(file)
+
+                // 비트맵을 JPEG 형식으로 압축하여 저장
+
+                val reSizeBitMap = Tools.resizeBitmap(1024,bitmap)
+
+
+                val compressed = reSizeBitMap.compress(Bitmap.CompressFormat.JPEG, 70, fileOutputStream)
+
+                // 로그: 압축 성공 여부 확인
+                Log.d("bitmaps", "Bitmap compress 성공: $compressed")
+
+                // 파일 출력 스트림 플러시 후 닫기
+                fileOutputStream.flush()
+                fileOutputStream.close()
+
+                // 파일 존재 여부 로그
+                Log.d("bitmaps", "파일 존재 여부: ${file.exists()}")
+                Log.d("bitmaps", "파일 경로: ${file.absolutePath}")  // 저장된 파일 경로 확인
+
+            } catch (e: Exception) {
+                // 예외 발생 시 로그
+                Log.e("bitmaps", "파일 저장 중 오류 발생: ${e.message}", e)
+            }
+
+            // 저장된 파일 경로 리턴
+            return file.absolutePath
         }
 
 

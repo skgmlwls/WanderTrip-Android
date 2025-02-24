@@ -45,28 +45,6 @@ import com.skydoves.landscapist.glide.GlideImage
 @Composable
 fun VerticalReviewList(detailViewModel: DetailViewModel) {
     val sh = detailViewModel.tripApplication.screenHeight
-
-    /*  LaunchedEffect(Unit) {
-          Log.d("filterReview","fiterLivew : ${detailViewModel.filteredReviewList.joinToString()  }}")
-          detailViewModel.setState() // 로딩 상태를 true로 변경
-      }*/
-
-    // setState() 호출 후, 로딩 상태 변경 시 UI를 다시 갱신하도록 LaunchedEffect 사용
-    LaunchedEffect(detailViewModel.isLoading.value) {
-        // 로딩 상태 변경 시 Lottie 로딩 화면 보여주기
-        if (detailViewModel.isLoading.value) {
-        } else {
-            Log.d("test100", "로딩 끝")
-        }
-    }
-
-    // 필터된 리뷰 리스트가 변경될 때 getUri() 호출
-    LaunchedEffect(detailViewModel.filteredReviewList) {
-        if (detailViewModel.filteredReviewList.isNotEmpty()) {
-            detailViewModel.getUri(detailViewModel.filteredReviewList)
-        }
-    }
-
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -88,15 +66,20 @@ fun VerticalReviewList(detailViewModel: DetailViewModel) {
 @Composable
 fun ReviewItem(reviewModel: ReviewModel, detailViewModel: DetailViewModel, pos: Int) {
     val sh = detailViewModel.tripApplication.screenHeight
-    if (detailViewModel.reviewImageUrlMap.size != 0)
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 20.dp)
+    ) {
+        // 최상단 등록자 정보와 수정/삭제 버튼이 포함된 Row
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                // 등록자 이미지 넣어야 함
+                // 등록자 이미지
                 GlideImage(
                     imageModel = reviewModel.reviewWriterProfileImgURl,
                     contentScale = ContentScale.Crop,
@@ -114,57 +97,52 @@ fun ReviewItem(reviewModel: ReviewModel, detailViewModel: DetailViewModel, pos: 
                     Text(text = "20개의 리뷰", color = Color.Gray)
                 }
             }
-            // 수정, 삭제 아이콘
-            if (reviewModel.reviewWriterNickname == detailViewModel.tripApplication.loginUserModel.userNickName)
-                Row {
-                    //수정
-                    CustomIconButton(
-                        ImageVector.vectorResource(R.drawable.ic_edit_24px),
-                        iconButtonOnClick = {
-                            detailViewModel.onClickIconReviewModify(
-                                reviewModel.contentsDocId,
-                                reviewModel.reviewDocId
-                            )
-                        })
-                    Spacer(modifier = Modifier.width(8.dp))
-                    // 삭제
-                    CustomIconButton(
-                        ImageVector.vectorResource(R.drawable.ic_delete_24px),
-                        iconButtonOnClick = {})
 
-                }
+            // 수정 / 삭제 버튼 (우측 정렬)
+            if(detailViewModel.tripApplication.loginUserModel.userNickName==reviewModel.reviewWriterNickname)
+            Row {
+                CustomIconButton(
+                    ImageVector.vectorResource(R.drawable.ic_edit_24px),
+                    iconButtonOnClick = {
+                        detailViewModel.onClickIconReviewModify(
+                            reviewModel.contentsDocId,
+                            reviewModel.reviewDocId
+                        )
+                    })
+                Spacer(modifier = Modifier.width(8.dp))
+                CustomIconButton(
+                    ImageVector.vectorResource(R.drawable.ic_delete_24px),
+                    iconButtonOnClick = {})
+            }
         }
 
-    Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-    // 별점 및 여행 날짜
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        CustomRatingBar(reviewModel.reviewRatingScore)
-        Spacer(modifier = Modifier.width(8.dp))
+        // 별점 및 여행 날짜
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            CustomRatingBar(reviewModel.reviewRatingScore)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                "${detailViewModel.convertToMonthDate(reviewModel.reviewTimeStamp)} 여행",
+                color = Color.Gray
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // 전체 리뷰 내용
         Text(
-            "${detailViewModel.convertToMonthDate(reviewModel.reviewTimeStamp)} 여행",
-            color = Color.Gray
+            text = reviewModel.reviewContent,
+            modifier = Modifier.heightIn(100.dp)
         )
-    }
 
-    Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-    // 전체 리뷰 내용
-    Text(
-        text = reviewModel.reviewContent,
-        modifier = Modifier.heightIn(100.dp)
-    )
-
-    Spacer(modifier = Modifier.height(8.dp))
-
-    // 이미지 가로 스크롤
-    LazyRow {
-        val imageList = detailViewModel.reviewImageUrlMap[pos]
-
-        if (!imageList.isNullOrEmpty()) {
-            items(imageList.toString().length) { index ->
+        // 이미지 가로 스크롤
+        LazyRow {
+            items(reviewModel.reviewImageList.size) { index ->
                 GlideImage(
-                    imageModel = imageList[index],
+                    imageModel = reviewModel.reviewImageList[index],
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -175,30 +153,27 @@ fun ReviewItem(reviewModel: ReviewModel, detailViewModel: DetailViewModel, pos: 
                 )
                 Spacer(modifier = Modifier.width(8.dp))
             }
-        } else {
-            // 이미지가 없는 경우 처리
-            Log.e("ReviewItem", "이미지가 없거나 리스트가 비어 있음")
-        }
-    }
-    Spacer(modifier = Modifier.height(8.dp))
-
-    // 좋아요 및 댓글 아이콘, 날짜 및 메뉴 아이콘
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Row {
-            Icon(Icons.Default.FavoriteBorder, contentDescription = "좋아요")
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(text = "3")
-            Spacer(modifier = Modifier.width(16.dp))
-            Icon(Icons.Default.ChatBubbleOutline, contentDescription = "채팅")
-            Spacer(modifier = Modifier.width(4.dp))
-            Text(text = "5")
         }
 
-        // 날짜
-        Text(text = detailViewModel.convertToDate(reviewModel.reviewTimeStamp), color = Color.Gray)
+        Spacer(modifier = Modifier.height(8.dp))
 
+        // 좋아요 및 댓글 아이콘, 날짜 및 메뉴 아이콘
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row {
+                Icon(Icons.Default.FavoriteBorder, contentDescription = "좋아요")
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(text = "3")
+                Spacer(modifier = Modifier.width(16.dp))
+                Icon(Icons.Default.ChatBubbleOutline, contentDescription = "채팅")
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(text = "5")
+            }
+
+            // 날짜
+            Text(text = detailViewModel.convertToDate(reviewModel.reviewTimeStamp), color = Color.Gray)
+        }
     }
 }
