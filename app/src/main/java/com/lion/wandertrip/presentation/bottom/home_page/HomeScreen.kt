@@ -20,7 +20,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.lion.wandertrip.model.SimpleTripItemModel
+import com.lion.wandertrip.presentation.bottom.home_page.components.PopularTripItem
 import com.lion.wandertrip.presentation.bottom.home_page.components.TravelSpotItem
+import com.lion.wandertrip.util.ContentTypeId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,43 +74,80 @@ fun HomeScreen(
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                // "추천 관광지" 제목 추가
-                Text(
-                    text = "추천 관광지",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
-                )
-
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                        items(viewModel.tripItemList) { tripItem ->
+                    // "추천 관광지" 섹션
+                    item {
+                        Text(
+                            text = "추천 관광지",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
+                        )
+                    }
+                    items(viewModel.tripItemList) { tripItem ->
                         TravelSpotItem(
+                            tripItem = tripItem,
+                            onItemClick = { viewModel.onClickTrip() }
+                        )
+                    }
+
+                    // "인기 여행기" 섹션
+                    item {
+                        Text(
+                            text = "인기 여행기",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
+                        )
+                    }
+                    items(getDummyPopularTripItems()) { tripItem ->
+                        PopularTripItem(
                             tripItem = tripItem,
                             onItemClick = { viewModel.onClickTrip() }
                         )
                     }
                 }
 
-                Text(
-                    text = "인기 여행기",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
-                )
-
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(viewModel.tripItemList) { tripItem ->
-
-                    }
-                }
             }
         }
     }
 }
 
+//items(viewModel.popularTripList) { tripItem ->
+fun getDummyPopularTripItems(): List<SimpleTripItemModel> {
+    return listOf(
+        SimpleTripItemModel(
+            contentID = "101",
+            contentTypeID = ContentTypeId.TOURIST_ATTRACTION,
+            contentSmallImageUri = "https://example.com/popular1.jpg",
+            title = "설경이 아름다운 겨울 여행",
+            areaCode = "1",
+            siGunGuCode = "101",
+            cat2 = "여행기",
+            cat3 = "겨울"
+        ),
+        SimpleTripItemModel(
+            contentID = "102",
+            contentTypeID = ContentTypeId.RESTAURANT,
+            contentSmallImageUri = "https://example.com/popular2.jpg",
+            title = "맛집과 함께한 힐링 여행",
+            areaCode = "2",
+            siGunGuCode = "102",
+            cat2 = "여행기",
+            cat3 = "맛집"
+        ),
+        SimpleTripItemModel(
+            contentID = "103",
+            contentTypeID = ContentTypeId.ACCOMMODATION,
+            contentSmallImageUri = "https://example.com/popular3.jpg",
+            title = "럭셔리 호텔에서 즐긴 여행",
+            areaCode = "3",
+            siGunGuCode = "103",
+            cat2 = "여행기",
+            cat3 = "숙박"
+        )
+    )
+}

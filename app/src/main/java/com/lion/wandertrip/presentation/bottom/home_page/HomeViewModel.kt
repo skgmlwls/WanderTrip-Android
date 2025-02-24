@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.compose.runtime.mutableStateListOf
 import com.lion.wandertrip.TripApplication
+import com.lion.wandertrip.model.SimpleTripItemModel
 import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.model.TripScheduleModel
@@ -32,7 +33,7 @@ class HomeViewModel @Inject constructor(
     // 여행지 항목 리스트
     var tripItemList = mutableStateListOf<TripItemModel>()
     
-    var popularTripList = mutableStateListOf<MyTripNoteViewModel>()
+    var popularTripList = mutableStateListOf<SimpleTripItemModel>()
 
     var myNoteItemList = mutableStateListOf<TripNoteModel>()
     
