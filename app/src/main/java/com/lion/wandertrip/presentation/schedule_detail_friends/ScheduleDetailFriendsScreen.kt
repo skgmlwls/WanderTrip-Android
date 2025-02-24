@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -39,10 +38,13 @@ fun ScheduleDetailFriendsScreen(
     viewModel.setScheduleDocId(scheduleDocId)
 
     // 다이얼로그 표시 여부를 기억하는 상태
-    var showAddFriendDialog by remember { mutableStateOf(false) }
+    var showAddFriendDialog by remember { viewModel.showAddFriendDialog }
 
     // 닉네임 값 상태
-    var friendNickname by remember { mutableStateOf("") }
+    var inviteNickname by remember { mutableStateOf("") }
+
+    // 에러 메세지 상태값
+    val addFriendError by viewModel.friendAddError
 
     Scaffold(
         containerColor = Color.White,
@@ -83,14 +85,18 @@ fun ScheduleDetailFriendsScreen(
             // 다이얼로그 표시
             if (showAddFriendDialog) {
                 AddFriendDialog(
-                    nickname = friendNickname,
-                    onNicknameChange = { friendNickname = it },
-                    onDismiss = { showAddFriendDialog = false },
+                    nickname = inviteNickname,
+                    onNicknameChange = { inviteNickname = it },
+                    onDismiss = {
+                        viewModel.showAddFriendDialog.value = false
+                        viewModel.friendAddError.value = ""
+                    },
                     onConfirm = {
-                        // 닉네임이 입력되었을 때 처리 로직
-                        // 예: 친구 목록에 추가, 서버 전송 등
-                        showAddFriendDialog = false
-                    }
+                        // 결과에 따라 ViewModel 내 상태가 업데이트됨
+                        viewModel.addFriendByNickName(inviteNickname)
+                        // nickname 초기화는 성공 시 ViewModel에서 처리됨
+                    },
+                    errorMessage = addFriendError
                 )
             }
         }
