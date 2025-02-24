@@ -110,4 +110,7 @@ dependencies {
     // Shimmer 라이브러리
     implementation("com.valentinilk.shimmer:compose-shimmer:1.0.3")// 버전 예시
 
+    // LazyColumn 순서 변경
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
+
 }

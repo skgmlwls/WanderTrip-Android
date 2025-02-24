@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
@@ -15,6 +16,7 @@ import com.lion.wandertrip.model.ScheduleItem
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.service.TripScheduleService
 import com.lion.wandertrip.util.ScheduleScreenName
+import com.lion.wandertrip.vo.ScheduleItemVO
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -162,5 +164,39 @@ class ScheduleDetailViewModel @Inject constructor(
     fun backScreen() {
         application.navHostController.popBackStack()
     }
+
+    // LazyColumn Reorderable 관련 //////////////////////////////////////////////////////////////////
+
+    // 완료 버튼 클릭 시, 임시 리스트 기준으로 각 항목의 itemIndex를 1부터 업데이트
+    fun updateItemsOrderForDate(tempList : SnapshotStateList<ScheduleItem>, date: Timestamp) {
+        // 완료 버튼 클릭 시, 임시 리스트 기준으로 각 항목의 itemIndex를 1부터 업데이트
+        tempList.forEachIndexed { index, item ->
+            item.itemIndex = index + 1
+        }
+        // viewModel의 전체 리스트에서 해당 날짜 그룹만 새 순서로 반영
+        tripScheduleItems.replaceAll { item ->
+            if (item.itemDate.seconds == date.seconds) {
+                tempList.find { it.itemDocId == item.itemDocId } ?: item
+            } else {
+                item
+            }
+        }
+        // 전체 리스트를 날짜와 itemIndex 기준으로 정렬
+        tripScheduleItems.sortWith(compareBy({ it.itemDate.seconds }, { it.itemIndex }))
+
+        // 변경한 위치를 데이터베이스에 업데이트
+        updateItemsPosition(tempList)
+    }
+
+    // 위치 조정한 일정 항목 업데이트
+    fun updateItemsPosition(updatedItems: List<ScheduleItem>) {
+        viewModelScope.launch {
+            val work1 = async(Dispatchers.IO) {
+                tripScheduleService.updateItemsPosition(tripScheduleDocId.value, updatedItems)
+            }.await()
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
 }
