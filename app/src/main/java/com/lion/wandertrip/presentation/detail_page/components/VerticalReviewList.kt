@@ -45,28 +45,6 @@ import com.skydoves.landscapist.glide.GlideImage
 @Composable
 fun VerticalReviewList(detailViewModel: DetailViewModel) {
     val sh = detailViewModel.tripApplication.screenHeight
-
-    /*  LaunchedEffect(Unit) {
-          Log.d("filterReview","fiterLivew : ${detailViewModel.filteredReviewList.joinToString()  }}")
-          detailViewModel.setState() // 로딩 상태를 true로 변경
-      }*/
-
-    // setState() 호출 후, 로딩 상태 변경 시 UI를 다시 갱신하도록 LaunchedEffect 사용
-    LaunchedEffect(detailViewModel.isLoading.value) {
-        // 로딩 상태 변경 시 Lottie 로딩 화면 보여주기
-        if (detailViewModel.isLoading.value) {
-        } else {
-            Log.d("test100", "로딩 끝")
-        }
-    }
-
-    // 필터된 리뷰 리스트가 변경될 때 getUri() 호출
-    LaunchedEffect(detailViewModel.filteredReviewList) {
-        if (detailViewModel.filteredReviewList.isNotEmpty()) {
-            detailViewModel.getUri(detailViewModel.filteredReviewList)
-        }
-    }
-
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
@@ -159,12 +137,9 @@ fun ReviewItem(reviewModel: ReviewModel, detailViewModel: DetailViewModel, pos: 
 
     // 이미지 가로 스크롤
     LazyRow {
-        val imageList = detailViewModel.reviewImageUrlMap[pos]
-
-        if (!imageList.isNullOrEmpty()) {
-            items(imageList.toString().length) { index ->
+            items(reviewModel.reviewImageList.size) { index ->
                 GlideImage(
-                    imageModel = imageList[index],
+                    imageModel = reviewModel.reviewImageList[index],
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -175,11 +150,8 @@ fun ReviewItem(reviewModel: ReviewModel, detailViewModel: DetailViewModel, pos: 
                 )
                 Spacer(modifier = Modifier.width(8.dp))
             }
-        } else {
-            // 이미지가 없는 경우 처리
-            Log.e("ReviewItem", "이미지가 없거나 리스트가 비어 있음")
         }
-    }
+
     Spacer(modifier = Modifier.height(8.dp))
 
     // 좋아요 및 댓글 아이콘, 날짜 및 메뉴 아이콘

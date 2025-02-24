@@ -1,7 +1,5 @@
 package com.lion.wandertrip.service
 
-import android.content.Context
-import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import com.lion.wandertrip.model.ReviewModel
@@ -98,13 +96,13 @@ class ContentsReviewService(val contentsReviewRepository: ContentsReviewReposito
 
 
     // 이미지 데이터를 서버로 업로드 하는 메서드
-    suspend fun uploadReviewImage(sourceFilePath: List<String>, serverFilePath: MutableList<String>, contentsId: String) {
-        contentsReviewRepository.uploadReviewImage(sourceFilePath,serverFilePath,contentsId)
+    suspend fun uploadReviewImageList(sourceFilePath: List<String>, serverFilePath: MutableList<String>, contentsId: String) :List<String>  {
+       return contentsReviewRepository.uploadReviewImageList(sourceFilePath,serverFilePath,contentsId)
     }
 
     // 이미지 Uri 리스트를 가져오는 함수
     suspend fun gettingReviewImage(imageFileNameList: List<String>,contentsId: String): List<Uri> {
-        return contentsReviewRepository.gettingReviewImage(imageFileNameList,contentsId)
+        return contentsReviewRepository.gettingReviewImageList(imageFileNameList,contentsId)
     }
 
 }

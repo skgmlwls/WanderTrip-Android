@@ -29,6 +29,7 @@ fun ReviewLazyColumn(detailViewModel: DetailViewModel) {
     val sh = detailViewModel.tripApplication.screenHeight
 
     LaunchedEffect(detailViewModel.reviewList) {
+        Log.d("test10","detailViewModel.reviewList")
         detailViewModel.getReviewList()
         detailViewModel.getFilteredReviewList()
     }
@@ -37,9 +38,6 @@ fun ReviewLazyColumn(detailViewModel: DetailViewModel) {
         detailViewModel.getUri(detailViewModel.filteredReviewList)
     }
     val contentModel = detailViewModel.contentModelValue.value
-    if(detailViewModel.isLoading.value){
-        LottieLoadingIndicator()
-    }else{
         LazyColumn(
             modifier = Modifier
                 .padding(8.dp)
@@ -83,7 +81,7 @@ fun ReviewLazyColumn(detailViewModel: DetailViewModel) {
             }
         }
 
-    }
+
 
 
 }

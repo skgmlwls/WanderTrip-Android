@@ -111,33 +111,33 @@ class TripNoteSelectDownViewModel @Inject constructor(
         showDialogState.value = false
     }
 
-//    // 완료 버튼 클릭 시 다이얼로그 상태 변경 , 담은 일정 문서id랑 내 일정 중에 담아갈 일정 id
-//    fun selectFinishButtonClick(tripNoteScheduleDocId : String, scheduleDocId : String, documentId : String ) {
-//
-//
-//        Log.d("TripNoteSelectDownViewModel - 담아갈 일정", "tripNoteScheduleDocId: ${tripNoteScheduleDocId}")
-//        Log.d("TripNoteSelectDownViewModel - 내 일정 중에 담아가려고 일정", "scheduleDocId: $scheduleDocId")
-//        Log.d("TripNoteSelectDownViewModel - 담아갈 여행기", "documentId: $documentId")
-//
-//
-//
-//
-////        // 스케쥴 디테일 페이지로 이동 - 추후에 tripNoteScheduleDocId, scheduleDocId 각각 전달..
-////        tripApplication.navHostController.navigate(
-////            "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
-////                  "tripScheduleDocId=${scheduleDocId}")
-//
-//
-//
-//        // 일정 담기면 그 여행기의 tripNoteScrapCount 증가시키기
-//        CoroutineScope(Dispatchers.Main).launch {
-//            val work1 = async(Dispatchers.IO){
-//                tripNoteService.addTripNoteScrapCount(documentId)
-//            }
-//            work1.join()
-//        }
-//
-//    }
+    // 완료 버튼 클릭 시 다이얼로그 상태 변경 , 담은 일정 문서id랑 내 일정 중에 담아갈 일정 id
+    fun selectFinishButtonClick(tripNoteScheduleDocId : String, scheduleDocId : String, documentId : String ) {
+
+
+        Log.d("TripNoteSelectDownViewModel - 담아갈 일정", "tripNoteScheduleDocId: ${tripNoteScheduleDocId}")
+        Log.d("TripNoteSelectDownViewModel - 내 일정 중에 담아가려고 일정", "scheduleDocId: $scheduleDocId")
+        Log.d("TripNoteSelectDownViewModel - 담아갈 여행기", "documentId: $documentId")
+
+
+
+
+//        // 스케쥴 디테일 페이지로 이동 - 추후에 tripNoteScheduleDocId, scheduleDocId 각각 전달..
+//        tripApplication.navHostController.navigate(
+//            "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
+//                  "tripScheduleDocId=${scheduleDocId}")
+
+
+
+        // 일정 담기면 그 여행기의 tripNoteScrapCount 증가시키기
+        CoroutineScope(Dispatchers.Main).launch {
+            val work1 = async(Dispatchers.IO){
+                tripNoteService.addTripNoteScrapCount(documentId)
+            }
+            work1.join()
+        }
+
+    }
 
 //    fun selectFinishButtonClick(
 //        tripNoteScheduleDocId: String,

@@ -2,9 +2,11 @@ package com.lion.wandertrip.presentation.detail_review_write_page
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lion.wandertrip.TripApplication
@@ -16,10 +18,14 @@ import com.lion.wandertrip.service.UserService
 import com.lion.wandertrip.util.Tools
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import javax.inject.Inject
 
@@ -44,8 +50,9 @@ class DetailReviewWriteViewModel @Inject constructor(
     // 비트맵 리스트 상태 변수
     val mutableBitMapList = mutableStateListOf<Bitmap?>()
 
-    // 이미지 리스트 경로명을 담을 변수
-    val imagePathList = mutableStateListOf<String>()
+    // 로딩 변수
+    val isLoading = mutableStateOf(false)
+
 
 
     // 뒤로가기
@@ -53,67 +60,100 @@ class DetailReviewWriteViewModel @Inject constructor(
         tripApplication.navHostController.popBackStack()
     }
 
-    // 후기 등록 메서드
     suspend fun addContentsReview(contentId: String): String {
-        imagePathList.clear()
-
+        val imagePathList = mutableListOf<String>()
+        val serverFilePathList = mutableListOf<String>()
         var contentsDocId = ""
+        var imageUrlList = listOf<String>()
 
         if (isImagePicked.value) {
+            isLoading.value = true
             Log.d("test100", "골랐나?")
 
             mutableBitMapList.forEachIndexed { index, bitmap ->
                 val name = "image_${index}_${System.currentTimeMillis()}.jpg"
+                serverFilePathList.add(name)
 
-                // 이미지 저장 (파일명 일치)
-                Tools.saveBitmaps(tripApplication, bitmap!!, name)
+                val savedFilePath = Tools.saveBitmaps(tripApplication, bitmap!!, name)
+                Log.d("checkFile", "파일 저장 경로: $savedFilePath")
 
-                // 저장된 파일이 존재하는지 확인
-                val savedFile = File(tripApplication.getExternalFilesDir(null), name)
-                Log.d(
-                    "checkFile",
-                    "파일 저장 확인: ${savedFile.absolutePath}, Exists: ${savedFile.exists()}"
-                )
-
-                imagePathList.add(name)
+                imagePathList.add(savedFilePath)
             }
+
+
+            // 📌 이미지 업로드 완료될 때까지 대기
+             imageUrlList = withContext(Dispatchers.IO) {
+                uploadImageWithTimeout(imagePathList, serverFilePathList, contentId)
+            }
+
+            // 📌 이미지 업로드 실패 시 로그
+            if (imageUrlList.isEmpty()) {
+                Log.e("getUri", "이미지 업로드 URL 리스트가 비어 있음! Firestore 저장 중단")
+                return ""
+            }
+
+            Log.d("getUri", "이미지 URL 리스트: $imageUrlList")
         }
 
-        val review = ReviewModel()
-        review.reviewContent = reviewContentValue.value
-        review.reviewImageList = listOf()
-        review.reviewRatingScore = ratingScoreValue.value
-        review.reviewWriterNickname = tripApplication.loginUserModel.userNickName
-        review.reviewWriterProfileImgURl =
-            userService.gettingImage(tripApplication.loginUserModel.userProfileImageURL).toString()
-        review.reviewImageList = imagePathList
+        // 📌 이미지 업로드가 끝난 후 리뷰 데이터 저장
+        val review = ReviewModel().apply {
+            reviewContent = reviewContentValue.value
+            reviewImageList = imageUrlList // ✅ 업로드가 끝난 후 URL 리스트를 저장
+            reviewRatingScore = ratingScoreValue.value
+            reviewWriterNickname = tripApplication.loginUserModel.userNickName
+            reviewWriterProfileImgURl =
+                userService.gettingImage(tripApplication.loginUserModel.userProfileImageURL).toString()
+        }
 
-
-
-        // 문서가 존재하면 그 문서 DocId 를 리턴함
+        // 문서 존재 여부 확인 후 저장
         contentsDocId = contentsService.isContentExists(contentId)
 
-        // 존재하면 서브컬렉션에 리뷰 추가
-        if (contentsDocId != "") {
-            contentsReviewService.addContentsReview(
-                contentsId = contentId,
-                contentsReviewModel = review
-            )
+        if (contentsDocId.isNotEmpty()) {
+            contentsReviewService.addContentsReview(contentId, review)
         } else {
-            // 컨텐츠 문서가 없다면 문서를 만들고 넣는다
-            val contents = ContentsModel(
-                contentId = contentId,
-            )
-            // 컨텐츠 문서 만들고 docID 리턴받음
+            val contents = ContentsModel(contentId = contentId)
             contentsDocId = contentsService.addContents(contents)
-            contentsReviewService.addContentsReview(
-                contentsId = contentId,
-                contentsReviewModel = review
-            )
+            contentsReviewService.addContentsReview(contentId, review)
         }
 
-
         return contentsDocId
+    }
+
+    suspend fun uploadImageWithTimeout(
+        sourceFilePath: List<String>,
+        serverFilePath: List<String>,
+        contentId: String
+    ): List<String> {
+        Log.d("uploadImageWithTimeout", "sourceFilePath: $sourceFilePath")
+        Log.d("uploadImageWithTimeout", "serverFilePath: $serverFilePath")
+        Log.d("uploadImageWithTimeout", "contentId: $contentId")
+
+        val resultUrlList = mutableListOf<String>()
+
+        return withTimeoutOrNull(10000) {  // 📌 타임아웃을 10초로 늘림
+            var retry = true
+            var tempUrlList: List<String>?
+
+            while (retry) {
+                tempUrlList = contentsReviewService.uploadReviewImageList(
+                    sourceFilePath,
+                    serverFilePath.toMutableStateList(),
+                    contentId
+                )
+
+                if (tempUrlList.isNullOrEmpty()) {
+                    Log.d("uploadImageWithTimeout", "이미지 URL이 아직 준비되지 않음. 재시도 중...")
+                    delay(500)  // 0.5초 대기 후 재시도
+                } else {
+                    retry = false
+                    resultUrlList.addAll(tempUrlList)
+                }
+            }
+            resultUrlList
+        } ?: run {
+            Log.e("uploadImageWithTimeout", "이미지 URL 가져오기 실패 (타임아웃)")
+            emptyList() // 타임아웃 시 빈 리스트 반환
+        }
     }
 
     // 컨텐츠 의 별점 필드 수정
@@ -134,20 +174,6 @@ class DetailReviewWriteViewModel @Inject constructor(
             tripApplication.navHostController.popBackStack()
 
         }
-    }
-
-    fun uploadImageInFireStore(contentId : String) {
-        viewModelScope.launch {
-            // 병렬로 Firestore에 이미지와 사용자 데이터 업데이트
-            val filePaths = imagePathList.mapIndexed { index, path ->
-                tripApplication.getExternalFilesDir(null).toString() + "/${path}"
-            }
-            // fireStore 에 이미지 저장
-            if (isImagePicked.value) {
-                contentsReviewService.uploadReviewImage(filePaths, imagePathList, contentId)
-            }
-        }
-
     }
 
 }
