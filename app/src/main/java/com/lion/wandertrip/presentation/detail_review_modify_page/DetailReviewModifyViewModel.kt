@@ -126,6 +126,7 @@ class DetailReviewModifyViewModel @Inject constructor(
         paramContentsId:String,
         reviewDocID: String,
     ) {
+        isLoading.value=true
         Log.d("DRMVM", "onClickIconCheckModifyReview")
         viewModelScope.launch {
             val imagePathList = mutableListOf<String>()
@@ -203,6 +204,7 @@ class DetailReviewModifyViewModel @Inject constructor(
             Log.d("addContentsReview", "리뷰 저장 후 컨텐츠 업데이트 완료")
 
             Log.d("addContentsReview", "화면 뒤로 이동")
+            isLoading.value=false
             tripApplication.navHostController.popBackStack()
         }
     }

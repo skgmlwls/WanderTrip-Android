@@ -77,13 +77,9 @@ fun DetailReviewModifyScreen(
     }
 
     LaunchedEffect(reviewModelValue) {
-
         detailReviewModifyViewModel.settingRatingScore(reviewModelValue.reviewRatingScore)
         detailReviewModifyViewModel.settingReviewContent(reviewModelValue.reviewContent)
         detailReviewModifyViewModel.settingReviewImgList(reviewModelValue.reviewImageList.toMutableStateList())
-
-        detailReviewModifyViewModel.isLoading.value = false  // 데이터 로드 완료 후 로딩 종료
-
     }
 
     // 앨범용 런처 (여러 개 선택 가능)
