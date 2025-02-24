@@ -111,7 +111,8 @@ class TripNoteSelectDownViewModel @Inject constructor(
         showDialogState.value = false
     }
 
-//    // 완료 버튼 클릭 시 다이얼로그 상태 변경 , 담은 일정 문서id랑 내 일정 중에 담아갈 일정 id
+
+    // 완료 버튼 클릭 시 다이얼로그 상태 변경 , 담은 일정 문서id랑 내 일정 중에 담아갈 일정 id
     fun selectFinishButtonClick(tripNoteScheduleDocId : String, scheduleDocId : String, documentId : String ) {
 
 

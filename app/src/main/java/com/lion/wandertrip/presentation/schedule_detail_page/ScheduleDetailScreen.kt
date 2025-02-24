@@ -69,7 +69,7 @@ fun ScheduleDetailScreen(
                         }
                     },
                     actions = {
-                        IconButton(onClick = { viewModel.moveToScheduleDetailFriendsScreen("abcd") }) {
+                        IconButton(onClick = { viewModel.moveToScheduleDetailFriendsScreen(tripScheduleDocId) }) {
                             Icon(imageVector = Icons.Filled.People, contentDescription = "함께 하는 사람 목록")
                         }
                     },
