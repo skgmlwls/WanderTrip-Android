@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,22 +39,33 @@ fun SearchResultScreen(
     viewModel: SearchResultViewModel = hiltViewModel(),
     searchViewModel: SearchViewModel = hiltViewModel()
 ) {
+    // 초기값을 contentId로 설정
+    var searchInput by remember { mutableStateOf(contentId) }
     var searchQuery by remember { mutableStateOf(contentId) }
     var selectedCategoryCode by remember { mutableStateOf<String?>(null) }
 
     val dummyTripList = remember { getDummyTripItems() }
 
-    // 🔹 검색어가 포함된 데이터 필터링
-    val filteredList = dummyTripList.filter { it.title.contains(searchQuery, ignoreCase = true) }
+    // filteredList는 searchQuery 기준으로 업데이트됨.
+    var filteredList by remember { mutableStateOf<List<TripItemModel>>(emptyList()) }
 
-    // 🔹 "추천" 선택 시 모든 카테고리를 포함
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.isNotBlank()) {
+            filteredList = dummyTripList.filter {
+                it.title.contains(searchQuery, ignoreCase = true)
+            }
+        }
+        // searchQuery가 비어 있으면 이전 결과를 유지 (업데이트하지 않음)
+    }
+
+    // 카테고리별 분류
     val categorizedResults = if (selectedCategoryCode == "추천" || selectedCategoryCode == null) {
-        filteredList.groupBy { it.cat2 } // ✅ 모든 카테고리를 표시
+        filteredList.groupBy { it.cat2 }
     } else {
         filteredList.filter { it.cat2 == selectedCategoryCode }.groupBy { it.cat2 }
     }
 
-    // ✅ "맛집", "여행기" 등 특정 카테고리가 없으면 빈 메시지 표시
+    // 표시할 카테고리 리스트 (순서 유지)
     val requiredCategories = listOf("관광지", "숙소", "맛집", "여행기")
 
     Scaffold(containerColor = Color.White) { paddingValues ->
@@ -63,28 +75,38 @@ fun SearchResultScreen(
                 .background(Color.White)
                 .padding(paddingValues)
         ) {
-            // 🔹 검색 바
+            // 검색 바: 화면에는 searchInput을 표시함.
             HomeSearchBar(
-                query = searchQuery,
-                onSearchQueryChanged = { searchQuery = it },
+                query = searchInput,
+                onSearchQueryChanged = { newValue ->
+                    searchInput = newValue
+                },
                 onSearchClicked = {
-                    if (searchQuery.isNotBlank()) {
-                        val searchItem = TripItemModel(title = searchQuery)
+                    if (searchInput.isNotBlank()) {
+                        // 검색 아이콘을 눌렀을 때만 실제 필터링에 사용할 searchQuery를 업데이트
+                        searchQuery = searchInput
+                        val searchItem = TripItemModel(title = searchInput)
                         searchViewModel.addSearchToRecent(searchItem)
-                        searchViewModel.onClickToResult(searchQuery)
+                        searchViewModel.onClickToResult(searchInput)
                     }
                 },
-                onClearQuery = { searchQuery = "" },
+                onClearQuery = {
+                    // 검색어 입력란은 지워지지만, 이전 검색 결과는 유지됨.
+                    searchInput = ""
+                },
                 onBackClicked = { viewModel.onClickNavIconBack() }
             )
 
-            // 🔹 카테고리 칩 (고정된 5개 카테고리 사용)
+            // 카테고리 칩
             SearchItemCategoryChips(
                 selectedCategoryCode = selectedCategoryCode,
                 onCategorySelected = { selectedCategoryCode = it }
             )
 
-            // 🔹 검색 결과 리스트
+            // 최대 표시할 항목 수
+            val maxDisplayCount = 3
+
+            // 검색 결과 리스트
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -92,9 +114,9 @@ fun SearchResultScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // 🔹 검색된 카테고리 표시
-                categorizedResults.forEach { (category, items) ->
+                requiredCategories.forEach { category ->
                     item {
+                        // 카테고리 제목
                         Text(
                             text = category,
                             fontSize = 20.sp,
@@ -103,26 +125,36 @@ fun SearchResultScreen(
                         )
                     }
 
-                    // 🔹 개별 `items()`로 처리
-                    items(items) { tripItem ->
-                        SearchItem(
-                            tripItem = tripItem,
-                            onItemClick = { searchViewModel.onClickToResult(tripItem.title) }
-                        )
-                        CustomDividerComponent(10.dp)
-                    }
+                    val itemsForCategory = categorizedResults[category] ?: emptyList()
 
-                    // 🔹 "더보기" 버튼 추가
-                    item {
-                        MoreButton(category = category)
-                    }
-                }
-
-                // ✅ 특정 카테고리가 없으면 "없음" 메시지 표시
-                requiredCategories.forEach { category ->
-                    if (!categorizedResults.containsKey(category)) {
+                    if (itemsForCategory.isNotEmpty()) {
+                        // 최대 maxDisplayCount 개의 항목만 표시
+                        val visibleItems = itemsForCategory.take(maxDisplayCount)
+                        items(visibleItems) { tripItem ->
+                            SearchItem(
+                                tripItem = tripItem,
+                                onItemClick = { searchViewModel.onClickToResult(tripItem.title) }
+                            )
+                            CustomDividerComponent(10.dp)
+                        }
+                    } else {
+                        // 해당 카테고리에 데이터가 없으면 "없음" 메시지 표시
                         item {
                             NoResultsMessage(category)
+                        }
+                    }
+
+                    // 항목이 많을 경우 "더보기" 버튼 표시
+                    if (itemsForCategory.size > maxDisplayCount) {
+                        item {
+                            MoreButton(category = category)
+                        }
+                    }
+
+                    // 마지막 카테고리가 아니라면 구분선 추가
+                    if (category != requiredCategories.last()) {
+                        item {
+                            CustomDividerComponent(16.dp)
                         }
                     }
                 }
@@ -130,6 +162,8 @@ fun SearchResultScreen(
         }
     }
 }
+
+
 
 
 @Composable

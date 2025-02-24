@@ -3,7 +3,10 @@ package com.lion.wandertrip.presentation.search_page
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lion.wandertrip.TripApplication
@@ -37,6 +40,15 @@ class SearchViewModel @Inject constructor(
     fun backScreen() {
         application.navHostController.popBackStack()
     }
+
+    // 검색어 상태를 ViewModel에 저장 (상태 호이스팅)
+    var searchQuery by mutableStateOf("")
+        private set
+
+    fun updateQuery(newQuery: String) {
+        searchQuery = newQuery
+    }
+
 
     // 여행지 항목 가져 오기
     fun loadTripItems(serviceKey: String, areaCode: String, contentTypeId: String) {

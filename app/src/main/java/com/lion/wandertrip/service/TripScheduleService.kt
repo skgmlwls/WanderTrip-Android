@@ -72,6 +72,19 @@ class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
         return tripScheduleRepository.uploadBitmapListToFirebase(bitmaps)
     }
 
+    // 위치 조정한 일정 항목 업데이트
+    suspend fun updateItemsPosition(tripScheduleDocId: String, updatedItems: List<ScheduleItem>) {
+        val updatedItemsVO = updatedItems.map { it.toScheduleItemVO() }
+        tripScheduleRepository.updateItemsPosition(tripScheduleDocId, updatedItemsVO)
+    }
+
+    // 초대할 닉네임으로 유저 존재 여부 확인 후, 있으면 문서 ID 반환, 없으면 빈 문자열 반환
+    suspend fun addInviteUserByInviteNickname(scheduleDocId: String, inviteNickname: String): Boolean {
+        val isCheckInvite = tripScheduleRepository.addInviteUserByInviteNickname(scheduleDocId, inviteNickname)
+
+        return isCheckInvite
+    }
+
     // 공공 데이터 관련 ///////////////////////////////////////////////////////////////////////////////
 
     // API 호출 및 데이터 로드

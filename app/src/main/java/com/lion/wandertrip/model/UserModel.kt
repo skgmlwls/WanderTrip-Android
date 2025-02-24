@@ -14,7 +14,9 @@ class UserModel(
     var rouletteAgainCnt: Int = 0,                  // 룰렛 다시 돌린 횟수
     var userTimeStamp: Timestamp = Timestamp.now(), // 데이터 입력 시간 (Firebase Timestamp)
     var userState: Int = 1,                         // 유저 상태 (1: 정상, 2: 탈퇴)
-    var userKakaoToken : String = ""                // 카카오토큰
+    var userKakaoToken : String = "",               // 카카오토큰
+    var userScheduleList : List<String> = emptyList(), // 유저가 만든 일정 리스트
+    var invitedScheduleList : List<String> = emptyList(), // 초대 받은 일정 리스트
 ) {
     fun toUserVO(): UserVO {
         val userVO = UserVO()
@@ -29,6 +31,8 @@ class UserModel(
         userVO.userTimeStamp = userTimeStamp
         userVO.userState = userState
         userVO.userKakaoToken=userKakaoToken
+        userVO.userScheduleList = userScheduleList
+        userVO.invitedScheduleList = invitedScheduleList
         return userVO
     }
 }

@@ -47,7 +47,7 @@ class ScheduleViewModel @Inject constructor(
 
     // 일정 추가 버튼 클릭 이벤트
     fun addIconButtonEvent() {
-        application.navHostController.navigate(ScheduleScreenName.SCHEDULE_ADD_SCREEN.name)
+        application.navHostController.navigate( "${ScheduleScreenName.SCHEDULE_ADD_SCREEN.name}/")
     }
 
     // ✅ Timestamp -> "YYYY.MM.DD" 형식 변환 함수

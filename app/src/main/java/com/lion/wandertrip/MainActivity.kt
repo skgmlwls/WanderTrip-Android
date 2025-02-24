@@ -88,7 +88,6 @@ fun MyApp() {
     NavHost(
         navController = rememberNavHostController,
         startDestination = MainScreenName.MAIN_SCREEN_START.name
-
     ) {
         composable(MainScreenName.MAIN_SCREEN_START.name) { StartScreen() }
         // 일정 메인 화면
@@ -118,7 +117,6 @@ fun MyApp() {
             val contentId = backStackEntry.arguments?.getString("contentId") ?: "default_id"
             SearchResultScreen(contentId)
         }
-        composable(MainScreenName.MAIN_SCREEN_SEARCH.name) { SearchScreen() }
 
 //        // 여행기 메인 화면
 //        composable(
@@ -175,7 +173,17 @@ fun MyApp() {
         // 일정 화면 ////////////////////////////////////////////////////////////////////////////
         
         // 일정 제목, 날짜 입력 화면
-        composable(ScheduleScreenName.SCHEDULE_ADD_SCREEN.name) { ScheduleAddScreen() }
+        // composable(ScheduleScreenName.SCHEDULE_ADD_SCREEN.name) { ScheduleAddScreen() }
+        composable(
+            route = "${ScheduleScreenName.SCHEDULE_ADD_SCREEN.name}/{documentId}"
+        ){
+            val documentId = it.arguments?.getString("documentId") ?:  ""
+
+            ScheduleAddScreen(documentId = documentId)
+        }
+
+
+
         // 내 여행 화면
         composable(MainScreenName.MAIN_SCREEN_MY_TRIP.name) { MyTripScreen() }
         // 내 저장 화면
