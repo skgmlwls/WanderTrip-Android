@@ -31,6 +31,7 @@ import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 
 @Composable
 fun ScheduleAddScreen(
+    documentId : String,
     viewModel : ScheduleAddViewModel = hiltViewModel()
 ) {
     val focusManager = LocalFocusManager.current // 포커스 관리 객체 생성
@@ -105,7 +106,14 @@ fun ScheduleAddScreen(
                         errorMessage = "일정 제목을 입력해주세요!" // ✅ 에러 메시지 설정
                     } else {
                         // 지역 선택 화면으로 이동
-                        viewModel.moveToScheduleCitySelectScreen()
+                        // viewModel.moveToScheduleCitySelectScreen()
+                        if (documentId.isNullOrEmpty()) {
+                            viewModel.moveToScheduleCitySelectScreen()
+                        } else {
+                            // documentId가 존재할 경우 실행할 코드 (새 일정 담기에서 넘어온경우)
+                            viewModel.goScheduleTitleButtonClick(documentId)
+                        }
+
                     }
                 }
             )

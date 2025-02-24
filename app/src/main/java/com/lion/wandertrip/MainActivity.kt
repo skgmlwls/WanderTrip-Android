@@ -174,7 +174,17 @@ fun MyApp() {
         // 일정 화면 ////////////////////////////////////////////////////////////////////////////
         
         // 일정 제목, 날짜 입력 화면
-        composable(ScheduleScreenName.SCHEDULE_ADD_SCREEN.name) { ScheduleAddScreen() }
+        // composable(ScheduleScreenName.SCHEDULE_ADD_SCREEN.name) { ScheduleAddScreen() }
+        composable(
+            route = "${ScheduleScreenName.SCHEDULE_ADD_SCREEN.name}/{documentId}"
+        ){
+            val documentId = it.arguments?.getString("documentId") ?:  ""
+
+            ScheduleAddScreen(documentId = documentId)
+        }
+
+
+
         // 내 여행 화면
         composable(MainScreenName.MAIN_SCREEN_MY_TRIP.name) { MyTripScreen() }
         // 내 저장 화면
