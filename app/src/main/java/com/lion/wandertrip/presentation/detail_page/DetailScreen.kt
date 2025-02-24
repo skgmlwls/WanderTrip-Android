@@ -79,7 +79,6 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
             )
         }
     ) {
-
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()

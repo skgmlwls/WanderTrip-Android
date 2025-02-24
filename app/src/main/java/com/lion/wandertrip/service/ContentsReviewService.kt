@@ -100,9 +100,14 @@ class ContentsReviewService(val contentsReviewRepository: ContentsReviewReposito
        return contentsReviewRepository.uploadReviewImageList(sourceFilePath,serverFilePath,contentsId)
     }
 
-    // 이미지 Uri 리스트를 가져오는 함수
+    // 이미지 Uri 리스트를 가져오는 메서드
     suspend fun gettingReviewImage(imageFileNameList: List<String>,contentsId: String): List<Uri> {
         return contentsReviewRepository.gettingReviewImageList(imageFileNameList,contentsId)
+    }
+
+    // 리뷰 삭제 메서드
+    suspend fun deleteContentsReview(contentsDocId: String, contentsReviewDocId: String) {
+        contentsReviewRepository.deleteContentsReview(contentsDocId,contentsReviewDocId)
     }
 
 }
