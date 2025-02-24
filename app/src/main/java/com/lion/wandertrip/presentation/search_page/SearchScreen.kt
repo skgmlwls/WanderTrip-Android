@@ -20,8 +20,6 @@ import com.lion.wandertrip.presentation.search_page.component.RecentItem
 
 @Composable
 fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
-    // 🔍 검색어 상태
-    var searchQuery by remember { mutableStateOf("") }
 
     Scaffold(
         containerColor = Color.White,
@@ -33,18 +31,17 @@ fun SearchScreen(viewModel: SearchViewModel = hiltViewModel()) {
 
             // 🔍 수정된 검색 바 적용
             HomeSearchBar(
-                query = searchQuery,
-                onSearchQueryChanged = { searchQuery = it },
-                onSearchClicked = { if (searchQuery.isNotBlank()) {
-                    // 🔹 최근 검색어 저장
-                    val searchItem = TripItemModel(title = searchQuery)
-                    viewModel.addSearchToRecent(searchItem)
-
-                    // 🔹 검색 결과 화면으로 이동
-                    viewModel.onClickToResult(searchQuery)
-                } },
-                onClearQuery = { searchQuery = "" }, // X 버튼 클릭 시 전체 목록 표시
-                onBackClicked = { viewModel.backScreen() } // 🔙 뒤로 가기 버튼 클릭 시 동작
+                query = viewModel.searchQuery,
+                onSearchQueryChanged = { viewModel.updateQuery(it) },
+                onSearchClicked = {
+                    if (viewModel.searchQuery.isNotBlank()) {
+                        val searchItem = TripItemModel(title = viewModel.searchQuery)
+                        viewModel.addSearchToRecent(searchItem)
+                        viewModel.onClickToResult(viewModel.searchQuery)
+                    }
+                },
+                onClearQuery = { viewModel.updateQuery("") },
+                onBackClicked = { viewModel.backScreen() }
             )
 
         // ✅ 최근 검색어 목록 추가

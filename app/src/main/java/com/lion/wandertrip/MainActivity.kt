@@ -87,9 +87,8 @@ fun MyApp() {
 
     NavHost(
         navController = rememberNavHostController,
-        startDestination = "${MainScreenName.MAIN_SCREEN_START.name}?"
-//        startDestination = "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
-//                "tripScheduleDocId=jgbGuyxXMAj8nvChmAyN&areaName=서울&areaCode=1"
+        startDestination = "${MainScreenName.MAIN_SCREEN_START.name}?" +
+                "tripScheduleDocId=jgbGuyxXMAj8nvChmAyN&areaName=서울&areaCode=1"
     ) {
         composable(MainScreenName.MAIN_SCREEN_START.name) { StartScreen() }
         // 일정 메인 화면
@@ -119,7 +118,6 @@ fun MyApp() {
             val contentId = backStackEntry.arguments?.getString("contentId") ?: "default_id"
             SearchResultScreen(contentId)
         }
-        composable(MainScreenName.MAIN_SCREEN_SEARCH.name) { SearchScreen() }
 
 //        // 여행기 메인 화면
 //        composable(
