@@ -1,16 +1,15 @@
 package com.lion.wandertrip.presentation.bottom.my_info_page.used_dummy_data
 
+import com.google.firebase.Timestamp
+import com.lion.wandertrip.model.RecentTripItemModel
 import com.lion.wandertrip.model.TripItemModel
-import com.lion.wandertrip.model.TripScheduleModel
-import com.lion.wandertrip.presentation.bottom.my_info_page.used_dummy_data.ScheduleDummyData.Companion.scheduleStartDate1
-import com.lion.wandertrip.presentation.bottom.my_info_page.used_dummy_data.ScheduleDummyData.Companion.scheduleStartDate2
-import com.lion.wandertrip.presentation.bottom.my_info_page.used_dummy_data.ScheduleDummyData.Companion.scheduleStartDate3
-import com.lion.wandertrip.presentation.bottom.my_info_page.used_dummy_data.ScheduleDummyData.Companion.scheduleStartDate4
+import com.lion.wandertrip.util.ContentTypeId
+import java.util.Calendar
 
 class RecentPostsDummyData {
     companion object{
         // 12: 관광지, 32: 숙박, 39: 음식점
-        val RecentPostsDummyDataList = mutableListOf<TripItemModel>(
+        val recentPostsDummyDataList = mutableListOf<TripItemModel>(
            TripItemModel(
                contentId = "2814180",
                title = "속초해수욕장 대관람차(속초아이)",

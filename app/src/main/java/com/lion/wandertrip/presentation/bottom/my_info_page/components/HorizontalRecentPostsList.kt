@@ -16,14 +16,16 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lion.wandertrip.R
+import com.lion.wandertrip.model.RecentTripItemModel
 import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.presentation.bottom.my_info_page.MyInfoViewModel
+import com.lion.wandertrip.util.ContentTypeId
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 
 
 @Composable
-fun HorizontalRecentPostsList(tripItemList: MutableList<TripItemModel>,myInfoViewModel: MyInfoViewModel) {
+fun HorizontalRecentPostsList(tripItemList: MutableList<RecentTripItemModel>,myInfoViewModel: MyInfoViewModel) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
@@ -36,7 +38,7 @@ fun HorizontalRecentPostsList(tripItemList: MutableList<TripItemModel>,myInfoVie
 }
 
 @Composable
-fun TouristItem(tripItem: TripItemModel,myInfoViewModel: MyInfoViewModel) {
+fun TouristItem(tripItem: RecentTripItemModel,myInfoViewModel: MyInfoViewModel) {
     // 12: 관광지, 32: 숙박, 39: 음식점
     // 글자 줄이기
     val shortedTitle = if (tripItem.title.length > 6) {
@@ -47,9 +49,9 @@ fun TouristItem(tripItem: TripItemModel,myInfoViewModel: MyInfoViewModel) {
 
     // 지역 타입으로 나누기
 
-    val spotType = when(tripItem.contentTypeId){
-        "12"->{"관광명소"}
-        "32"->{"숙박시설"}
+    val spotType = when(tripItem.contentTypeID){
+        ContentTypeId.TOURIST_ATTRACTION->{"관광명소"}
+        ContentTypeId.ACCOMMODATION->{"숙박시설"}
         else -> {"맛집"}
     }
 
@@ -59,7 +61,7 @@ fun TouristItem(tripItem: TripItemModel,myInfoViewModel: MyInfoViewModel) {
             .fillMaxWidth()
             .height(80.dp)
             .clickable {
-                myInfoViewModel.onClickCardRecentContent(tripItem.contentId)
+                myInfoViewModel.onClickCardRecentContent(tripItem.contentID)
             },
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -92,7 +94,7 @@ fun TouristItem(tripItem: TripItemModel,myInfoViewModel: MyInfoViewModel) {
             }
             // 이미지
             GlideImage(
-                imageModel = tripItem.firstImage,
+                imageModel = tripItem.imageUri,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(40.dp)  // 이미지 크기 설정

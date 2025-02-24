@@ -45,7 +45,7 @@ class ScheduleDetailViewModel @Inject constructor(
     val tripSchedule = mutableStateOf(TripScheduleModel())
     val tripScheduleItems = mutableStateListOf<ScheduleItem>()
 
-    val isLoading = mutableStateOf(false) // ✅ 로딩 상태 추가
+    val isLoading = mutableStateOf(true) // ✅ 로딩 상태 추가
 
     // Firestore 리스너 (변경 감지용)
     private var scheduleItemsListener: ListenerRegistration? = null
@@ -83,7 +83,7 @@ class ScheduleDetailViewModel @Inject constructor(
     // 일정 상세 정보 가져오기
     fun getTripSchedule() {
         viewModelScope.launch {
-            isLoading.value = true // ✅ 로딩 시작
+            // isLoading.value = true // ✅ 로딩 시작
 
             val work1 = async(Dispatchers.IO) {
                 tripScheduleService.getTripSchedule(tripScheduleDocId.value)
@@ -143,6 +143,18 @@ class ScheduleDetailViewModel @Inject constructor(
         application.navHostController.navigate(
             "${ScheduleScreenName.SCHEDULE_DETAIL_FRIENDS_SCREEN.name}?" +
                 "scheduleDocId=${scheduleDocId}"
+        )
+    }
+
+    // 일정 항목 후기 화면으로 이동
+    fun moveToScheduleItemReviewScreen(
+        tripScheduleDocId: String,
+        scheduleItemDocId: String,
+        scheduleItemTitle: String,
+    ) {
+        application.navHostController.navigate(
+            ScheduleScreenName.SCHEDULE_ITEM_REVIEW_SCREEN.name +
+                    "/$tripScheduleDocId/$scheduleItemDocId/$scheduleItemTitle"
         )
     }
 

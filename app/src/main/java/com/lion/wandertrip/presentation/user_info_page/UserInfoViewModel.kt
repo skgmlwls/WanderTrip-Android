@@ -3,7 +3,6 @@ package com.lion.wandertrip.presentation.user_info_page
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -41,6 +40,9 @@ class UserInfoViewModel @Inject constructor(
     // 앨범이나 사진에서 이미지를 받아왔는지 상태 관리 변수
     val isImagePicked = mutableStateOf(false)
 
+    // 로딩 상태 변수
+    val isLoading = mutableStateOf(false)
+
     // 네비게이션 아이콘을 누르면 호출되는 메서드
     fun onClickNavIconBack() {
         tripApplication.navHostController.popBackStack()
@@ -50,15 +52,17 @@ class UserInfoViewModel @Inject constructor(
     // 유저 정보 수정 메서드
     fun onClickIconCheck() {
         CoroutineScope(Dispatchers.Main).launch {
+            // 로딩상태 변경
+            isLoading.value=true
             val userModel = tripApplication.loginUserModel
-            var imageUri = userModel.userProfileImageURL
+            var imageName = userModel.userProfileImageURL
             val oldNickName = userModel.userNickName
             var newNickName = ""
 
 
             if (isImagePicked.value) {
                 // 새로운 이미지 파일명 생성
-                imageUri = "image_${System.currentTimeMillis()}.jpg"
+                imageName = "image_${System.currentTimeMillis()}.jpg"
 
                 // 이미지 저장 (파일 경로 설정)
                 Tools.saveBitmap(tripApplication, imageBitmapState.value!!)
@@ -68,25 +72,31 @@ class UserInfoViewModel @Inject constructor(
             userModel.userNickName = textFieldUserNicknameValue.value
             newNickName = textFieldUserNicknameValue.value
 
-            userModel.userProfileImageURL = imageUri
+            userModel.userProfileImageURL = imageName
 
             // 병렬로 Firestore에 이미지와 사용자 데이터 업데이트
             val filePath = tripApplication.getExternalFilesDir(null).toString()
 
             val work1 = async(Dispatchers.IO) {
+
+                // fireStore 에 이미지 저장
                 if (isImagePicked.value) {
-                    userService.uploadImage("$filePath/uploadTemp.jpg", imageUri)
+                    userService.uploadImage("$filePath/uploadTemp.jpg", imageName)
                 }
             }
 
             val work2 = async(Dispatchers.IO) {
+                // 유저 정보 수정
                 userService.updateUserData(userModel)
             }
 
+            // 닉네임 변경을 했다면
             if(oldNickName!= newNickName){
+                // 쓴 여행기 닉네임을 변경한 닉네임으로 수정
                 val work3= async(Dispatchers.IO){
                     tripNoteService.changeTripNoteNickname(oldNickName,newNickName)
                 }
+                // 쓴 일정 닉네임을 변경한 닉네임으로 수정
                 val work4= async(Dispatchers.IO){
                     tripScheduleService.changeTripScheduleNickName(oldNickName,newNickName)
                 }
@@ -98,6 +108,7 @@ class UserInfoViewModel @Inject constructor(
             // 모든 작업 완료 후 업데이트
             work1.await()
             work2.await()
+            isLoading.value=false
 
             // 업데이트된 데이터 저장
             tripApplication.loginUserModel = userModel
@@ -108,7 +119,7 @@ class UserInfoViewModel @Inject constructor(
     }
 
 
-
+    // 프로필 이미지 가져오기
     fun hasImageInApplication(){
         if(tripApplication.loginUserModel.userProfileImageURL!=""){
             viewModelScope.launch {

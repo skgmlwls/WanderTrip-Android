@@ -18,6 +18,7 @@ import com.lion.wandertrip.presentation.bottom.my_info_page.components.Horizonta
 import com.lion.wandertrip.presentation.bottom.my_info_page.components.ProfileCardBasicImage
 import com.lion.wandertrip.presentation.bottom.my_info_page.components.ProfileCardHasProfileImage
 import com.lion.wandertrip.presentation.bottom.my_info_page.used_dummy_data.RecentPostsDummyData
+import com.lion.wandertrip.util.Tools
 
 @Composable
 fun MyInfoScreen(myInfoViewModel: MyInfoViewModel = hiltViewModel()) {
@@ -25,6 +26,8 @@ fun MyInfoScreen(myInfoViewModel: MyInfoViewModel = hiltViewModel()) {
         myInfoViewModel.gettingUserModel()
         // 화면 열때 리스트 가져오기
         myInfoViewModel.getTripScheduleList()
+        // 최근 본 목록 가져오기
+        myInfoViewModel.getRecentTripItemList()
     }
     val userModel = myInfoViewModel.userModelValue.value
     Scaffold { paddingValues ->
@@ -50,7 +53,7 @@ fun MyInfoScreen(myInfoViewModel: MyInfoViewModel = hiltViewModel()) {
 
             // 최근 게시글 리스트
             HorizontalRecentPostsList(
-                RecentPostsDummyData.RecentPostsDummyDataList,
+                myInfoViewModel.recentTripItemList,
                 myInfoViewModel
             )
 

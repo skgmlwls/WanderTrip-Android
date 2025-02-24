@@ -8,7 +8,7 @@ class TripItemModel(
     var areaCode: String = "",       // 지역코드
     var contentId: String = "",      // 항목 ID
     var contentTypeId: String = "",  // 12: 관광지, 32: 숙박, 39: 음식점
-    var firstImage: String = "",     // 이미지 URL
+    var firstImage: String = "",     // 이미지 URi
     var mapLat: Double = 0.0,        // 위도(Y)
     var mapLong: Double = 0.0,       // 경도(X)
     var tel: String = "",            // 전화번호

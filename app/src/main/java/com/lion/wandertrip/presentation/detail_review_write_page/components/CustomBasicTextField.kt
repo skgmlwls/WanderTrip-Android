@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.detail_review_write_page.components
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
@@ -31,8 +32,10 @@ fun CustomBasicTextField(
     var isFocused by rememberSaveable { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() } // FocusRequester 생성
 
-    val onValueChange: (String) -> Unit = { newValue -> textFieldValue.value = newValue }
-
+    val onValueChange: (String) -> Unit = { newValue ->
+        textFieldValue.value = newValue // 상태를 업데이트
+        Log.d("CustomTextField", "변경된 값: ${textFieldValue.value}") // 값 확인용 로그
+    }
     Box(
         modifier = Modifier.fillMaxWidth()
     ) {

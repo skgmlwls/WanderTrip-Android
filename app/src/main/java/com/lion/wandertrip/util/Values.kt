@@ -1,5 +1,7 @@
 package com.lion.wandertrip.util
 
+
+
 // 목적지 타입
 enum class ContentTypeId(val contentTypeCode: Int, val contentTypeName: String) {
     TOURIST_ATTRACTION(12, "관광지"),
@@ -7,7 +9,7 @@ enum class ContentTypeId(val contentTypeCode: Int, val contentTypeName: String) 
     RESTAURANT(39, "음식점"),
 }
 
-// 목적지 타입
+// 상태
 enum class State(val stateNumber: Int, val stateStr: String) {
     ACTIVATE(1, "활성화"),
     DEACTIVATE(2, "비활성화"),
@@ -316,6 +318,8 @@ enum class ScheduleScreenName{
     SCHEDULE_SELECT_ITEM_SCREEN,
     // 함께 하는 친구 목록 화면
     SCHEDULE_DETAIL_FRIENDS_SCREEN,
+    // 일정 항목 후기 화면
+    SCHEDULE_ITEM_REVIEW_SCREEN,
 }
 
 enum class TripNoteScreenName{

@@ -7,11 +7,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lion.wandertrip.TripApplication
+import com.lion.wandertrip.model.RecentTripItemModel
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.model.UserModel
 import com.lion.wandertrip.service.TripScheduleService
 import com.lion.wandertrip.service.UserService
 import com.lion.wandertrip.util.MainScreenName
+import com.lion.wandertrip.util.Tools
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -36,7 +38,11 @@ class MyInfoViewModel @Inject constructor(
     // 보여줄 이미지의 Uri
     val showImageUri = mutableStateOf<Uri?>(null)
 
+    // 최근 일정 목록
     val recentScheduleList = mutableStateListOf<TripScheduleModel>()
+
+    // 최근 본 아이템 목록
+    val recentTripItemList = mutableStateListOf<RecentTripItemModel>()
 
     // 프로필 편집
     fun onClickTextUserInfoModify() {
@@ -81,7 +87,7 @@ class MyInfoViewModel @Inject constructor(
         }
     }
 
-    // 화면 열때 리스트 가져오기
+    // 화면 열 때 여행 일정 리스트 가져오기
     fun getTripScheduleList() {
         recentScheduleList.clear()
         viewModelScope.launch {
@@ -94,6 +100,16 @@ class MyInfoViewModel @Inject constructor(
             )
         }
 
+    }
+
+
+    // 화면 열 때 최근 본 목록 가져오기
+    fun getRecentTripItemList() {
+        recentTripItemList.clear()
+     val recentList = Tools.getRecentItemList(tripApplication)
+        recentTripItemList.addAll(
+            recentList
+        )
     }
 
 

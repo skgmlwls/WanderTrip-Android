@@ -1,11 +1,15 @@
 package com.lion.wandertrip.presentation.schedule_detail_page.component
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
@@ -13,13 +17,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
+import coil.compose.rememberAsyncImagePainter
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.google.firebase.Timestamp
 import com.lion.a02_boardcloneproject.component.CustomDividerComponent
-import com.lion.a02_boardcloneproject.component.CustomOutlinedButton
+import com.lion.wandertrip.R
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.presentation.schedule_detail_page.ScheduleDetailViewModel
 import com.lion.wandertrip.ui.theme.NanumSquareRound
@@ -39,151 +51,154 @@ fun ScheduleDetailDateList(
         modifier = Modifier
             .fillMaxSize()
             .padding(20.dp),
-        userScrollEnabled = !isMapTouched // Google Map 터치 시 LazyColumn 스크롤 방지
+        userScrollEnabled = !isMapTouched,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        items(tripSchedule.scheduleDateList.size) { index ->
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 10.dp)
-            ) {
-                // 날짜 표시
-                Row(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .weight(1f)
-                            .alignByBaseline(),
-                        text = "DAY ${index + 1}",
-                        fontSize = 25.sp,
-                        fontFamily = NanumSquareRound,
-                    )
-                    Text(
-                        modifier = Modifier.alignByBaseline(),
-                        text = formatTimestampToDate(tripSchedule.scheduleDateList[index]),
-                        fontSize = 14.sp,
-                        fontFamily = NanumSquareRoundRegular
-                    )
-                }
+        tripSchedule.scheduleDateList.forEachIndexed { index, date ->
 
-                // 해당 날짜의 스케줄 아이템 목록 필터링 후 정렬
-                // val filteredItems = tripSchedule.scheduleItems
-                val filteredItems = viewModel.tripScheduleItems
-                    .filter { it.itemDate.seconds == tripSchedule.scheduleDateList[index].seconds }
-                    .sortedBy { it.itemIndex }
-
-                // Google Map 표시 (해당 날짜의 스케줄 아이템 목록을 전달)
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                        .padding(top = 5.dp),
-                ) {
-                    ScheduleDetailGoogleMap(
-                        scheduleItems = filteredItems,
-                        onTouch = { touched -> isMapTouched = touched }
-                    )
-                }
-
-                // 상세 일정 리스트 표시
-                // 상세 일정 리스트 표시
+            // 해당 날짜의 스케줄 아이템 목록 필터링 후 정렬
+            val filteredItems = viewModel.tripScheduleItems
+                .filter { it.itemDate.seconds == date.seconds }
+                .sortedBy { it.itemIndex }
+            // 날짜 헤더 추가
+            item {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 10.dp),
-                    verticalArrangement = Arrangement.spacedBy(0.dp) // 요소들 사이에 간격 0
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    filteredItems.forEach { scheduleItem ->
-                        // 각 scheduleItem마다 개별적으로 expanded 상태를 선언
-                        var expanded by remember { mutableStateOf(false) }
+                    Row(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            modifier = Modifier.weight(1f),
+                            text = "DAY ${index + 1}",
+                            fontSize = 25.sp,
+                            fontFamily = NanumSquareRound,
+                        )
+                        Text(
+                            text = formatTimestampToDate(date),
+                            fontSize = 14.sp,
+                            fontFamily = NanumSquareRoundRegular
+                        )
+                    }
 
-                        Row(
-                            modifier = Modifier.height(IntrinsicSize.Min) // intrinsic measurements
-                        ) {
-                            ScheduleDetailVerticalDividerWithCircle()
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 20.dp)
-                                    .weight(1f)
-                            ) {
-                                Row {
-                                    // 일정 항목 이름
-                                    Text(
-                                        text = scheduleItem.itemTitle,
-                                        fontSize = 14.sp,
-                                        fontFamily = NanumSquareRoundRegular,
-                                        modifier = Modifier.padding(start = 10.dp)
-                                    )
-
-                                    // 일정 항목 종류
-                                    Text(
-                                        text = scheduleItem.itemType,
-                                        fontSize = 10.sp,
-                                        fontFamily = NanumSquareRoundRegular,
-                                        color = Color.DarkGray,
-                                        modifier = Modifier.padding(start = 10.dp)
-                                    )
-                                }
-
-                                if (scheduleItem.itemReviewImagesURL.isNotEmpty()) {
-                                    Row {
-                                        scheduleItem.itemReviewImagesURL.forEach { imageUrl ->
-                                            AsyncImage(
-                                                model = imageUrl,
-                                                contentDescription = "Review Image",
-                                                modifier = Modifier
-                                                    .size(100.dp)
-                                                    .padding(start = 5.dp, end = 8.dp)
-                                            )
-                                        }
-                                    }
-                                }
-
-                                if (scheduleItem.itemReviewText != "") {
-                                    // 후기
-                                    Text(
-                                        text = scheduleItem.itemReviewText,
-                                        fontSize = 12.sp,
-                                        fontFamily = NanumSquareRoundRegular,
-                                        modifier = Modifier.padding(start = 10.dp)
-                                    )
-                                }
-
-                            }
-
-                            // 메뉴 버튼
-                            Box {
-                                IconButton(
-                                    modifier = Modifier
-                                        .padding(top = 5.dp)
-                                        .size(18.dp),
-                                    onClick = { expanded = true }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Filled.MoreVert,
-                                        contentDescription = "더보기"
-                                    )
-                                }
-                                ScheduleDetailDropDawn(
-                                    expanded = expanded,
-                                    onDismissRequest = { expanded = false },
-                                    onDelete = {
-                                        viewModel.removeTripScheduleItem(
-                                            viewModel.tripScheduleDocId.value,
-                                            scheduleItem.itemDocId,
-                                            scheduleItem.itemDate
-                                        )
-                                    },
-                                    onReview = { /* 후기 기능 구현 */ },
-                                    onMove = { /* 위치조정 기능 구현 */ }
-                                )
-                            }
-                        }
+                    // Google Map 표시
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(150.dp)
+                            .padding(top = 5.dp),
+                    ) {
+                        ScheduleDetailGoogleMap(
+                            scheduleItems = filteredItems,
+                            onTouch = { touched -> isMapTouched = touched }
+                        )
                     }
                 }
+            }
+
+            // 일정 리스트 추가
+            items(filteredItems) { scheduleItem ->
+                var expanded by remember { mutableStateOf(false) }
+
+                Row(
+                    modifier = Modifier.height(IntrinsicSize.Min) // intrinsic measurements
+                ) {
+                    ScheduleDetailVerticalDividerWithCircle()
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 20.dp)
+                            .weight(1f)
+                    ) {
+                        Row {
+                            Log.d("ScheduleDetailDateList", "scheduleItem: ${scheduleItem.itemTitle}")
+                            Text(
+                                text = scheduleItem.itemTitle,
+                                fontSize = 14.sp,
+                                fontFamily = NanumSquareRoundRegular,
+                                modifier = Modifier.padding(start = 10.dp)
+                            )
+
+                            Text(
+                                text = scheduleItem.itemType,
+                                fontSize = 10.sp,
+                                fontFamily = NanumSquareRoundRegular,
+                                color = Color.DarkGray,
+                                modifier = Modifier.padding(start = 10.dp)
+                            )
+                        }
+
+                        Row {
+                            scheduleItem.itemReviewImagesURL.forEach { imageUrl ->
+                                val painter = rememberAsyncImagePainter(model = imageUrl)
+
+                                Box(
+                                    modifier = Modifier
+                                        .size(80.dp)
+                                        .padding(horizontal = 5.dp)
+                                        .clip(RoundedCornerShape(10.dp))
+                                ) {
+                                    Image(
+                                        painter = painter,
+                                        contentDescription = "Review Image",
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                }
+                            }
+                        }
+
+                        if (scheduleItem.itemReviewText.isNotEmpty()) {
+                            Text(
+                                text = scheduleItem.itemReviewText,
+                                fontSize = 12.sp,
+                                fontFamily = NanumSquareRoundRegular,
+                                modifier = Modifier.padding(start = 10.dp)
+                            )
+                        }
+                    }
+
+                    // 메뉴 버튼
+                    Box {
+                        IconButton(
+                            modifier = Modifier
+                                .padding(top = 5.dp)
+                                .size(18.dp),
+                            onClick = { expanded = true }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.MoreVert,
+                                contentDescription = "더보기"
+                            )
+                        }
+                        ScheduleDetailDropDawn(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                            onDelete = {
+                                expanded = false
+                                viewModel.removeTripScheduleItem(
+                                    viewModel.tripScheduleDocId.value,
+                                    scheduleItem.itemDocId,
+                                    scheduleItem.itemDate
+                                )
+                            },
+                            onReview = {
+                                expanded = false
+                                viewModel.moveToScheduleItemReviewScreen(
+                                    viewModel.tripScheduleDocId.value,
+                                    scheduleItem.itemDocId,
+                                    scheduleItem.itemTitle,
+                                )
+                            },
+                            onMove = {}
+                        )
+                    }
+                }
+            }
+
+            // 버튼 추가
+            item {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -194,10 +209,10 @@ fun ScheduleDetailDateList(
                         onClick = {
                             viewModel.moveToScheduleSelectItemScreen(
                                 ContentTypeId.TOURIST_ATTRACTION.contentTypeCode,
-                                tripSchedule.scheduleDateList[index]
+                                date
                             )
                         },
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp) // 내부 여백 조정
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp)
                     ) {
                         Text(
                             text = "관광지 추가",
@@ -209,10 +224,10 @@ fun ScheduleDetailDateList(
                         onClick = {
                             viewModel.moveToScheduleSelectItemScreen(
                                 ContentTypeId.RESTAURANT.contentTypeCode,
-                                tripSchedule.scheduleDateList[index]
+                                date
                             )
                         },
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp) // 내부 여백 조정
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp)
                     ) {
                         Text(
                             text = "음식점 추가",
@@ -224,10 +239,10 @@ fun ScheduleDetailDateList(
                         onClick = {
                             viewModel.moveToScheduleSelectItemScreen(
                                 ContentTypeId.ACCOMMODATION.contentTypeCode,
-                                tripSchedule.scheduleDateList[index]
+                                date
                             )
                         },
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp) // 내부 여백 조정
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp)
                     ) {
                         Text(
                             text = "숙소 추가",
@@ -242,4 +257,3 @@ fun ScheduleDetailDateList(
         }
     }
 }
-

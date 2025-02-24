@@ -65,4 +65,14 @@ class ScheduleItem(
         scheduleItemVO.itemContentId = itemContentId
         return scheduleItemVO
     }
+
+    fun copy(
+        itemReviewImagesURL: List<String> = emptyList(),
+        itemReviewText: String = ""
+    ): ScheduleItemVO {
+        return ScheduleItemVO(
+            itemReviewImagesURL = itemReviewImagesURL,
+            itemReviewText = itemReviewText
+        )
+    }
 }

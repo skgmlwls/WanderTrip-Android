@@ -61,7 +61,7 @@ fun TripNoteScreen(
     // 리사이클러뷰 항목 데이터 초기화
     tripNoteViewModel.gettingTripNoteData()
 
-    tripNoteViewModel.topAppBarTitle.value = "추천 여행기"
+    tripNoteViewModel.topAppBarTitle.value = "여행기 모아보기"
 
 
 
@@ -90,7 +90,7 @@ fun TripNoteScreen(
                     .padding(16.dp),
             ) {
                 Text(
-                    text = " 추천 여행기",
+                    text = tripNoteViewModel.topAppBarTitle.value,
                     fontFamily = NanumSquareRound,
                     fontSize = 22.sp,
                     modifier = Modifier

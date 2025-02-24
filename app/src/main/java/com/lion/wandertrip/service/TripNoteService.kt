@@ -1,6 +1,8 @@
 package com.lion.wandertrip.service
 
 import android.net.Uri
+import android.util.Log
+import com.lion.wandertrip.model.ScheduleItem
 import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.model.TripNoteReplyModel
 import com.lion.wandertrip.model.TripScheduleModel
@@ -73,7 +75,7 @@ class TripNoteService @Inject constructor(val tripNoteRepository: TripNoteReposi
         return tripNoteList
     }
 
-
+    // 내 여행일정 가져오기
     suspend fun gettingUserScheduleList(userNickName : String) : MutableList<TripScheduleModel>{
         // 여행기 정보를 가져온다.
         val tripNoteList = mutableListOf<TripScheduleModel>()
@@ -88,6 +90,43 @@ class TripNoteService @Inject constructor(val tripNoteRepository: TripNoteReposi
 
         return tripNoteList
     }
+
+    // 내 다가오는 여행 일정 가져오기
+    suspend fun gettingUpcomingScheduleList(userNickName : String) : MutableList<TripScheduleModel>{
+        // 여행기 정보를 가져온다.
+        val tripNoteList = mutableListOf<TripScheduleModel>()
+        val resultList = tripNoteRepository.gettingUpcomingScheduleList(userNickName)
+
+        resultList.forEach {
+            val tripNoteVO = it["tripScheduleVO"] as TripScheduleVO
+            // val documentId = it["documentId"] as String
+            val tripNoteModel = tripNoteVO.toTripScheduleModel()
+            tripNoteList.add(tripNoteModel)
+        }
+
+        return tripNoteList
+    }
+
+    // 일정 담아가면 담아가기 카운트 증가시키기
+    suspend fun addTripNoteScrapCount(documentId: String){
+        tripNoteRepository.addTripNoteScrapCount(documentId)
+    }
+
+    // 일정 조회 (Firestore → VO 변환 → Model 변환)
+    suspend fun getTripSchedule(docId: String): TripScheduleModel? {
+        val tripScheduleVO = tripNoteRepository.getTripSchedule(docId) ?: return null
+        val tripScheduleModel = tripScheduleVO.toTripScheduleModel()
+        Log.d("TripScheduleService", "getTripSchedule: 문서 $docId 조회 완료")
+        return tripScheduleModel
+    }
+
+    // TripSchedule 서브 컬렉션의 모든 문서를 ScheduleItemVO 리스트로 조회
+    suspend fun getTripScheduleItems(docId: String): List<ScheduleItem>? {
+        val itemVOList = tripNoteRepository.getTripScheduleItems(docId) ?: emptyList()
+        return itemVOList.map { it.toScheduleItemModel() }
+    }
+
+
 
     // 해당 사람의 여행기 리스트 가져오기
     suspend fun gettingOtherTripNoteList(otherNickName : String) : MutableList<TripNoteModel>{
