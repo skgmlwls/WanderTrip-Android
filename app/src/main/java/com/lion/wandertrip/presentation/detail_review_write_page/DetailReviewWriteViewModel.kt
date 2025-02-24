@@ -54,126 +54,117 @@ class DetailReviewWriteViewModel @Inject constructor(
     val isLoading = mutableStateOf(false)
 
 
-
     // 뒤로가기
     fun onClickNavIconBack() {
         tripApplication.navHostController.popBackStack()
     }
 
-    suspend fun addContentsReview(contentId: String): String {
-        val imagePathList = mutableListOf<String>()
-        val serverFilePathList = mutableListOf<String>()
-        var contentsDocId = ""
-        var imageUrlList = listOf<String>()
+    // 올린 contents Doc Id 리턴
+    fun addContentsReview(contentId: String) {
+        viewModelScope.launch {
+            val imagePathList = mutableListOf<String>()
+            val serverFilePathList = mutableListOf<String>()
+            var contentsDocId = ""
+            var imageUrlList = listOf<String>()
 
-        if (isImagePicked.value) {
-            isLoading.value = true
-            Log.d("test100", "골랐나?")
+            Log.d("addContentsReview", "함수 시작 - contentId: $contentId")
 
-            mutableBitMapList.forEachIndexed { index, bitmap ->
-                val name = "image_${index}_${System.currentTimeMillis()}.jpg"
-                serverFilePathList.add(name)
+            if (isImagePicked.value) {
+                Log.d("addContentsReview", "이미지 선택됨, 저장 시작")
 
-                val savedFilePath = Tools.saveBitmaps(tripApplication, bitmap!!, name)
-                Log.d("checkFile", "파일 저장 경로: $savedFilePath")
+                // 외장 메모리에 bitmap 저장
+                mutableBitMapList.forEachIndexed { index, bitmap ->
+                    val name = "image_${index}_${System.currentTimeMillis()}.jpg"
+                    serverFilePathList.add(name)
 
-                imagePathList.add(savedFilePath)
+                    val savedFilePath = Tools.saveBitmaps(tripApplication, bitmap!!, name)
+                    Log.d("checkFile", "파일 저장 경로: $savedFilePath")
+
+                    imagePathList.add(savedFilePath)
+                }
+                Log.d("addContentsReview", "이미지 저장 완료 - 총 ${imagePathList.size}개")
             }
 
-
-            // 📌 이미지 업로드 완료될 때까지 대기
-             imageUrlList = withContext(Dispatchers.IO) {
-                uploadImageWithTimeout(imagePathList, serverFilePathList, contentId)
+            if (isImagePicked.value) {
+                Log.d("addContentsReview", "이미지 업로드 시작")
+                val work1 = async(Dispatchers.IO) {
+                    uploadImage(imagePathList, serverFilePathList, contentId)
+                }
+                imageUrlList = work1.await()
+                Log.d("getUri", "이미지 업로드 완료 - URL 리스트: $imageUrlList")
+            } else {
+                Log.d("addContentsReview", "이미지 선택 안 됨, 업로드 스킵")
             }
 
-            // 📌 이미지 업로드 실패 시 로그
-            if (imageUrlList.isEmpty()) {
-                Log.e("getUri", "이미지 업로드 URL 리스트가 비어 있음! Firestore 저장 중단")
-                return ""
+            // 📌 업로드가 끝난 후 리뷰 데이터 저장
+            Log.d("addContentsReview", "리뷰 데이터 생성 시작")
+            val review = ReviewModel().apply {
+                reviewContent = reviewContentValue.value
+                reviewImageList = imageUrlList // ✅ 업로드 완료 후 URL 리스트 저장
+                reviewRatingScore = ratingScoreValue.value
+                reviewWriterNickname = tripApplication.loginUserModel.userNickName
+                reviewWriterProfileImgURl =
+                    userService.gettingImage(tripApplication.loginUserModel.userProfileImageURL)
+                        .toString()
             }
+            Log.d("addContentsReview", "리뷰 데이터 생성 완료: $review")
 
-            Log.d("getUri", "이미지 URL 리스트: $imageUrlList")
+            // 문서 존재 여부 확인 후 저장
+            Log.d("addContentsReview", "콘텐츠 문서 존재 여부 확인 시작")
+            contentsDocId = contentsService.isContentExists(contentId)
+            Log.d("addContentsReview", "콘텐츠 문서 확인 완료 - contentsDocId: $contentsDocId")
+
+            if (contentsDocId.isNotEmpty()) {
+                Log.d("addContentsReview", "기존 콘텐츠 문서 있음 - 리뷰 추가 중")
+                contentsReviewService.addContentsReview(contentId, review)
+            } else {
+                Log.d("addContentsReview", "기존 콘텐츠 문서 없음 - 새 문서 생성 후 리뷰 추가 중")
+                val contents = ContentsModel(contentId = contentId)
+                contentsDocId = contentsService.addContents(contents)
+                contentsReviewService.addContentsReview(contentId, review)
+            }
+            Log.d("addContentsReview", "리뷰 추가 완료")
+
+            Log.d("addContentsReview", "리뷰 저장 후 컨텐츠 업데이트 시작")
+            val work2 = async(Dispatchers.IO) {
+                addReviewAndUpdateContents(contentsDocId)
+            }
+            work2.join()
+            Log.d("addContentsReview", "리뷰 저장 후 컨텐츠 업데이트 완료")
+
+            Log.d("addContentsReview", "화면 뒤로 이동")
+            tripApplication.navHostController.popBackStack()
         }
-
-        // 📌 이미지 업로드가 끝난 후 리뷰 데이터 저장
-        val review = ReviewModel().apply {
-            reviewContent = reviewContentValue.value
-            reviewImageList = imageUrlList // ✅ 업로드가 끝난 후 URL 리스트를 저장
-            reviewRatingScore = ratingScoreValue.value
-            reviewWriterNickname = tripApplication.loginUserModel.userNickName
-            reviewWriterProfileImgURl =
-                userService.gettingImage(tripApplication.loginUserModel.userProfileImageURL).toString()
-        }
-
-        // 문서 존재 여부 확인 후 저장
-        contentsDocId = contentsService.isContentExists(contentId)
-
-        if (contentsDocId.isNotEmpty()) {
-            contentsReviewService.addContentsReview(contentId, review)
-        } else {
-            val contents = ContentsModel(contentId = contentId)
-            contentsDocId = contentsService.addContents(contents)
-            contentsReviewService.addContentsReview(contentId, review)
-        }
-
-        return contentsDocId
     }
 
-    suspend fun uploadImageWithTimeout(
+
+    // url 리스트 리턴받는 메서드
+    suspend fun uploadImage(
         sourceFilePath: List<String>,
         serverFilePath: List<String>,
         contentId: String
     ): List<String> {
-        Log.d("uploadImageWithTimeout", "sourceFilePath: $sourceFilePath")
-        Log.d("uploadImageWithTimeout", "serverFilePath: $serverFilePath")
-        Log.d("uploadImageWithTimeout", "contentId: $contentId")
+        Log.d("uploadImage", "sourceFilePath: $sourceFilePath")
+        Log.d("uploadImage", "serverFilePath: $serverFilePath")
+        Log.d("uploadImage", "contentId: $contentId")
 
-        val resultUrlList = mutableListOf<String>()
+        // 📌 동기적으로 업로드 실행 후 결과 반환
+        val resultUrlList = contentsReviewService.uploadReviewImageList(
+            sourceFilePath,
+            serverFilePath.toMutableList(), // `toMutableStateList()` 제거 (필요 없음)
+            contentId
+        )
 
-        return withTimeoutOrNull(10000) {  // 📌 타임아웃을 10초로 늘림
-            var retry = true
-            var tempUrlList: List<String>?
+        Log.d("uploadImage", "업로드된 이미지 URL 리스트: $resultUrlList")
 
-            while (retry) {
-                tempUrlList = contentsReviewService.uploadReviewImageList(
-                    sourceFilePath,
-                    serverFilePath.toMutableStateList(),
-                    contentId
-                )
-
-                if (tempUrlList.isNullOrEmpty()) {
-                    Log.d("uploadImageWithTimeout", "이미지 URL이 아직 준비되지 않음. 재시도 중...")
-                    delay(500)  // 0.5초 대기 후 재시도
-                } else {
-                    retry = false
-                    resultUrlList.addAll(tempUrlList)
-                }
-            }
-            resultUrlList
-        } ?: run {
-            Log.e("uploadImageWithTimeout", "이미지 URL 가져오기 실패 (타임아웃)")
-            emptyList() // 타임아웃 시 빈 리스트 반환
-        }
+        return resultUrlList ?: emptyList() // 업로드 실패 시 빈 리스트 반환
     }
+
 
     // 컨텐츠 의 별점 필드 수정
-    fun addReviewAndUpdateContents(contentId: String) {
-
-        viewModelScope.launch {
-            val work1 = async(Dispatchers.IO) {
-
-            }
-            work1.await()
-        }
-
-        runBlocking {
-            // 리뷰 등록 메서드 호출
-            val contentDocId = addContentsReview(contentId)
-            // 위에 끝날때까지 대기
-            contentsService.updateContentRating(contentDocId)
-            tripApplication.navHostController.popBackStack()
-
-        }
+    suspend fun addReviewAndUpdateContents(contentDocId:String) {
+        contentsService.updateContentRating(contentDocId)
     }
+
 
 }

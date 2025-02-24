@@ -71,8 +71,9 @@ class DetailReviewModifyViewModel @Inject constructor(
                 reviewModel.value.reviewRatingScore = ratingScoreValue.value
                 reviewModel.value.reviewContent = reviewContentValue.value
                 contentsReviewService.modifyContentsReview(reviewModel.value.contentsDocId,reviewModel.value)
-                tripApplication.navHostController.popBackStack()
             }
+            tripApplication.navHostController.popBackStack()
+
         }
     }
 
