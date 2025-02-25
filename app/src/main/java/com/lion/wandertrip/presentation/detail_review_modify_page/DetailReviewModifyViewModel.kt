@@ -21,7 +21,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,7 +33,7 @@ class DetailReviewModifyViewModel @Inject constructor(
 ) : ViewModel() {
     val tripApplication = context as TripApplication
 
-    val reviewModel = mutableStateOf(ReviewModel())
+    val reviewModelValue = mutableStateOf(ReviewModel())
 
     val ratingScoreValue = mutableStateOf(0.0f)
 
@@ -51,50 +50,37 @@ class DetailReviewModifyViewModel @Inject constructor(
         tripApplication.navHostController.popBackStack()
     }
 
-    fun setState (value : Boolean){
-        Log.d("test","$isLoading : $isLoading")
-        isLoading.value=value
-        Log.d("test","$isLoading : $isLoading")
-    }
-
     // 모델 가져오기
     fun getReviewModel(contentDocId: String, contentReviewDocId: String) {
         Log.d("test100","contentDocId : ${contentDocId}, contentReviewDocId : $contentReviewDocId")
         isLoading.value = true
         viewModelScope.launch {
-            val reviewData = withContext(Dispatchers.IO) {
+            isLoading.value=true
+            // 수정할 리뷰 가져오기
+            val work1 = async(Dispatchers.IO){
                 contentsReviewService.getContentsReviewByDocId(contentDocId, contentReviewDocId)
             }
-            reviewModel.value = reviewData
+            val reviewData =work1.await()
+            Log.d("test","reviewData : ${reviewData.reviewTitle}")
+            reviewModelValue.value = reviewData
 
-            withContext(Dispatchers.Main) {
+            val work2 = async(Dispatchers.IO){
                 convertToBitMap()
-                isLoading.value = false
             }
+            work2.join()
+
+            ratingScoreValue.value = reviewData.reviewRatingScore
+
+            reviewContentValue.value = reviewData.reviewContent
+            isLoading.value=false
+
         }
-    }
-
-    // 별점 스테이트 설정하기
-    fun settingRatingScore(score: Float) {
-        ratingScoreValue.value = score
-    }
-
-    // 내용 스테이트 설정하기
-    fun settingReviewContent(reviewContent: String) {
-        reviewContentValue.value = reviewContent
-    }
-
-    // 이미지 설정하기
-    fun settingReviewImgList(imgPathList: MutableList<String>) {
-        imgPathList.addAll(
-            imgPathList
-        )
     }
 
     // 비트맵 객체로 변환
     suspend fun convertToBitMap() {
         mutableBitMapList.clear()
-        val urlList = reviewModel.value.reviewImageList
+        val urlList = reviewModelValue.value.reviewImageList
         val bitMapList = mutableListOf<Bitmap>()
 
         // 각 URL에 대해 비트맵을 로드하여 리스트에 추가
@@ -171,6 +157,7 @@ class DetailReviewModifyViewModel @Inject constructor(
             Log.d("addContentsReview", "리뷰 데이터 생성 시작")
 
             val review = ReviewModel().apply {
+                reviewTitle = gettingReview.reviewTitle
                 reviewDocId = reviewDocID
                 contentsDocId = contentDocID
                 contentsId = paramContentsId

@@ -12,12 +12,51 @@ import java.io.File
 
 class ContentsReviewRepository {
 
+    // 사용자의 리뷰 문서 가져오기
+    suspend fun getContentsMyReview(contentsWriterNickName: String): List<ReviewVO> {
+        return try {
+            val db = FirebaseFirestore.getInstance()
+            Log.d("Firestore", "Fetching all documents from ContentsData...")
+
+            val contentsDataSnapshot = db.collection("ContentsData").get().await()
+            Log.d("Firestore", "Fetched ${contentsDataSnapshot.documents.size} documents from ContentsData.")
+
+            val allReviews = mutableListOf<ReviewVO>()
+
+            for (document in contentsDataSnapshot.documents) {
+                Log.d("Firestore", "Checking document: ${document.id}")
+
+                val reviewsSnapshot = document.reference
+                    .collection("ContentsReview")
+                    .whereEqualTo("reviewWriterNickname", contentsWriterNickName)
+                    .get()
+                    .await()
+
+                Log.d("Firestore", "Fetched ${reviewsSnapshot.documents.size} reviews from ${document.id} matching nickname: $contentsWriterNickName")
+
+                val reviews = reviewsSnapshot.documents.mapNotNull { it.toObject(ReviewVO::class.java) }
+                Log.d("Firestore", "Converted ${reviews.size} reviews to ReviewVO objects.")
+
+                allReviews.addAll(reviews)
+            }
+
+            Log.d("Firestore", "Total reviews found: ${allReviews.size}")
+            allReviews
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error fetching reviews: ${e.message}", e)
+            emptyList()
+        }
+    }
+
+
     // 리뷰 문서 1개 가져오기
     suspend fun getContentsReviewByDocId(
         contentsDocId: String,
         contentsReviewDocId: String
     ): ReviewVO {
         return try {
+            Log.d("FirestoreDebug", "리뷰 문서를 가져오는 중: contentsDocId = $contentsDocId, contentsReviewDocId = $contentsReviewDocId")
+
             val db = FirebaseFirestore.getInstance()
             val document = db.collection("ContentsData")
                 .document(contentsDocId)
@@ -26,18 +65,25 @@ class ContentsReviewRepository {
                 .get()
                 .await()
 
+            // 문서가 존재하는지 여부 체크
             if (document.exists()) {
+                Log.d("FirestoreDebug", "문서 찾음: ${document.id}")
+                document.toObject(ReviewVO::class.java)?.let {
+                    Log.d("FirestoreDebug", "리뷰 데이터: $it")
+                } ?: Log.d("FirestoreDebug", "문서에 데이터가 없음.")
+
                 document.toObject(ReviewVO::class.java) ?: ReviewVO()
             } else {
+                Log.d("FirestoreDebug", "문서가 존재하지 않음.")
                 ReviewVO()
             }
         } catch (e: Exception) {
+            Log.e("FirestoreDebug", "리뷰 문서 가져오기 오류", e)
             e.printStackTrace()
             ReviewVO() // 예외 발생 시 기본값 반환
         }
     }
-
-
+    // 컨텐츠 모든 리뷰 가져오기
     suspend fun getAllReviewsWithContents(contentId: String): MutableList<ReviewVO> {
         val reviewList = mutableListOf<ReviewVO>()
 

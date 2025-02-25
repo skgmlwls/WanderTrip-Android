@@ -4,8 +4,20 @@ import android.net.Uri
 import android.util.Log
 import com.lion.wandertrip.model.ReviewModel
 import com.lion.wandertrip.repository.ContentsReviewRepository
+import com.lion.wandertrip.vo.ReviewVO
 
 class ContentsReviewService(val contentsReviewRepository: ContentsReviewRepository) {
+
+    // 사용자의 리뷰 문서 가져오기
+    suspend fun getContentsMyReview(contentsWriterNickName: String): MutableList<ReviewModel> {
+        val voList = contentsReviewRepository.getContentsMyReview(contentsWriterNickName)
+        val resultList = mutableListOf<ReviewModel>()
+        voList.forEach {
+            resultList.add(it.toReviewItemModel())
+        }
+        return resultList
+    }
+
 
     // 해당 리뷰 가져오기
     suspend fun getContentsReviewByDocId(contentsDocId: String, contentsReviewDocId: String): ReviewModel {

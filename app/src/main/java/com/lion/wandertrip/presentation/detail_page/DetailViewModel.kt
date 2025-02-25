@@ -456,6 +456,7 @@ class DetailViewModel @Inject constructor(
         tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_DETAIL_REVIEW_MODIFY.name}/${contentDocID}/${contentsID}/${reviewDocID}")
     }
 
+
     // 리뷰 삭제 버튼
     fun deleteReview(contentDocId: String, contentsReviewDocId : String) {
         Log.d("test100","contentDocId :$contentDocId, contentsReviewDocId:$contentsReviewDocId")

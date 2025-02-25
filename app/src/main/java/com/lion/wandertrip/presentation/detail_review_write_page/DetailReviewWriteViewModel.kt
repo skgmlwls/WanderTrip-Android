@@ -59,8 +59,9 @@ class DetailReviewWriteViewModel @Inject constructor(
         tripApplication.navHostController.popBackStack()
     }
 
-    // 올린 contents Doc Id 리턴
-    fun addContentsReview(contentId: String) {
+    // 리뷰 올리는 메서드
+    fun addContentsReview(contentId: String, title : String) {
+        Log.d("test100"," title $title")
         viewModelScope.launch {
 
             val imagePathList = mutableListOf<String>()
@@ -91,9 +92,13 @@ class DetailReviewWriteViewModel @Inject constructor(
                 Log.d("addContentsReview", "이미지 선택 안 됨, 업로드 스킵")
             }
 
+            contentsDocId = contentsService.isContentExists(contentId)
+
+
             //  업로드가 끝난 후 리뷰 데이터 저장
 
             val review = ReviewModel().apply {
+                reviewTitle = title
                 contentsId = contentId
                 reviewContent = reviewContentValue.value
                 reviewImageList = imageUrlList // ✅ 업로드 완료 후 URL 리스트 저장
@@ -103,8 +108,6 @@ class DetailReviewWriteViewModel @Inject constructor(
                     userService.gettingImage(tripApplication.loginUserModel.userProfileImageURL)
                         .toString()
             }
-
-            contentsDocId = contentsService.isContentExists(contentId)
 
             if (contentsDocId.isNotEmpty()) {
                 Log.d("addContentsReview", "기존 콘텐츠 문서 있음 - 리뷰 추가 중")
