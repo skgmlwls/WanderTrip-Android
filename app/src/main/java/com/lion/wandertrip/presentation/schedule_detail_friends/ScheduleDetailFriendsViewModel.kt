@@ -2,16 +2,13 @@ package com.lion.wandertrip.presentation.schedule_detail_friends
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
 import com.lion.wandertrip.TripApplication
-import com.lion.wandertrip.model.TripScheduleModel
+import com.lion.wandertrip.model.UserModel
 import com.lion.wandertrip.service.TripScheduleService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -37,7 +34,10 @@ class ScheduleDetailFriendsViewModel @Inject constructor(
     val friendAddError = mutableStateOf("")
 
     // 함께 하는 친구 목록
-    val friendsList = mutableStateListOf<String>()
+    val friendsDocIdList = mutableStateListOf<String>()
+
+    // 함께 하는 친구 목록
+    val friendsUserList = mutableStateListOf<UserModel>()
 
     // 일정 문서 ID 설정
     fun setScheduleDocId(id: String) {
@@ -60,10 +60,11 @@ class ScheduleDetailFriendsViewModel @Inject constructor(
                 val schedule = snapshot.get("scheduleInviteList") as? List<String> ?: emptyList()
 
                 // 기존 리스트 클리어 후 업데이트
-                friendsList.clear()
-                friendsList.addAll(schedule)
+                friendsDocIdList.clear()
+                friendsDocIdList.addAll(schedule)
+                Log.d("ScheduleDetailFriendsViewModel", "friendsList: $friendsDocIdList")
 
-                Log.d("ScheduleDetailFriendsViewModel", "friendsList: $friendsList")
+                formatInvitedUserDataToUserDocId()
             }
         }
     }
@@ -79,21 +80,36 @@ class ScheduleDetailFriendsViewModel @Inject constructor(
             val work1 = async(Dispatchers.IO) {
                 tripScheduleService.addInviteUserByInviteNickname(scheduleDocId.value, inviteNickname)
             }.await()
-            if (!work1) {
+            if (work1 == "") {
                 Log.d("ScheduleDetailFriendsViewModel", "유저 없음 : $work1")
                 friendAddError.value = "검색된 유저가 없습니다"
                 // 다이얼로그는 계속 열어둠
             } else {
                 Log.d("ScheduleDetailFriendsViewModel", "유저 있음 : $work1")
-                friendAddError.value = ""
-                // 성공 시 다이얼로그 닫음
-                showAddFriendDialog.value = false
-            }
-            if (work1) {
                 val work2 = async(Dispatchers.IO) {
                     // 일정 항목의 초대 리스트에 유저 DocId 추가
+                    tripScheduleService.addInviteUserDocIdToScheduleInviteList(scheduleDocId.value, work1)
+                }.await()
+                if (work2) {
+                    friendAddError.value = ""
+                    // 성공 시 다이얼로그 닫음
+                    showAddFriendDialog.value = false
+                } else {
+                    friendAddError.value = "이미 추가된 유저입니다."
                 }
             }
+        }
+    }
+
+    // 초대된 유저 문서 Id로 유저 정보 가져오기
+    fun formatInvitedUserDataToUserDocId() {
+        viewModelScope.launch {
+            val work1 = async(Dispatchers.IO) {
+                tripScheduleService.fetchUserScheduleList(friendsDocIdList)
+            }.await()
+
+            friendsUserList.clear()
+            friendsUserList.addAll(work1)
         }
     }
 

@@ -13,6 +13,7 @@ import com.lion.wandertrip.service.TripScheduleService
 import com.lion.wandertrip.util.ContentTypeId
 import com.lion.wandertrip.util.RouletteScreenName
 import com.lion.wandertrip.util.ScheduleScreenName
+import com.lion.wandertrip.util.SharedTripItemList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -37,12 +38,6 @@ class RouletteItemViewModel @Inject constructor(
     // 여행지 선택 화면으로 이동
     fun moveToRouletteItemSelectScreen() {
         application.navHostController.navigate(RouletteScreenName.ROULETTE_ITEM_SELECT_SCREEN.name)
-    }
-
-    // 선택된 여행지 리스트 업데이트
-    fun updateRouletteItemList(selectedItems: List<TripItemModel>) {
-        rouletteItemList.clear()
-        rouletteItemList.addAll(selectedItems)
     }
 
     // 일정에 여행지 항목 추가
@@ -73,18 +68,10 @@ class RouletteItemViewModel @Inject constructor(
                 tripScheduleService.addTripItemToSchedule(tripScheduleDocId, scheduleDate, scheduleItem)
             }.await()
             // ✅ 현재 화면을 닫고 이전 화면으로 돌아감
-            application.navHostController.navigate(
-                route = "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
-                        "tripScheduleDocId=${tripScheduleDocId}&areaName=${areaName}&areaCode=${areaCode}",
-            ) {
-                popUpTo(
-                    "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
-                        "tripScheduleDocId=${tripScheduleDocId}&areaName=${areaName}&areaCode=${areaCode}"
-                ) {
-
-                    inclusive = false
-                }
-            }
+            application.navHostController.popBackStack(
+                "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?tripScheduleDocId={tripScheduleDocId}&areaName={areaName}&areaCode={areaCode}",
+                false
+            )
         }
     }
 }

@@ -6,11 +6,13 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.lion.wandertrip.model.UserModel
 import com.lion.wandertrip.retrofit.ApiResponse
 import com.lion.wandertrip.retrofit.RetrofitClient
 import com.lion.wandertrip.vo.ScheduleItemVO
 import com.lion.wandertrip.vo.TripItemVO
 import com.lion.wandertrip.vo.TripScheduleVO
+import com.lion.wandertrip.vo.UserVO
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.json.Json
 import java.io.ByteArrayOutputStream
@@ -102,6 +104,52 @@ class TripScheduleRepository {
             println("Firestore 추가 실패: ${e.message}")
         }
     }
+
+    // 관심 지역(또는 콘텐츠) 추가
+    suspend fun addLikeItem(userDocId: String, likeItemContentId: String) {
+
+        Log.d("addLikeItem", "userDocId: $userDocId, likeItemContentId: $likeItemContentId")
+        val firestore = FirebaseFirestore.getInstance()
+        // 루트 컬렉션은 "UserData"이어야 함
+        val subCollectionRef = firestore.collection("UserData")
+            .document(userDocId)
+            .collection("UserLikeList")
+
+        // 먼저, 같은 콘텐츠 ID가 이미 있는지 확인
+        val querySnapshot = subCollectionRef
+            .whereEqualTo("contentId", likeItemContentId)
+            .get()
+            .await()
+
+        if (!querySnapshot.isEmpty) {
+            // 이미 존재하면 추가하지 않음
+        } else {
+            // 존재하지 않으면 새 문서를 추가
+            subCollectionRef.add(mapOf("contentId" to likeItemContentId)).await()
+        }
+    }
+
+    // 관심 지역(또는 콘텐츠) 삭제
+    suspend fun removeLikeItem(userDocId: String, likeItemContentId: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        val subCollectionRef = firestore.collection("UserData")
+            .document(userDocId)
+            .collection("UserLikeList")
+
+        // 같은 콘텐츠 ID가 있는 문서 쿼리
+        val querySnapshot = subCollectionRef
+            .whereEqualTo("contentId", likeItemContentId)
+            .get()
+            .await()
+
+        // 쿼리 결과가 비어있지 않으면 해당 문서 삭제
+        if (!querySnapshot.isEmpty) {
+            for (doc in querySnapshot.documents) {
+                doc.reference.delete().await()
+            }
+        }
+    }
+
 
     // 일정 항목 삭제 후 itemIndex 재조정
     suspend fun removeTripScheduleItem(scheduleDocId: String, itemDocId: String) {
@@ -237,7 +285,7 @@ class TripScheduleRepository {
     }
 
     // 초대할 닉네임으로 유저 존재 여부 확인 후, 있으면 문서 ID 반환, 없으면 빈 문자열 반환
-    suspend fun addInviteUserByInviteNickname(scheduleDocId: String, inviteNickname: String): Boolean {
+    suspend fun addInviteUserByInviteNickname(scheduleDocId: String, inviteNickname: String): String {
         val firestore = FirebaseFirestore.getInstance().collection("UserData")
         val querySnapshot = firestore
             .whereEqualTo("userNickName", inviteNickname)
@@ -249,10 +297,58 @@ class TripScheduleRepository {
             val userDoc = querySnapshot.documents.first()
             userDoc.reference.update("invitedScheduleList", FieldValue.arrayUnion(scheduleDocId))
                 .await()
-            true
+            userDoc.id
         } else {
-            false
+            ""
         }
+    }
+
+    // 초대한 유저 문서 Id를 데이터에 추가
+    suspend fun addInviteUserDocIdToScheduleInviteList(scheduleDocId: String, invitedUserDocId: String): Boolean {
+        val firestore = FirebaseFirestore.getInstance()
+        val scheduleDocRef = firestore.collection("TripSchedule").document(scheduleDocId)
+
+        val snapshot = scheduleDocRef.get().await()
+        if (snapshot.exists()) {
+            // scheduleInviteList 필드를 읽어옴 (없으면 빈 리스트)
+            val inviteList = snapshot.get("scheduleInviteList") as? List<String> ?: emptyList()
+            if (inviteList.contains(invitedUserDocId)) {
+                // 이미 초대된 docId가 있으면 false 반환
+                return false
+            } else {
+                // 초대되지 않은 경우, invitedUserDocId를 추가하고 true 반환
+                scheduleDocRef.update("scheduleInviteList", FieldValue.arrayUnion(invitedUserDocId)).await()
+                return true
+            }
+        } else {
+            // 문서가 존재하지 않으면, 새로 생성하면서 초대 리스트에 추가하고 true 반환
+            scheduleDocRef.set(mapOf("scheduleInviteList" to listOf(invitedUserDocId))).await()
+            return true
+        }
+    }
+
+    // 유저 DocId 리스트로 유저 정보 가져오기
+    suspend fun fetchUserScheduleList(userDocIdList: List<String>): List<UserVO> {
+        val firestore = FirebaseFirestore.getInstance()
+        val userList = mutableListOf<UserVO>()
+        // 안전한 반복을 위해 toList()로 복사
+        for (docId in userDocIdList.toList()) {
+            try {
+                val snapshot = firestore.collection("UserData")
+                    .document(docId)
+                    .get()
+                    .await()
+                if (snapshot.exists()) {
+                    val user = snapshot.toObject(UserVO::class.java)
+                    user?.let { userList.add(it) }
+                } else {
+                    Log.d("fetchUserScheduleList", "Document $docId does not exist")
+                }
+            } catch (e: Exception) {
+                Log.e("fetchUserScheduleList", "Error fetching user for docId: $docId", e)
+            }
+        }
+        return userList
     }
 
     // 유저 일정 docId로 일정 항목 가져 오기

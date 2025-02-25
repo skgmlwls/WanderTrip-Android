@@ -13,19 +13,16 @@ import com.lion.wandertrip.presentation.schedule_select_item.roulette_item.Roule
 import com.lion.wandertrip.presentation.schedule_select_item.roulette_item.roulette_item_select.component.TripItemList
 import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 import com.lion.wandertrip.util.RouletteScreenName
+import com.lion.wandertrip.util.SharedTripItemList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RouletteItemSelectScreen(
     navController: NavHostController,
-    rouletteItemViewModel: RouletteItemViewModel = hiltViewModel(navController.getBackStackEntry(
-        "${RouletteScreenName.ROULETTE_ITEM_SCREEN.name}?" +
-                "tripScheduleDocId={tripScheduleDocId}&areaName={areaName}&areaCode={areaCode}"
-    )),
     viewModel: RouletteItemSelectViewModel = hiltViewModel()
 ) {
     // ✅ 기존 선택된 항목 유지 (State 사용)
-    var selectedItems by remember { mutableStateOf(rouletteItemViewModel.rouletteItemList.toList()) }
+    var selectedItems by remember { mutableStateOf(SharedTripItemList.rouletteItemList.toList()) }
 
     Scaffold(
         topBar = {
@@ -51,7 +48,7 @@ fun RouletteItemSelectScreen(
 
             // TripItemList 컴포넌트
             TripItemList(
-                tripItems = rouletteItemViewModel.tripItemList,
+                tripItems = SharedTripItemList.sharedTripItemList,
                 selectedItems = selectedItems,
                 onItemClick = { tripItem ->
                     selectedItems = if (selectedItems.contains(tripItem)) {
@@ -68,7 +65,7 @@ fun RouletteItemSelectScreen(
             Button(
                 onClick = {
                     // ✅ 선택된 항목을 ViewModel의 `rouletteItemList`에 저장
-                    rouletteItemViewModel.updateRouletteItemList(selectedItems)
+                    viewModel.updateRouletteItemList(selectedItems)
                     navController.popBackStack()
                 },
                 modifier = Modifier.fillMaxWidth(),

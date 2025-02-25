@@ -22,6 +22,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -30,8 +31,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.wandertrip.component.LottieLoadingIndicator
+import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.presentation.schedule_detail_page.component.ScheduleDetailDateList
 import com.lion.wandertrip.ui.theme.NanumSquareRound
+import com.lion.wandertrip.util.SharedTripItemList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,6 +53,11 @@ fun ScheduleDetailScreen(
             viewModel.getTripSchedule()
             isFirstLaunch.value = false // ✅ 이후에는 실행되지 않도록 설정
         }
+        
+        // 공공데이터 포털에서 받아온 여행지 목록 데이터 초기화
+        SharedTripItemList.sharedTripItemList.clear()
+        // ✅ 선택된 여행지 목록 (룰렛 항목) 초기화
+        SharedTripItemList.rouletteItemList.clear()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {

@@ -19,6 +19,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.checkerframework.checker.units.qual.Area
 import javax.inject.Inject
@@ -30,6 +31,8 @@ class ScheduleCitySelectViewModel @Inject constructor(
 ) : ViewModel() {
 
     val application = context as TripApplication
+
+    val isLoading = mutableStateOf(false)
     
     // 일정 모델
     val tripScheduleModel = TripScheduleModel()
@@ -128,6 +131,7 @@ class ScheduleCitySelectViewModel @Inject constructor(
         areaName: String,
         areaCode: Int
     ) {
+        isLoading.value = true
         val scheduleDateList = generateDateList(scheduleStartDate, scheduleEndDate)
         tripScheduleModel.userID = application.loginUserModel.userId
         tripScheduleModel.userNickName = application.loginUserModel.userNickName
@@ -136,8 +140,9 @@ class ScheduleCitySelectViewModel @Inject constructor(
         tripScheduleModel.scheduleStartDate = scheduleStartDate
         tripScheduleModel.scheduleEndDate = scheduleEndDate
         tripScheduleModel.scheduleDateList = scheduleDateList
-        tripScheduleModel.scheduleInviteList += application.loginUserModel.userNickName
+        tripScheduleModel.scheduleInviteList += application.loginUserModel.userDocId
 
+        Log.d("ScheduleCitySelectViewModel", "userDocId: ${application.loginUserModel.userDocId}")
 
 
         viewModelScope.launch {
@@ -154,6 +159,8 @@ class ScheduleCitySelectViewModel @Inject constructor(
                     tripScheduleModel.tripScheduleDocId
                 )
             }.await()
+
+            delay(2000)
 
             // 일정 상세 화면 으로 이동
             moveToScheduleDetailScreen(areaName, areaCode)
