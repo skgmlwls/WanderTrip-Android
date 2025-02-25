@@ -1,6 +1,7 @@
 package com.lion.wandertrip.presentation.my_interesting_page.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,17 +33,19 @@ import androidx.compose.ui.unit.sp
 import com.lion.wandertrip.R
 import com.lion.wandertrip.component.CustomRatingBar
 import com.lion.wandertrip.model.UserInterestingModel
+import com.lion.wandertrip.presentation.my_interesting_page.MyInterestingViewModel
+import com.lion.wandertrip.util.CustomFont
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 
 
 @Composable
-fun VerticalUserInterestingList(items: List<UserInterestingModel>) {
+fun VerticalUserInterestingList(viewModel : MyInterestingViewModel,items: List<UserInterestingModel>) {
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(16.dp)
     ) {
         items(items) { item ->
-            UserInterestingItem(interestingItem = item)
+            UserInterestingItem(viewModel,interestingItem = item)
             Spacer(modifier = Modifier.height(12.dp))
         }
     }
@@ -51,9 +54,11 @@ fun VerticalUserInterestingList(items: List<UserInterestingModel>) {
 
 
 @Composable
-fun UserInterestingItem(interestingItem: UserInterestingModel) {
+fun UserInterestingItem(viewModel : MyInterestingViewModel, interestingItem: UserInterestingModel) {
     Row(
-        modifier = Modifier
+        modifier = Modifier.clickable {
+            viewModel.onClickListItemToDetailScreen(interestingItem.contentID)
+        }
             .fillMaxWidth()
             .background(Color.White, RoundedCornerShape(8.dp))
             .padding(12.dp),
@@ -63,21 +68,26 @@ fun UserInterestingItem(interestingItem: UserInterestingModel) {
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            Text(text = interestingItem.contentTitle, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(text = interestingItem.contentTitle, fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = CustomFont.customFontBold)
             Spacer(modifier = Modifier.height(4.dp))
+
             CustomRatingBar(interestingItem.ratingScore)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "저장 ${interestingItem.saveCount}회", fontSize = 14.sp, color = Color.Gray)
+
+            Text(text = "저장 ${interestingItem.saveCount}회/추천 : ${interestingItem.starRatingCount}", fontSize = 14.sp, color = Color.Gray, fontFamily = CustomFont.customFontRegular)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "지역 코드: ${interestingItem.areacode}-${interestingItem.sigungucode}", fontSize = 14.sp, color = Color.Gray)
+
+            Text(text = "주소: ${interestingItem.addr1} ${interestingItem.addr2}", fontSize = 14.sp, color = Color.Gray, fontFamily = CustomFont.customFontRegular)
         }
 
         // 우측: 이미지 + 하트 아이콘
         Box(
             modifier = Modifier
-                .size(80.dp)
+                .size(80.dp).padding(start = 10.dp).fillMaxHeight()
                 .clip(RoundedCornerShape(8.dp))
-                .background(Color.LightGray),
+                .background(Color.LightGray).clickable {
+
+                },
             contentAlignment = Alignment.TopEnd
         ) {
             if (interestingItem.smallImagePath.isNotEmpty()) {

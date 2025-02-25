@@ -576,9 +576,9 @@ class Tools {
 
                     if (subAreaName != null) {
                         // 시군구 코드가 주어진 경우 해당 구 리턴
-                        "구명: $subAreaName"
+                        "$cityName $subAreaName"
                     } else {
-                        ""
+                        "$cityName 의 작은도시"
                     }
                 }
             } else {

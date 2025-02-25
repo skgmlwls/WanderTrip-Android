@@ -2,6 +2,7 @@ package com.lion.wandertrip.service
 
 import android.util.Log
 import com.lion.wandertrip.model.TripCommonItem
+import com.lion.wandertrip.model.UserInterestingModel
 import com.lion.wandertrip.repository.TripCommonItemRepository
 
 class TripCommonItemService(private val repository: TripCommonItemRepository) {
@@ -19,4 +20,13 @@ class TripCommonItemService(private val repository: TripCommonItemRepository) {
             null
         }
     }
+
+    // 사용자 관심 아이템 받아오기
+    suspend fun gettingTripItemCommonInteresting(
+        contentIdList: MutableList<String>,
+        contentTypeId: String?
+    ): MutableList<UserInterestingModel> {
+        return repository.gettingTripItemCommonInteresting(contentIdList,contentTypeId)
+    }
+
 }

@@ -1,17 +1,14 @@
 package com.lion.wandertrip.presentation.my_review_page
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.common.internal.safeparcel.SafeParcelable.Constructor
 import com.google.firebase.Timestamp
 import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.ReviewModel
-import com.lion.wandertrip.presentation.my_review_page.used_dummy_data.ReviewDummyData
 import com.lion.wandertrip.service.ContentsReviewService
 import com.lion.wandertrip.service.ContentsService
 import com.lion.wandertrip.util.MainScreenName
@@ -80,7 +77,7 @@ class MyReviewViewModel @Inject constructor(
             work1.join()
             // 컨텐츠 별점 수정
             val work2 = async(Dispatchers.IO){
-                contentsService.updateContentRating(contentDocId)
+                contentsService.updateContentRatingAndRatingCount(contentDocId)
             }
             work2.join()
             getReviewList()

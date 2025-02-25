@@ -9,6 +9,8 @@ class ContentsVO {
     var contentId: String = ""
     var ratingScore: Float = 0.0f
     var reviewList: List<ReviewVO> = emptyList()
+    var getRatingCount : Int = 0
+    var interestingCount : Int = 0
 
     fun toDetailReviewModel(): ContentsModel {
         val detailReviewModel = ContentsModel()
@@ -16,6 +18,8 @@ class ContentsVO {
         detailReviewModel.contentId = contentId
         detailReviewModel.ratingScore = ratingScore
         detailReviewModel.reviewList = reviewList.map { it.toReviewItemModel() }
+        detailReviewModel.getRatingCount =getRatingCount
+        detailReviewModel.interestingCount =interestingCount
         return detailReviewModel
     }
 }

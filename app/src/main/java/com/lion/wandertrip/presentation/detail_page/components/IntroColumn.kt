@@ -120,11 +120,13 @@ fun IntroColumn(detailViewModel: DetailViewModel, contentId : String) {
         ) {
             DetailColumnIconAndText(
                 ImageVector.vectorResource(R.drawable.ic_heart_filled_24px),
-                "저장하기"
+                "저장하기", onClick = {}
             )
             DetailColumnIconAndText(
                 ImageVector.vectorResource(R.drawable.ic_calendar_add_on_24px),
-                "일정추가"
+                "일정추가", onClick = {
+                    detailViewModel.onClickIconAddSchedule()
+                }
             )
         }
 

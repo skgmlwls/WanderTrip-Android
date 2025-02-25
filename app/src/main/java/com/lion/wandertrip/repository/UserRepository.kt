@@ -233,4 +233,35 @@ class UserRepository {
             throw e
         }
     }
+
+    // 사용자의 관심 콘텐츠 ID 리스트를 가져오는 함수
+    suspend fun gettingUserInterestingContentIdList(userDocId: String): List<String> {
+        return try {
+            val firebase = FirebaseFirestore.getInstance()
+            val contentIdList = mutableListOf<String>()
+
+            // 1. UserData 컬렉션에서 해당 userDocId 문서의 UserLikeList 서브컬렉션 접근
+            val documents = firebase.collection("UserData")
+                .document(userDocId)
+                .collection("UserLikeList")
+                .get()
+                .await() // suspend 사용 (비동기)
+
+            // 2. 모든 문서의 contentId 필드 값을 가져와 리스트에 추가
+            for (document in documents) {
+                val contentId = document.getString("contentId")
+                if (contentId != null) {
+                    contentIdList.add(contentId)
+                }
+            }
+
+            Log.d("test100", " 사용자 관심 콘텐츠 ID 리스트: $contentIdList")
+            contentIdList // 최종 리스트 반환
+
+        } catch (e: Exception) {
+            Log.e("test100", " 관심 콘텐츠 ID 가져오기 실패: $userDocId", e)
+            emptyList() // 예외 발생 시 빈 리스트 반환
+        }
+    }
+
 }

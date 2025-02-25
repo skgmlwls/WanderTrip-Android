@@ -6,8 +6,12 @@ data class UserInterestingModel(
     val contentTitle: String = "",
     val areacode: String = "",
     val sigungucode: String = "",
-    val saveCount: Int = 0,
-    val starRatingCount: Int = 0,
-    val ratingScore : Float = 0.0f,
-    val smallImagePath: String = ""
+    var saveCount: Int = 0,
+    var starRatingCount: Int = 0,
+    var ratingScore : Float = 0.0f,
+    val smallImagePath: String = "",
+    val cat2 : String = "",
+    val cat3 : String = "",
+    val addr1 : String = "",
+    val addr2 : String = "",
 )

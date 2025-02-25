@@ -39,11 +39,13 @@ data class Item(
     val tel: String?,
     val homepage: String?,
     @SerializedName("firstimage") val firstImage: String?,
-    val areaCode: String?,
+    @SerializedName("areacode")val areaCode: String?,
     @SerializedName("sigungucode") val siGunGuCode: String?,
     val addr1: String?,
     val addr2: String?,
     @SerializedName("mapx") val mapLat: String?,
     @SerializedName("mapy") val mapLng: String?,
-    val overview: String?
+    val overview: String?,
+    val cat2 : String?,
+    val cat3: String?,
 )

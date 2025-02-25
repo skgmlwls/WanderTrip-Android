@@ -144,4 +144,9 @@ class UserService (val userRepository: UserRepository) {
         val imageUri = userRepository.gettingImage(imageFileName)
         return imageUri
     }
+
+    // 사용자의 관심 콘텐츠 ID 리스트를 가져오는 함수
+    suspend fun gettingUserInterestingContentIdList(userDocId: String): List<String> {
+        return userRepository.gettingUserInterestingContentIdList(userDocId)
+    }
 }

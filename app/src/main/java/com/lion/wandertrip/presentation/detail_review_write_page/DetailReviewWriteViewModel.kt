@@ -2,11 +2,9 @@ package com.lion.wandertrip.presentation.detail_review_write_page
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lion.wandertrip.TripApplication
@@ -18,15 +16,9 @@ import com.lion.wandertrip.service.UserService
 import com.lion.wandertrip.util.Tools
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
-import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
@@ -118,7 +110,7 @@ class DetailReviewWriteViewModel @Inject constructor(
                 contentsDocId = contentsService.addContents(contents)
                 contentsReviewService.addContentsReview(contentId, review)
             }
-
+            // 컨텐츠의 별점 부분을 업데이트 한다.
             val work2 = async(Dispatchers.IO) {
                 addReviewAndUpdateContents(contentsDocId)
             }
@@ -155,7 +147,7 @@ class DetailReviewWriteViewModel @Inject constructor(
 
     // 컨텐츠 의 별점 필드 수정
     suspend fun addReviewAndUpdateContents(contentDocId:String) {
-        contentsService.updateContentRating(contentDocId)
+        contentsService.updateContentRatingAndRatingCount(contentDocId)
     }
 
 

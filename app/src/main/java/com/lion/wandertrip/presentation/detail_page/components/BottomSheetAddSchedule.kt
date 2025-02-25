@@ -70,10 +70,22 @@ fun BottomSheetAddSchedule(
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
-                    if(detailViewModel.isShownAddScheduleIconValue.value)
-                    CustomIconButton(
-                        icon = ImageVector.vectorResource(R.drawable.ic_calendar_add_on_24px),
-                        iconButtonOnClick = {})
+                    if (detailViewModel.isShownAddScheduleIconValue.value)
+                        CustomIconButton(
+                            // 일정 추가버튼
+                            icon = ImageVector.vectorResource(R.drawable.ic_calendar_add_on_24px),
+                            iconButtonOnClick = {
+                                // 클릭 인덱스
+                                detailViewModel.addSchedule(
+                                    title = schedules[detailViewModel.truedIdx.value].scheduleTitle,
+                                    tripScheduleDocId = schedules[detailViewModel.truedIdx.value].tripScheduleDocId,
+                                    contentId = detailViewModel.tripCommonContentModelValue.value.contentId?:"",
+                                    date = schedules[detailViewModel.truedIdx.value].scheduleDateList[detailViewModel.scheduleDatePickerTruedIdx.value],
+                                    type =detailViewModel.tripCommonContentModelValue.value.contentTypeId.toString(),
+                                    lat =detailViewModel.tripCommonContentModelValue.value.mapLat?.toDouble()?:0.0,
+                                    lng = detailViewModel.tripCommonContentModelValue.value.mapLng?.toDouble()?:0.0,
+                                )
+                            })
                 }
             }
 

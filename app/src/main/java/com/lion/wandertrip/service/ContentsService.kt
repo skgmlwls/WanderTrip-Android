@@ -2,7 +2,6 @@ package com.lion.wandertrip.service
 
 import com.lion.wandertrip.model.ContentsModel
 import com.lion.wandertrip.repository.ContentsRepository
-import com.lion.wandertrip.vo.ContentsVO
 
 class ContentsService(val contentsRepository: ContentsRepository) {
     // 컨텐츠 가져오는 서비스
@@ -33,8 +32,8 @@ class ContentsService(val contentsRepository: ContentsRepository) {
     }
 
     // 특정 컨텐츠의 리뷰 평점 평균을 계산하여 ContentsData 문서에 저장하고 리뷰 개수를 반환
-    suspend fun updateContentRating(contentsDocId: String): Int {
-        return contentsRepository.updateContentRating(contentsDocId)
+    suspend fun updateContentRatingAndRatingCount(contentsDocId: String): Int {
+        return contentsRepository.updateContentRatingAndRatingCount(contentsDocId)
     }
 }
 
