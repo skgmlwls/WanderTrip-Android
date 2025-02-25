@@ -193,6 +193,37 @@ class TripNoteRepository@Inject constructor() {
         return resultList
     }
 
+    suspend fun gettingTripScrapeCount(): MutableList<Map<String, *>> {
+        val firestore = FirebaseFirestore.getInstance()
+        val collectionReference = firestore.collection("TripNoteData")
+
+        // 데이터를 가져온다.
+        val result = collectionReference
+            .orderBy("tripNoteTimeStamp", Query.Direction.DESCENDING).get()
+            .await()
+
+        // 반환할 리스트
+        val resultList = mutableListOf<Map<String, *>>()
+
+        // 데이터의 수 만큼 반환한다.
+        result.forEach {
+            val tripNoteVO = it.toObject(TripNoteVO::class.java) // TripNoteVO 객체 가져오기
+            val tripNoteImage = tripNoteVO.tripNoteImage
+            val tripNoteScrapCount = it.getLong("tripNoteScrapCount")?.toInt() ?: 0 // ✅ 스크랩 수 추가
+
+            val map = mapOf(
+                "documentId" to it.id,        // 문서 ID
+                "tripNoteVO" to tripNoteVO,  // 여행기 데이터 객체
+                "tripNoteImage" to tripNoteImage, // 이미지 리스트
+                "tripNoteScrapCount" to tripNoteScrapCount // ✅ 스크랩 수 추가
+            )
+
+            resultList.add(map)
+        }
+        return resultList
+    }
+
+
     // 일정 조회 (VO 리턴)
     suspend fun getTripSchedule(docId: String): TripScheduleVO? {
         val firestore = FirebaseFirestore.getInstance()

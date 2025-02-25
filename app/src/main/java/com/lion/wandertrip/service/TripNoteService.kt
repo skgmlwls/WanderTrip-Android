@@ -107,6 +107,28 @@ class TripNoteService @Inject constructor(val tripNoteRepository: TripNoteReposi
         return tripNoteList
     }
 
+    suspend fun gettingTripNoteListWithScrapCount(): MutableList<TripNoteModel> {
+        val tripNoteList = mutableListOf<TripNoteModel>()
+        val resultList = tripNoteRepository.gettingTripNoteList()
+
+        resultList.forEach {
+            val tripNoteVO = it["tripNoteVO"] as TripNoteVO
+            val documentId = it["documentId"] as String
+            val tripNoteImage = it["tripNoteImage"] as List<String>?
+            val tripNoteScrapCount = it["tripNoteScrapCount"] as? Int ?: 0 // ✅ 스크랩 수 가져오기
+
+            val tripNoteModel = tripNoteVO.toTripNoteModel(documentId).apply {
+                this.tripNoteImage = tripNoteImage ?: emptyList()
+                this.tripNoteScrapCount = tripNoteScrapCount
+            }
+
+            tripNoteList.add(tripNoteModel)
+        }
+
+        return tripNoteList
+    }
+
+
     // 일정 담아가면 담아가기 카운트 증가시키기
     suspend fun addTripNoteScrapCount(documentId: String){
         tripNoteRepository.addTripNoteScrapCount(documentId)
