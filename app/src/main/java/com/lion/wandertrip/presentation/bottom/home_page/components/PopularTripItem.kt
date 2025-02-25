@@ -19,11 +19,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.lion.wandertrip.model.SimpleTripItemModel
+import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.util.ContentTypeId
 
 @Composable
 fun PopularTripItem(
-    tripItem: SimpleTripItemModel,
+    tripItem: TripNoteModel,
     onItemClick: () -> Unit = {}
 ) {
     Card(
@@ -40,8 +41,8 @@ fun PopularTripItem(
         ) {
             // 대표 이미지
             AsyncImage(
-                model = tripItem.contentSmallImageUri,
-                contentDescription = tripItem.title,
+                model = tripItem.tripNoteImage,
+                contentDescription = tripItem.tripNoteTitle,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp),
@@ -51,44 +52,10 @@ fun PopularTripItem(
             Column(modifier = Modifier.padding(16.dp)) {
                 // 타이틀
                 Text(
-                    text = tripItem.title,
+                    text = tripItem.tripNoteTitle,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // contentTypeID -> 텍스트 변환
-                val contentTypeText = when (tripItem.contentTypeID) {
-                    ContentTypeId.TOURIST_ATTRACTION -> "관광지"
-                    ContentTypeId.RESTAURANT -> "맛집"
-                    ContentTypeId.ACCOMMODATION -> "숙소"
-                }
-                Text(
-                    text = "카테고리: $contentTypeText",
-                    fontSize = 14.sp,
-                    color = Color.Gray
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // 지역 코드 / 시군구 코드
-                Text(
-                    text = "지역코드: ${tripItem.areaCode}, 시군구: ${tripItem.siGunGuCode}",
-                    fontSize = 14.sp,
-                    color = Color.Gray
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // 세부 카테고리 (cat2, cat3)
-                if (tripItem.cat2.isNotBlank() || tripItem.cat3.isNotBlank()) {
-                    Text(
-                        text = "세부정보: ${tripItem.cat2} / ${tripItem.cat3}",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
             }
         }
     }
