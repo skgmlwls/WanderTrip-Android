@@ -226,7 +226,7 @@ class UserRepository {
 
         try {
             val imageUri = childStorageReference.downloadUrl.await()
-            Log.d("gettingImage", "이미지 URI 가져옴: $imageUri")
+            // Log.d("gettingImage", "이미지 URI 가져옴: $imageUri")
             return imageUri
         } catch (e: Exception) {
             Log.e("gettingImage", "이미지 URI 가져오기 실패: ${e.message}")

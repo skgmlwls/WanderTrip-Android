@@ -3,13 +3,11 @@ package com.lion.wandertrip.service
 import android.graphics.Bitmap
 import android.util.Log
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.FirebaseFirestore
 import com.lion.wandertrip.model.ScheduleItem
 import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.model.TripScheduleModel
+import com.lion.wandertrip.model.UserModel
 import com.lion.wandertrip.repository.TripScheduleRepository
-import com.lion.wandertrip.vo.ScheduleItemVO
-import kotlinx.coroutines.tasks.await
 
 class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
 
@@ -23,6 +21,11 @@ class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
 
         // Repository에 VO를 넘겨서 Firestore에 저장
         return docId
+    }
+
+    // 일정 문서 id를 유저 일정 리스트에 추가
+    suspend fun addTripDocIdToUserScheduleList(userDocId: String, tripScheduleDocId: String) {
+        tripScheduleRepository.addTripDocIdToUserScheduleList(userDocId, tripScheduleDocId)
     }
 
     // 일정 조회 (Firestore → VO 변환 → Model 변환)
@@ -43,6 +46,16 @@ class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
     suspend fun addTripItemToSchedule(docId: String, scheduleDate: Timestamp, scheduleItem: ScheduleItem) {
         val scheduleItemVO = scheduleItem.toScheduleItemVO()
         tripScheduleRepository.addTripItemToSchedule(docId, scheduleDate, scheduleItemVO)
+    }
+
+    // 관심 지역 추가
+    suspend fun addLikeItem(userDocId: String, likeItemContentId: String) {
+        tripScheduleRepository.addLikeItem(userDocId, likeItemContentId)
+    }
+
+    // 관심 지역 삭제
+    suspend fun removeLikeItem(userDocId: String, likeItemContentId: String) {
+        tripScheduleRepository.removeLikeItem(userDocId, likeItemContentId)
     }
 
     // 일정 항목 삭제 후 itemIndex 재조정
@@ -70,6 +83,36 @@ class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
     // 단일 Bitmap 업로드 -> 다운 로드 URL
     suspend fun uploadBitmapListToFirebase(bitmaps: List<Bitmap>): List<String> {
         return tripScheduleRepository.uploadBitmapListToFirebase(bitmaps)
+    }
+
+    // 위치 조정한 일정 항목 업데이트
+    suspend fun updateItemsPosition(tripScheduleDocId: String, updatedItems: List<ScheduleItem>) {
+        val updatedItemsVO = updatedItems.map { it.toScheduleItemVO() }
+        tripScheduleRepository.updateItemsPosition(tripScheduleDocId, updatedItemsVO)
+    }
+
+    // 초대할 닉네임으로 유저 존재 여부 확인 후, 있으면 문서 ID 반환, 없으면 빈 문자열 반환
+    suspend fun addInviteUserByInviteNickname(scheduleDocId: String, inviteNickname: String): String {
+        val userDocId = tripScheduleRepository.addInviteUserByInviteNickname(scheduleDocId, inviteNickname)
+
+        return userDocId
+    }
+
+    // 초대한 유저 문서 Id를 데이터에 추가
+    suspend fun addInviteUserDocIdToScheduleInviteList(scheduleDocId: String, invitedUserDocId: String): Boolean {
+        return tripScheduleRepository.addInviteUserDocIdToScheduleInviteList(scheduleDocId, invitedUserDocId)
+    }
+
+    // 유저 DocId 리스트로 유저 정보 가져오기
+    suspend fun fetchUserScheduleList(userDocIdList: List<String>): List<UserModel> {
+        return tripScheduleRepository.fetchUserScheduleList(userDocIdList).map { it.toUserModel() }
+    }
+
+
+    // 유저 일정 docId로 일정 항목 가져 오기
+    suspend fun fetchScheduleList(scheduleDocId: List<String>): List<TripScheduleModel> {
+        val scheduleItemList = tripScheduleRepository.fetchScheduleList(scheduleDocId)
+        return scheduleItemList.map { it.toTripScheduleModel() }
     }
 
     // 공공 데이터 관련 ///////////////////////////////////////////////////////////////////////////////

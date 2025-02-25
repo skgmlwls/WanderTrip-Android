@@ -2,9 +2,11 @@ package com.lion.wandertrip.presentation.detail_review_write_page
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lion.wandertrip.TripApplication
@@ -16,10 +18,14 @@ import com.lion.wandertrip.service.UserService
 import com.lion.wandertrip.util.Tools
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import javax.inject.Inject
 
@@ -44,8 +50,8 @@ class DetailReviewWriteViewModel @Inject constructor(
     // 비트맵 리스트 상태 변수
     val mutableBitMapList = mutableStateListOf<Bitmap?>()
 
-    // 이미지 리스트 경로명을 담을 변수
-    val imagePathList = mutableStateListOf<String>()
+    // 로딩 변수
+    val isLoading = mutableStateOf(false)
 
 
     // 뒤로가기
@@ -53,101 +59,101 @@ class DetailReviewWriteViewModel @Inject constructor(
         tripApplication.navHostController.popBackStack()
     }
 
-    // 후기 등록 메서드
-    suspend fun addContentsReview(contentId: String): String {
-        imagePathList.clear()
+    // 올린 contents Doc Id 리턴
+    fun addContentsReview(contentId: String) {
+        viewModelScope.launch {
 
-        var contentsDocId = ""
+            val imagePathList = mutableListOf<String>()
+            val serverFilePathList = mutableListOf<String>()
+            var contentsDocId = ""
+            var imageUrlList = listOf<String>()
 
-        if (isImagePicked.value) {
-            Log.d("test100", "골랐나?")
 
-            mutableBitMapList.forEachIndexed { index, bitmap ->
-                val name = "image_${index}_${System.currentTimeMillis()}.jpg"
+            if (isImagePicked.value) {
 
-                // 이미지 저장 (파일명 일치)
-                Tools.saveBitmaps(tripApplication, bitmap!!, name)
+                // 외장 메모리에 bitmap 저장
+                mutableBitMapList.forEachIndexed { index, bitmap ->
+                    val name = "image_${index}_${System.currentTimeMillis()}.jpg"
+                    serverFilePathList.add(name)
 
-                // 저장된 파일이 존재하는지 확인
-                val savedFile = File(tripApplication.getExternalFilesDir(null), name)
-                Log.d(
-                    "checkFile",
-                    "파일 저장 확인: ${savedFile.absolutePath}, Exists: ${savedFile.exists()}"
-                )
+                    val savedFilePath = Tools.saveBitmaps(tripApplication, bitmap!!, name)
 
-                imagePathList.add(name)
+                    imagePathList.add(savedFilePath)
+                }
             }
+
+            if (isImagePicked.value) {
+                val work1 = async(Dispatchers.IO) {
+                    uploadImage(imagePathList, serverFilePathList, contentId)
+                }
+                imageUrlList = work1.await()
+            } else {
+                Log.d("addContentsReview", "이미지 선택 안 됨, 업로드 스킵")
+            }
+
+            //  업로드가 끝난 후 리뷰 데이터 저장
+
+            val review = ReviewModel().apply {
+                contentsId = contentId
+                reviewContent = reviewContentValue.value
+                reviewImageList = imageUrlList // ✅ 업로드 완료 후 URL 리스트 저장
+                reviewRatingScore = ratingScoreValue.value
+                reviewWriterNickname = tripApplication.loginUserModel.userNickName
+                reviewWriterProfileImgURl =
+                    userService.gettingImage(tripApplication.loginUserModel.userProfileImageURL)
+                        .toString()
+            }
+
+            contentsDocId = contentsService.isContentExists(contentId)
+
+            if (contentsDocId.isNotEmpty()) {
+                Log.d("addContentsReview", "기존 콘텐츠 문서 있음 - 리뷰 추가 중")
+                contentsReviewService.addContentsReview(contentId, review)
+            } else {
+                Log.d("addContentsReview", "기존 콘텐츠 문서 없음 - 새 문서 생성 후 리뷰 추가 중")
+                val contents = ContentsModel(contentId = contentId)
+                contentsDocId = contentsService.addContents(contents)
+                contentsReviewService.addContentsReview(contentId, review)
+            }
+
+            val work2 = async(Dispatchers.IO) {
+                addReviewAndUpdateContents(contentsDocId)
+            }
+            work2.join()
+
+            tripApplication.navHostController.popBackStack()
+            isLoading.value=false
         }
-
-        val review = ReviewModel()
-        review.reviewContent = reviewContentValue.value
-        review.reviewImageList = listOf()
-        review.reviewRatingScore = ratingScoreValue.value
-        review.reviewWriterNickname = tripApplication.loginUserModel.userNickName
-        review.reviewWriterProfileImgURl =
-            userService.gettingImage(tripApplication.loginUserModel.userProfileImageURL).toString()
-        review.reviewImageList = imagePathList
-
-
-
-        // 문서가 존재하면 그 문서 DocId 를 리턴함
-        contentsDocId = contentsService.isContentExists(contentId)
-
-        // 존재하면 서브컬렉션에 리뷰 추가
-        if (contentsDocId != "") {
-            contentsReviewService.addContentsReview(
-                contentsId = contentId,
-                contentsReviewModel = review
-            )
-        } else {
-            // 컨텐츠 문서가 없다면 문서를 만들고 넣는다
-            val contents = ContentsModel(
-                contentId = contentId,
-            )
-            // 컨텐츠 문서 만들고 docID 리턴받음
-            contentsDocId = contentsService.addContents(contents)
-            contentsReviewService.addContentsReview(
-                contentsId = contentId,
-                contentsReviewModel = review
-            )
-        }
-
-
-        return contentsDocId
     }
+
+
+    // url 리스트 리턴받는 메서드
+    suspend fun uploadImage(
+        sourceFilePath: List<String>,
+        serverFilePath: List<String>,
+        contentId: String
+    ): List<String> {
+        Log.d("uploadImage", "sourceFilePath: $sourceFilePath")
+        Log.d("uploadImage", "serverFilePath: $serverFilePath")
+        Log.d("uploadImage", "contentId: $contentId")
+
+        // 📌 동기적으로 업로드 실행 후 결과 반환
+        val resultUrlList = contentsReviewService.uploadReviewImageList(
+            sourceFilePath,
+            serverFilePath.toMutableList(), // `toMutableStateList()` 제거 (필요 없음)
+            contentId
+        )
+
+        Log.d("uploadImage", "업로드된 이미지 URL 리스트: $resultUrlList")
+
+        return resultUrlList ?: emptyList() // 업로드 실패 시 빈 리스트 반환
+    }
+
 
     // 컨텐츠 의 별점 필드 수정
-    fun addReviewAndUpdateContents(contentId: String) {
-
-        viewModelScope.launch {
-            val work1 = async(Dispatchers.IO) {
-
-            }
-            work1.await()
-        }
-
-        runBlocking {
-            // 리뷰 등록 메서드 호출
-            val contentDocId = addContentsReview(contentId)
-            // 위에 끝날때까지 대기
-            contentsService.updateContentRating(contentDocId)
-            tripApplication.navHostController.popBackStack()
-
-        }
+    suspend fun addReviewAndUpdateContents(contentDocId:String) {
+        contentsService.updateContentRating(contentDocId)
     }
 
-    fun uploadImageInFireStore(contentId : String) {
-        viewModelScope.launch {
-            // 병렬로 Firestore에 이미지와 사용자 데이터 업데이트
-            val filePaths = imagePathList.mapIndexed { index, path ->
-                tripApplication.getExternalFilesDir(null).toString() + "/${path}"
-            }
-            // fireStore 에 이미지 저장
-            if (isImagePicked.value) {
-                contentsReviewService.uploadReviewImage(filePaths, imagePathList, contentId)
-            }
-        }
-
-    }
 
 }

@@ -76,9 +76,9 @@ class DetailViewModel @Inject constructor(
     val isLoading = mutableStateOf(false)
 
 
-    fun setState() {
+    fun setState(value : Boolean) {
         Log.d("test100","state : $isLoading")
-        isLoading.value = true
+        isLoading.value = value
         Log.d("test100","state : $isLoading")
     }
 
@@ -343,8 +343,6 @@ class DetailViewModel @Inject constructor(
     // 리뷰 사진 관리 map
     val reviewImageUrlMap = mutableStateMapOf<Int,List<Uri>>()
 
-    // 리뷰가져오기
-    // 동기실행
     fun getReviewList() {
         reviewList.clear()
         viewModelScope.launch {
@@ -373,7 +371,6 @@ class DetailViewModel @Inject constructor(
             filteredReviewList.addAll(
                 reviewList.sortedBy { it.reviewRatingScore }
             )
-
         }
         // 별점 높은순 정렬
         else {
@@ -381,14 +378,12 @@ class DetailViewModel @Inject constructor(
                 reviewList.sortedByDescending { it.reviewRatingScore }
             )
         }
-
     }
 
     // 이미지 uri로 변경
     fun getUri(filterReviewList : MutableList<ReviewModel>) {
         // url map 초기화
         reviewImageUrlMap.clear()
-
         // 로그 추가: 함수가 호출되었는지 확인
         Log.d("getUri", "getUri() 함수 호출됨, 이미지 URL 가져오기 시작")
 
@@ -457,8 +452,21 @@ class DetailViewModel @Inject constructor(
     }
 
     // 리뷰 수정 버튼 리스너
-    fun onClickIconReviewModify(contentDocID: String, reviewDocID: String) {
-        tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_DETAIL_REVIEW_MODIFY.name}/${contentDocID}/${reviewDocID}")
+    fun onClickIconReviewModify(contentDocID: String,contentsID :String,reviewDocID: String) {
+        tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_DETAIL_REVIEW_MODIFY.name}/${contentDocID}/${contentsID}/${reviewDocID}")
+    }
+
+    // 리뷰 삭제 버튼
+    fun deleteReview(contentDocId: String, contentsReviewDocId : String) {
+        Log.d("test100","contentDocId :$contentDocId, contentsReviewDocId:$contentsReviewDocId")
+        viewModelScope.launch {
+            val work1  = async(Dispatchers.IO){
+                contentsReviewService.deleteContentsReview(contentDocId,contentsReviewDocId)
+            }
+            work1.join()
+            getReviewList()
+        }
+
     }
     // ------------------------------------------------------------------
 

@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.google.firebase.Timestamp
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.presentation.schedule_select_item.ScheduleSelectItemViewModel
@@ -30,6 +31,7 @@ import com.lion.wandertrip.presentation.schedule_select_item.roulette_item.compo
 import com.lion.wandertrip.presentation.schedule_select_item.roulette_item.component.RouletteWheelForTripItems
 import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 import com.lion.wandertrip.util.ScheduleScreenName
+import com.lion.wandertrip.util.SharedTripItemList
 import kotlinx.coroutines.launch
 import kotlin.random.Random
 
@@ -38,19 +40,19 @@ fun RouletteItemScreen(
     tripScheduleDocId : String,
     areaName: String,
     areaCode: Int,
-    navController: NavHostController,
-    scheduleSelectItemViewModel: ScheduleSelectItemViewModel = hiltViewModel(
-        navController.getBackStackEntry(
-            "${ScheduleScreenName.SCHEDULE_SELECT_ITEM_SCREEN.name}?" +
-                    "itemCode={itemCode}&areaName={areaName}&areaCode={areaCode}&scheduleDate={scheduleDate}&tripScheduleDocId={tripScheduleDocId}"
-        )
-    ),
+    scheduleDate: Timestamp,
+//    scheduleSelectItemViewModel: ScheduleSelectItemViewModel = hiltViewModel(
+//        navController.getBackStackEntry(
+//            "${ScheduleScreenName.SCHEDULE_SELECT_ITEM_SCREEN.name}?" +
+//                    "itemCode={itemCode}&areaName={areaName}&areaCode={areaCode}&scheduleDate={scheduleDate}&tripScheduleDocId={tripScheduleDocId}"
+//        )
+//    ),
     viewModel: RouletteItemViewModel = hiltViewModel(),
 ) {
     // tripItemList 초기화
     LaunchedEffect(Unit) {
         viewModel.tripItemList.clear()
-        viewModel.tripItemList.addAll(scheduleSelectItemViewModel.tripItemList)
+        viewModel.tripItemList.addAll(SharedTripItemList.sharedTripItemList)
         Log.d("RouletteItemScreen", "tripItemList 로드 완료: ${viewModel.tripItemList.size} 개 항목")
     }
 
@@ -60,7 +62,7 @@ fun RouletteItemScreen(
     var showDialog by remember { mutableStateOf(false) }
 
     // rouletteItemList가 변경될 때마다 12시 방향(회전값 0)으로 초기화
-    LaunchedEffect(viewModel.rouletteItemList) {
+    LaunchedEffect(SharedTripItemList.rouletteItemList) {
         animatedRotation.snapTo(0f)
     }
 
@@ -70,7 +72,7 @@ fun RouletteItemScreen(
             CustomTopAppBar(
                 title = "룰렛 돌리기",
                 navigationIconImage = Icons.Filled.ArrowBack,
-                navigationIconOnClick = { navController.popBackStack() }
+                navigationIconOnClick = { viewModel.application.navHostController.popBackStack() }
             )
         }
     ) { innerPadding ->
@@ -86,7 +88,7 @@ fun RouletteItemScreen(
 
                 // 룰렛
                 RouletteWheelForTripItems(
-                    items = viewModel.rouletteItemList,
+                    items = SharedTripItemList.rouletteItemList,
                     rotationAngle = animatedRotation.value
                 )
 
@@ -121,7 +123,7 @@ fun RouletteItemScreen(
 
                             // 회전 후 현재 각도를 0~360 범위로 보정
                             val finalRotation = animatedRotation.value % 360
-                            val itemCount = viewModel.rouletteItemList.size
+                            val itemCount = SharedTripItemList.rouletteItemList.size
                             val sliceAngle = if (itemCount > 0) 360f / itemCount else 360f
                             // 12시 방향(270도)을 기준으로 당첨 항목 계산
                             val selectedIndex = if (itemCount > 0)
@@ -129,14 +131,14 @@ fun RouletteItemScreen(
                             else -1
 
                             if (selectedIndex >= 0) {
-                                selectedItem = viewModel.rouletteItemList[selectedIndex]
+                                selectedItem = SharedTripItemList.rouletteItemList[selectedIndex]
                             }
                             showDialog = true
                         }
                     },
                     shape = CircleShape,
                     modifier = Modifier.padding(10.dp),
-                    enabled = viewModel.rouletteItemList.isNotEmpty()
+                    enabled = SharedTripItemList.rouletteItemList.isNotEmpty()
                 ) {
                     Text("룰렛 돌리기", fontSize = 16.sp)
                 }
@@ -171,10 +173,10 @@ fun RouletteItemScreen(
                                 showDialog = false
                                 viewModel.addTripItemToSchedule(
                                     tripItemModel = selectedItem!!,
-                                    tripScheduleDocId = scheduleSelectItemViewModel.tripScheduleDocId.value,
+                                    tripScheduleDocId = tripScheduleDocId,
                                     areaName = areaName,
                                     areaCode = areaCode,
-                                    scheduleDate = scheduleSelectItemViewModel.scheduleDate.value,
+                                    scheduleDate = scheduleDate,
                                 )
                             }
                         ) {

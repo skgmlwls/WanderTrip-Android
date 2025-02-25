@@ -282,7 +282,6 @@ fun TripNoteDetailScreen(
                 }
 
                 // 여행기 제목
-                //tripNoteDetailData?.tripNoteTitle?.let { title ->
                     item {
                         Text(
                             text = tripNoteDetailViewModel.textFieldTripNoteSubject.value,
@@ -291,7 +290,6 @@ fun TripNoteDetailScreen(
                             modifier = Modifier.padding(start = 10.dp)
                         )
                     }
-               // }
 
                 item {
                     Spacer(modifier = Modifier.height(10.dp))
@@ -342,7 +340,6 @@ fun TripNoteDetailScreen(
                         )
 
 
-                        // 빈 공간 추가 (오른쪽 정렬을 위해 Spacer 사용)
                         Spacer(modifier = Modifier.weight(1f))
 
                         // 다운로드 아이콘 (오른쪽 상단에 배치)
@@ -383,13 +380,6 @@ fun TripNoteDetailScreen(
                 // 여행 일정 리스트
                 item {
                     TripNoteScheduleList(
-//                        viewModel = tripNoteDetailViewModel,
-//                        tripSchedule = tripNoteDetailViewModel.tripScheduleDetailList,
-//                        formatTimestampToDate = { timestamp ->
-//                            tripNoteDetailViewModel.formatTimestampToDate(
-//                                timestamp
-//                            )
-//                        },
                         viewModel = tripNoteDetailViewModel,
                         tripSchedule = tripNoteDetailViewModel.tripSchedule.value,
                         formatTimestampToDate = { timestamp -> tripNoteDetailViewModel.formatTimestampToDate(timestamp) },
@@ -427,7 +417,6 @@ fun TripNoteDetailScreen(
                     TextField(
                         value = tripNoteDetailViewModel.textFieldTripNoteReply.value,
                         onValueChange = { tripNoteDetailViewModel.textFieldTripNoteReply.value = it },
-                        // label = { Text("댓글을 입력하세요") },
                         placeholder = {
                             if (tripNoteDetailViewModel.textFieldTripNoteReply.value.isEmpty()) {
                                 Text("댓글을 입력하세요",

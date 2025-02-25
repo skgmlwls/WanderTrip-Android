@@ -27,7 +27,8 @@ fun AddFriendDialog(
     nickname: String,
     onNicknameChange: (String) -> Unit,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
+    errorMessage: String = "" // 기본값은 빈 문자열
 ) {
     Dialog(onDismissRequest = onDismiss) {
         // 다이얼로그의 배경 및 모양을 위한 Surface(또는 Card) 사용
@@ -56,10 +57,21 @@ fun AddFriendDialog(
                     value = nickname,
                     onValueChange = onNicknameChange,
                     label = { Text("추가할 닉네임") },
+                    isError = errorMessage.isNotEmpty(), // 에러가 있을 경우 에러 스타일 적용
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp, horizontal = 10.dp)
                 )
+
+                // 에러 메시지 표시 (있을 경우)
+                if (errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(start = 16.dp)
+                    )
+                }
 
                 // 버튼 영역
                 Row(

@@ -87,8 +87,7 @@ fun MyApp() {
 
     NavHost(
         navController = rememberNavHostController,
-        startDestination = "${MainScreenName.MAIN_SCREEN_START.name}?" +
-                "tripScheduleDocId=jgbGuyxXMAj8nvChmAyN&areaName=서울&areaCode=1"
+        startDestination = MainScreenName.MAIN_SCREEN_START.name
     ) {
         composable(MainScreenName.MAIN_SCREEN_START.name) { StartScreen() }
         // 일정 메인 화면
@@ -174,7 +173,17 @@ fun MyApp() {
         // 일정 화면 ////////////////////////////////////////////////////////////////////////////
         
         // 일정 제목, 날짜 입력 화면
-        composable(ScheduleScreenName.SCHEDULE_ADD_SCREEN.name) { ScheduleAddScreen() }
+        // composable(ScheduleScreenName.SCHEDULE_ADD_SCREEN.name) { ScheduleAddScreen() }
+        composable(
+            route = "${ScheduleScreenName.SCHEDULE_ADD_SCREEN.name}/{documentId}"
+        ){
+            val documentId = it.arguments?.getString("documentId") ?:  ""
+
+            ScheduleAddScreen(documentId = documentId)
+        }
+
+
+
         // 내 여행 화면
         composable(MainScreenName.MAIN_SCREEN_MY_TRIP.name) { MyTripScreen() }
         // 내 저장 화면
@@ -309,17 +318,21 @@ fun MyApp() {
         // 룰렛 일정 화면
         composable(
             route = "${RouletteScreenName.ROULETTE_ITEM_SCREEN.name}?" +
-                    "tripScheduleDocId={tripScheduleDocId}&areaName={areaName}&areaCode={areaCode}",
+                    "tripScheduleDocId={tripScheduleDocId}&areaName={areaName}&areaCode={areaCode}&scheduleDate={scheduleDate}",
             arguments = listOf(
                 navArgument("tripScheduleDocId") { type = NavType.StringType },
                 navArgument("areaName") { type = NavType.StringType },
-                navArgument("areaCode") { type = NavType.LongType }
+                navArgument("areaCode") { type = NavType.LongType },
+                navArgument("scheduleDate") { type = NavType.LongType }
             )
         ) {
             val tripScheduleDocId = it.arguments?.getString("tripScheduleDocId") ?: ""
             val areaName = it.arguments?.getString("areaName") ?: ""
             val areaCode = it.arguments?.getInt("areaCode") ?: 0
-            RouletteItemScreen(tripScheduleDocId, areaName, areaCode,navController = rememberNavHostController)
+            val scheduleDateTemp = it.arguments?.getLong("scheduleDate") ?: 0L
+            val scheduleDate = Timestamp(scheduleDateTemp, 0)
+
+            RouletteItemScreen(tripScheduleDocId, areaName, areaCode, scheduleDate)
         }
 
         // 룰렛 일정 항목 선택 화면
@@ -341,16 +354,18 @@ fun MyApp() {
         }
         // 리뷰 수정 화면
         composable(
-            route = "${MainScreenName.MAIN_SCREEN_DETAIL_REVIEW_MODIFY.name}/{contentDocID}/{reviewDocID}",
+            route = "${MainScreenName.MAIN_SCREEN_DETAIL_REVIEW_MODIFY.name}/{contentDocID}/{contentsID}/{reviewDocID}",
             arguments = listOf(
                 navArgument("contentDocID") { type = NavType.StringType },
+                navArgument("contentsID") { type = NavType.StringType },
                 navArgument("reviewDocID") { type = NavType.StringType }
             )
         ) { backStackEntry ->
             val contentDocID = backStackEntry.arguments?.getString("contentDocID") ?: ""
+            val contentsID = backStackEntry.arguments?.getString("contentsID") ?: ""
             val reviewDocID = backStackEntry.arguments?.getString("reviewDocID") ?: ""
 
-            DetailReviewModifyScreen(contentDocID = contentDocID, reviewDocID = reviewDocID)
+            DetailReviewModifyScreen(contentDocID = contentDocID, contentsID = contentsID, reviewDocID = reviewDocID)
         }
 
     }
