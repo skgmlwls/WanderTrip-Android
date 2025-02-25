@@ -86,6 +86,140 @@ class ScheduleAddViewModel @Inject constructor(
     }
 
 
+//    fun goScheduleTitleButtonClick(
+//        tripNoteScheduleDocId: String
+//    ) {
+//        val firestore = FirebaseFirestore.getInstance()
+//        val tripNoteScheduleRef = firestore.collection("TripSchedule").document(tripNoteScheduleDocId)
+//
+//        tripNoteScheduleRef.get().addOnSuccessListener { originalScheduleDoc ->
+//            if (!originalScheduleDoc.exists()) {
+//                Log.e("Firestore", "❌ 원본 일정 문서를 찾을 수 없음.")
+//                return@addOnSuccessListener
+//            }
+//
+//            // 원본 일정에서 scheduleCity와 날짜 값 가져오기
+//            val scheduleCity = originalScheduleDoc.getString("scheduleCity") ?: return@addOnSuccessListener
+//            val originalStartDate = (originalScheduleDoc.get("scheduleStartDate") as? Timestamp)?.seconds ?: return@addOnSuccessListener
+//            val originalEndDate = (originalScheduleDoc.get("scheduleEndDate") as? Timestamp)?.seconds ?: return@addOnSuccessListener
+//
+//            val scheduleDateList = generateDateRangeList(scheduleStartDate.value, scheduleEndDate.value)
+//
+//            // scheduleCity 값에 해당하는 areaCode를 찾는 방법
+//            areaCode = AreaCode.values().find { it.areaName == scheduleCity }?.areaCode!!
+//
+//            // 새 문서 데이터 생성 (scheduleStartDate: 1월 1일, scheduleEndDate: 1월 2일)
+//            val newScheduleDocData = hashMapOf(
+//                "scheduleCity" to scheduleCity,
+//                "scheduleStartDate" to scheduleStartDate.value,
+//                "scheduleEndDate" to scheduleEndDate.value,
+//                "scheduleDateList" to scheduleDateList,
+//                "scheduleState" to 1,
+//                "scheduleTimeStamp" to Timestamp.now(),
+//                "scheduleTitle" to scheduleTitle.value,
+//                "userID" to application.loginUserModel.userId,
+//                "userNickName" to application.loginUserModel.userNickName,
+////                "scheduleInviteList" to listOf(application.loginUserModel.userNickName),
+//                "scheduleInviteList" to listOf(application.loginUserModel.userDocId),
+//                "scheduleItems" to emptyList<Any>()
+//            )
+//
+//            // TripSchedule 컬렉션에 새 문서 추가
+//            firestore.collection("TripSchedule").add(newScheduleDocData)
+//                .addOnSuccessListener { newScheduleDoc ->
+//                    // 새로 생성된 문서의 tripScheduleDocId 필드에 문서 ID 추가
+//                    val newScheduleRef = firestore.collection("TripSchedule").document(newScheduleDoc.id)
+//                    newScheduleRef.update("tripScheduleDocId", newScheduleDoc.id)
+//                        .addOnSuccessListener {
+//                            Log.d("Firestore", "✅ 새 일정 문서 생성 완료: ${newScheduleDoc.id}")
+//                        }
+//                        .addOnFailureListener { e ->
+//                            Log.e("Firestore", "❌ tripScheduleDocId 업데이트 실패", e)
+//                        }
+//
+//                    newScheduleDocId = newScheduleDoc.id
+//                    Log.d("Firestore", "✅ 새 일정 문서 ID: $newScheduleDocId")
+//
+//
+//                    // 기존 일정의 아이템들 날짜 조정 작업
+//                    tripNoteScheduleRef.collection("TripScheduleItem").get().addOnSuccessListener { snapshot ->
+//                        snapshot.documents.forEach { document ->
+//                            val itemData = document.data?.toMutableMap() ?: return@forEach
+//                            val itemDate = (itemData["itemDate"] as? Timestamp)?.seconds ?: return@forEach
+//
+//
+//                            // 기존 값 제거
+//                            // itemData.remove("itemDocId")
+//
+//                            // 날짜 변환: 원본 일정의 itemDate를 새 일정에 맞게 변환
+//                            val adjustedItemDate = getAdjustedItemDate(originalStartDate, originalEndDate, itemDate, scheduleStartDate.value.seconds, scheduleEndDate.value.seconds)
+//
+//                            // 날짜만 추출
+//                            val adjustedItemDateOnly = getDateOnly(adjustedItemDate)
+//
+//                            // 새 일정에 맞춰서 추가 작업 진행
+//                            itemData["itemDate"] = Timestamp(adjustedItemDateOnly, 0)
+//
+//
+//
+//                            // 새 일정의 TripScheduleItem에 아이템 추가
+//                            newScheduleRef.collection("TripScheduleItem").add(itemData)
+//                                .addOnSuccessListener { newItemDoc ->
+//                                    // TripScheduleItem 서브컬렉션의 문서 ID를 itemDocId 필드에 넣기
+//                                    newItemDoc.update("itemDocId", newItemDoc.id)
+//                                        .addOnSuccessListener {
+//                                            Log.d("Firestore", "✅ 아이템 문서 ID 업데이트 완료: ${newItemDoc.id}")
+//                                        }
+//                                        .addOnFailureListener { e ->
+//                                            Log.e("Firestore", "❌ 아이템 문서 ID 업데이트 실패", e)
+//                                        }
+//                                    Log.d("Firestore", "✅ 새 일정 아이템 추가 완료: ${newItemDoc.id}")
+//                                }
+//                                .addOnFailureListener { e ->
+//                                    Log.e("Firestore", "❌ 새 일정 아이템 추가 실패", e)
+//                                }
+//                        }
+//                    }
+//
+//                    // ✅ UserData 컬렉션에서 userDocId에 해당하는 문서를 찾아 userScheduleList 업데이트
+//                    val userDocRef = firestore.collection("UserData").document(application.loginUserModel.userDocId)
+//
+//                    userDocRef.get().addOnSuccessListener { userDoc ->
+//                        if (userDoc.exists()) {
+//                            val userScheduleList = (userDoc.get("userScheduleList") as? MutableList<String>) ?: mutableListOf()
+//                            userScheduleList.add(newScheduleDocId)
+//
+//                            userDocRef.update("userScheduleList", userScheduleList)
+//                                .addOnSuccessListener {
+//                                    Log.d("Firestore", "✅ userScheduleList 업데이트 완료")
+//                                }
+//                                .addOnFailureListener { e ->
+//                                    Log.e("Firestore", "❌ userScheduleList 업데이트 실패", e)
+//                                }
+//                        }
+//                    }.addOnFailureListener { e ->
+//                        Log.e("Firestore", "❌ UserData 문서 조회 실패", e)
+//                    }
+//
+//                    application.navHostController.popBackStack()
+//                    // 일정 상세 화면으로 이동 - newScheduleDoc.id(새로 만들어진 일정 문서 id) 전달
+//                    application.navHostController.navigate(
+//                        "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
+//                                "tripScheduleDocId=${newScheduleDocId}&areaName=${scheduleCity}&areaCode=${areaCode}"
+//
+//                    )
+//                    Log.d("Schedule", "지역 이름: $scheduleCity, 지역 코드: $areaCode")
+//
+//
+//                }
+//                .addOnFailureListener { e ->
+//                    Log.e("Firestore", "❌ 새 일정 문서 생성 실패", e)
+//                }
+//
+//        }
+//
+//    }
+
     fun goScheduleTitleButtonClick(
         tripNoteScheduleDocId: String
     ) {
@@ -108,7 +242,7 @@ class ScheduleAddViewModel @Inject constructor(
             // scheduleCity 값에 해당하는 areaCode를 찾는 방법
             areaCode = AreaCode.values().find { it.areaName == scheduleCity }?.areaCode!!
 
-            // 새 문서 데이터 생성 (scheduleStartDate: 1월 1일, scheduleEndDate: 1월 2일)
+            // 새 문서 데이터 생성
             val newScheduleDocData = hashMapOf(
                 "scheduleCity" to scheduleCity,
                 "scheduleStartDate" to scheduleStartDate.value,
@@ -119,7 +253,6 @@ class ScheduleAddViewModel @Inject constructor(
                 "scheduleTitle" to scheduleTitle.value,
                 "userID" to application.loginUserModel.userId,
                 "userNickName" to application.loginUserModel.userNickName,
-//                "scheduleInviteList" to listOf(application.loginUserModel.userNickName),
                 "scheduleInviteList" to listOf(application.loginUserModel.userDocId),
                 "scheduleItems" to emptyList<Any>()
             )
@@ -127,7 +260,6 @@ class ScheduleAddViewModel @Inject constructor(
             // TripSchedule 컬렉션에 새 문서 추가
             firestore.collection("TripSchedule").add(newScheduleDocData)
                 .addOnSuccessListener { newScheduleDoc ->
-                    // 새로 생성된 문서의 tripScheduleDocId 필드에 문서 ID 추가
                     val newScheduleRef = firestore.collection("TripSchedule").document(newScheduleDoc.id)
                     newScheduleRef.update("tripScheduleDocId", newScheduleDoc.id)
                         .addOnSuccessListener {
@@ -140,48 +272,62 @@ class ScheduleAddViewModel @Inject constructor(
                     newScheduleDocId = newScheduleDoc.id
                     Log.d("Firestore", "✅ 새 일정 문서 ID: $newScheduleDocId")
 
-
                     // 기존 일정의 아이템들 날짜 조정 작업
                     tripNoteScheduleRef.collection("TripScheduleItem").get().addOnSuccessListener { snapshot ->
-                        snapshot.documents.forEach { document ->
-                            val itemData = document.data?.toMutableMap() ?: return@forEach
-                            val itemDate = (itemData["itemDate"] as? Timestamp)?.seconds ?: return@forEach
+                        val adjustedItems = snapshot.documents
+                            .mapNotNull { it.data?.toMutableMap() }
+                            .map { item ->
+                                val itemDate = (item["itemDate"] as? Timestamp)?.seconds ?: return@map null
 
+                                // 날짜 변환: 원본 일정의 itemDate를 새 일정에 맞게 변환
+                                val adjustedItemDate = getAdjustedItemDate(
+                                    originalStartDate,
+                                    originalEndDate,
+                                    itemDate,
+                                    scheduleStartDate.value.seconds,
+                                    scheduleEndDate.value.seconds
+                                )
 
-                            // 기존 값 제거
-                            // itemData.remove("itemDocId")
+                                // 날짜만 추출
+                                val adjustedItemDateOnly = getDateOnly(adjustedItemDate)
 
-                            // 날짜 변환: 원본 일정의 itemDate를 새 일정에 맞게 변환
-                            val adjustedItemDate = getAdjustedItemDate(originalStartDate, originalEndDate, itemDate, scheduleStartDate.value.seconds, scheduleEndDate.value.seconds)
+                                // 변환된 날짜 추가
+                                item["itemDate"] = Timestamp(adjustedItemDateOnly, 0)
 
-                            // 날짜만 추출
-                            val adjustedItemDateOnly = getDateOnly(adjustedItemDate)
+                                item // 변환된 아이템 반환
+                            }
+                            .filterNotNull()
 
-                            // 새 일정에 맞춰서 추가 작업 진행
-                            itemData["itemDate"] = Timestamp(adjustedItemDateOnly, 0)
+                        // 날짜 기준으로 그룹화
+                        val groupedItems = adjustedItems.groupBy { (it["itemDate"] as? Timestamp)?.seconds }
 
-                            // 새 일정의 TripScheduleItem에 아이템 추가
-                            newScheduleRef.collection("TripScheduleItem").add(itemData)
-                                .addOnSuccessListener { newItemDoc ->
-                                    // TripScheduleItem 서브컬렉션의 문서 ID를 itemDocId 필드에 넣기
-                                    newItemDoc.update("itemDocId", newItemDoc.id)
-                                        .addOnSuccessListener {
-                                            Log.d("Firestore", "✅ 아이템 문서 ID 업데이트 완료: ${newItemDoc.id}")
-                                        }
-                                        .addOnFailureListener { e ->
-                                            Log.e("Firestore", "❌ 아이템 문서 ID 업데이트 실패", e)
-                                        }
-                                    Log.d("Firestore", "✅ 새 일정 아이템 추가 완료: ${newItemDoc.id}")
-                                }
-                                .addOnFailureListener { e ->
-                                    Log.e("Firestore", "❌ 새 일정 아이템 추가 실패", e)
-                                }
+                        // 각 그룹에 대해 인덱스 부여
+                        groupedItems.forEach { (itemDate, items) ->
+                            items.forEachIndexed { index, item ->
+                                // itemIndex를 1부터 시작하여 부여
+                                item["itemIndex"] = index + 1
+
+                                // 새 일정의 TripScheduleItem에 아이템 추가
+                                newScheduleRef.collection("TripScheduleItem").add(item)
+                                    .addOnSuccessListener { newItemDoc ->
+                                        newItemDoc.update("itemDocId", newItemDoc.id)
+                                            .addOnSuccessListener {
+                                                Log.d("Firestore", "✅ 아이템 문서 ID 업데이트 완료: ${newItemDoc.id}")
+                                            }
+                                            .addOnFailureListener { e ->
+                                                Log.e("Firestore", "❌ 아이템 문서 ID 업데이트 실패", e)
+                                            }
+                                        Log.d("Firestore", "✅ 새 일정 아이템 추가 완료: ${newItemDoc.id}")
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Log.e("Firestore", "❌ 새 일정 아이템 추가 실패", e)
+                                    }
+                            }
                         }
                     }
 
                     // ✅ UserData 컬렉션에서 userDocId에 해당하는 문서를 찾아 userScheduleList 업데이트
                     val userDocRef = firestore.collection("UserData").document(application.loginUserModel.userDocId)
-
                     userDocRef.get().addOnSuccessListener { userDoc ->
                         if (userDoc.exists()) {
                             val userScheduleList = (userDoc.get("userScheduleList") as? MutableList<String>) ?: mutableListOf()
@@ -200,23 +346,18 @@ class ScheduleAddViewModel @Inject constructor(
                     }
 
                     application.navHostController.popBackStack()
-                    // 일정 상세 화면으로 이동 - newScheduleDoc.id(새로 만들어진 일정 문서 id) 전달
                     application.navHostController.navigate(
                         "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
                                 "tripScheduleDocId=${newScheduleDocId}&areaName=${scheduleCity}&areaCode=${areaCode}"
-
                     )
                     Log.d("Schedule", "지역 이름: $scheduleCity, 지역 코드: $areaCode")
-
-
                 }
                 .addOnFailureListener { e ->
                     Log.e("Firestore", "❌ 새 일정 문서 생성 실패", e)
                 }
-
         }
-
     }
+
 
     // 날짜 변환 함수
     fun getAdjustedItemDate(
