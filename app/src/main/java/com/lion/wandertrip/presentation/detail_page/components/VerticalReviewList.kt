@@ -167,18 +167,8 @@ fun ReviewItem(reviewModel: ReviewModel, detailViewModel: DetailViewModel, pos: 
         // 좋아요 및 댓글 아이콘, 날짜 및 메뉴 아이콘
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+             horizontalArrangement = Arrangement.End
         ) {
-            Row {
-                Icon(Icons.Default.FavoriteBorder, contentDescription = "좋아요")
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(text = "3")
-                Spacer(modifier = Modifier.width(16.dp))
-                Icon(Icons.Default.ChatBubbleOutline, contentDescription = "채팅")
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(text = "5")
-            }
-
             // 날짜
             Text(text = detailViewModel.convertToDate(reviewModel.reviewTimeStamp), color = Color.Gray)
         }

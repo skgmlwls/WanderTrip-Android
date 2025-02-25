@@ -4,7 +4,6 @@ import android.net.Uri
 import android.util.Log
 import com.lion.wandertrip.model.ReviewModel
 import com.lion.wandertrip.repository.ContentsReviewRepository
-import com.lion.wandertrip.vo.ReviewVO
 
 class ContentsReviewService(val contentsReviewRepository: ContentsReviewRepository) {
 
@@ -121,5 +120,36 @@ class ContentsReviewService(val contentsReviewRepository: ContentsReviewReposito
     suspend fun deleteContentsReview(contentsDocId: String, contentsReviewDocId: String) {
         contentsReviewRepository.deleteContentsReview(contentsDocId,contentsReviewDocId)
     }
+
+    // 해당 컨텐츠에 리뷰 문서 개수 리턴받기
+    suspend fun getAllReviewsCountWithContents(contentID: String): Int {
+        Log.d("test100","getAllReviewsCountWithContents")
+        return try {
+            Log.d("test100", "📌 리뷰 개수 조회 시작: contentsDocId = $contentID")
+
+            // 컨텐츠에 관련된 모든 리뷰를 가져옴
+            val voList = contentsReviewRepository.getAllReviewsWithContents(contentID)
+
+            // 가져온 리스트가 null이 아닌지 확인
+            Log.d("test100", "📌 가져온 리뷰 리스트: $voList")
+
+            // 리스트 개수 확인 후 리턴
+            val count = voList.size
+            Log.d("test100", "✅ 리뷰 개수: $count")
+
+            count
+        } catch (e: Exception) {
+            // 예외 발생 시 오류 로그 출력
+            Log.e("test100", "❌ 모든 리뷰 문서 가져오기 실패: $contentID", e)
+            0 // 예외 발생 시 0 반환
+        }
+    }
+
+    //닉네임 바꿀 때 사용하기
+    // 닉변 전 게시물의 닉네임을 변경한 닉네임으로 update
+    suspend fun changeReviewNickName(oldNickName: String, newNickName: String) {
+        contentsReviewRepository.changeReviewNickName(oldNickName,newNickName)
+    }
+
 
 }

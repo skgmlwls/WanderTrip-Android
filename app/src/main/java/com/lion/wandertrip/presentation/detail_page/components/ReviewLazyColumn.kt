@@ -27,7 +27,7 @@ import com.lion.wandertrip.presentation.detail_page.DetailViewModel
 @Composable
 fun ReviewLazyColumn(detailViewModel: DetailViewModel) {
     val sh = detailViewModel.tripApplication.screenHeight
-    val contentModel = detailViewModel.contentModelValue.value
+    val contentModel = detailViewModel.tripCommonContentModelValue.value
     LaunchedEffect(Unit) {
         Log.d("test100","unit")
         detailViewModel.setState(true)

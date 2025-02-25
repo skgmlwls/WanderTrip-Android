@@ -206,30 +206,42 @@ suspend fun modifyContentsReview(contentsDocId: String, reviewVO: ReviewVO): Boo
 }
 
 
-    /*
         //닉네임 바꿀 때 사용하기
         // 닉변 전 게시물의 닉네임을 변경한 닉네임으로 update
         suspend fun changeReviewNickName(oldNickName: String, newNickName: String) {
             val firestore = FirebaseFirestore.getInstance()
-            val collRef = firestore.collection("TripSchedule")
+            val collRef = firestore.collection("ContentsData")
 
             try {
-                val querySnapshot = collRef.whereEqualTo("userNickName", oldNickName).get().await()
+                Log.d("test100", "📌 닉네임 변경 시작: $oldNickName → $newNickName")
 
-                if (querySnapshot.isEmpty) {
-                    Log.d("test100", "변경할 닉네임($oldNickName)이 존재하지 않습니다.")
-                    return
+                // 1. 모든 ContentsData 컬렉션의 문서 가져오기
+                val contentsDocs = collRef.get().await()
+
+                for (contentDoc in contentsDocs) {
+                    val contentId = contentDoc.id
+                    Log.d("test100", "📌 현재 탐색 중인 문서 ID: $contentId")
+
+                    // 2. 해당 문서의 ContentsReview 서브컬렉션 접근
+                    val reviewCollectionRef = collRef.document(contentId).collection("ContentsReview")
+                    val reviews = reviewCollectionRef.whereEqualTo("reviewWriterNickname", oldNickName).get().await()
+
+                    for (reviewDoc in reviews) {
+                        val reviewId = reviewDoc.id
+                        Log.d("test100", "🔄 닉네임 변경할 리뷰 ID: $reviewId")
+
+                        // 3. reviewWriterNickname 필드를 새로운 닉네임으로 업데이트
+                        reviewCollectionRef.document(reviewId).update("reviewWriterNickname", newNickName).await()
+                        Log.d("test100", "✅ 닉네임 변경 완료: $reviewId")
+                    }
                 }
 
-                for (document in querySnapshot.documents) {
-                    val docRef = collRef.document(document.id)
-                    docRef.update("userNickName", newNickName).await()
-                }
+                Log.d("test100", "🎉 닉네임 변경 완료: $oldNickName → $newNickName")
             } catch (e: Exception) {
-                Log.e("test100", "닉네임 변경 중 오류 발생: $e", e)
+                Log.e("test100", "❌ 닉네임 변경 실패: $oldNickName → $newNickName", e)
             }
         }
-    */
+
 
     // 이미지 데이터를 서버로 업로드 하는 메서드
     suspend fun uploadReviewImageList(

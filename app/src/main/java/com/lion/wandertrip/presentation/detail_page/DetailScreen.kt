@@ -3,7 +3,6 @@ package com.lion.wandertrip.presentation.detail_page
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,11 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +31,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.a02_boardcloneproject.component.CustomIconButton
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.wandertrip.R
-import com.lion.wandertrip.component.LottieLoadingIndicator
 import com.lion.wandertrip.presentation.detail_page.components.BasicInfoDescriptionColumn
 import com.lion.wandertrip.presentation.detail_page.components.BottomSheetAddSchedule
 import com.lion.wandertrip.presentation.detail_page.components.BottomSheetReviewFilter
@@ -50,7 +46,7 @@ import com.lion.wandertrip.util.CustomFont
 fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewModel()) {
     Log.d("test", "contentID : $contentID")
     LaunchedEffect(Unit) {
-        detailViewModel.getContentModel(contentID)
+        detailViewModel.getCommonTripContentModel(contentID)
     }
     Scaffold(
         topBar = {
@@ -123,7 +119,7 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
             // 뷰페이저 항목
             if (detailViewModel.isClickIntroState.value)
             // 소개 페이지
-                item { IntroColumn(detailViewModel) }
+                item { IntroColumn(detailViewModel,contentID) }
             if (detailViewModel.isClickBasicInfoState.value)
                 item {
                     // 기본 정보 페이지

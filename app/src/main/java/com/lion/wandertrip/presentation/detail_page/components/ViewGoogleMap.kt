@@ -1,27 +1,17 @@
 package com.lion.wandertrip.presentation.detail_page.components
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -61,7 +51,7 @@ fun ViewGoogleMap(detailViewModel: DetailViewModel) {
         // 권한이 있을 경우 GoogleMap 표시
 
     // 권한을 사용하지 않아서 위 코드 전부 주석처리함 내위치 사용하지않아 권한 필요없음
-        val contentModel = detailViewModel.contentModelValue.value
+        val contentModel = detailViewModel.tripCommonContentModelValue.value
         val lat = contentModel.mapLat
         val long = contentModel.mapLng
 

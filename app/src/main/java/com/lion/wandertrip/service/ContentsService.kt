@@ -11,6 +11,11 @@ class ContentsService(val contentsRepository: ContentsRepository) {
         return contentsVO.toDetailReviewModel() // 변환 후 반환
     }
 
+    // 컨텐츠 가져오기 contentsID로
+    suspend fun getContentByContentsId(contentsId: String): ContentsModel {
+        return contentsRepository.getContentByContentsId(contentsId).toDetailReviewModel()
+    }
+
     // 컨텐츠 넣기
     suspend fun addContents(contentModel: ContentsModel): String {
         return contentsRepository.addContents(contentModel.toDetailReviewVO())

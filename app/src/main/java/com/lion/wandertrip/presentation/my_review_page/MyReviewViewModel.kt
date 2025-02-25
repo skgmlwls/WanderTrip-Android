@@ -13,6 +13,7 @@ import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.ReviewModel
 import com.lion.wandertrip.presentation.my_review_page.used_dummy_data.ReviewDummyData
 import com.lion.wandertrip.service.ContentsReviewService
+import com.lion.wandertrip.service.ContentsService
 import com.lion.wandertrip.util.MainScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -28,7 +29,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MyReviewViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    val contentsReviewService: ContentsReviewService
+    val contentsReviewService: ContentsReviewService,
+    val contentsService : ContentsService,
 ) : ViewModel() {
     val reviewList = mutableStateListOf<ReviewModel>()
 
@@ -76,6 +78,11 @@ class MyReviewViewModel @Inject constructor(
                 contentsReviewService.deleteContentsReview(contentDocId,contentsReviewDocId)
             }
             work1.join()
+            // 컨텐츠 별점 수정
+            val work2 = async(Dispatchers.IO){
+                contentsService.updateContentRating(contentDocId)
+            }
+            work2.join()
             getReviewList()
         }
     }
