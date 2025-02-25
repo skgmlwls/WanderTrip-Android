@@ -81,38 +81,6 @@ class TripNoteDetailViewModel @Inject constructor(
 
     val isLoading = mutableStateOf(false) // ✅ 로딩 상태 추가
 
-//    // 일정 상세 정보 가져오기
-//    fun getTripSchedule() {
-//        viewModelScope.launch {
-//
-//            isLoading.value = true // ✅ 로딩 시작
-//
-//            val work1 = async(Dispatchers.IO) {
-//                tripScheduleService.getTripSchedule(textFieldTripNoteScheduleDocId.value)
-//            }.await()
-//
-//            if (work1 != null) {
-//                tripSchedule.value = work1
-//            } else {
-//                Log.d("ScheduleViewModel", "해당 문서가 없습니다.")
-//            }
-//
-//            val work2 = async(Dispatchers.IO) {
-//                tripScheduleService.getTripScheduleItems(textFieldTripNoteScheduleDocId.value)
-//            }.await()
-//
-//            if (work2 != null) {
-//                tripScheduleItems.clear()
-//                tripScheduleItems.addAll(work2)
-//            } else {
-//                Log.d("ScheduleViewModel", "해당 문서가 없습니다.")
-//            }
-//
-//            isLoading.value = false // ✅ 로딩 완료
-//
-//
-//        }
-//    }
 
     // 일정 상세 정보 가져오기
     fun getTripSchedule() {
@@ -146,11 +114,8 @@ class TripNoteDetailViewModel @Inject constructor(
 
 
 
-
-
-
     var tripNoteDetailList = mutableStateListOf<TripNoteModel>()
-    //var tripNoteReplyList = mutableStateListOf<TripNoteReplyModel>()
+
 
 
     val areaName = mutableStateOf("")

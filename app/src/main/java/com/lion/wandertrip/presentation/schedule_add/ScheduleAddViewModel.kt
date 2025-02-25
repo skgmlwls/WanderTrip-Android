@@ -118,7 +118,10 @@ class ScheduleAddViewModel @Inject constructor(
                 "scheduleTimeStamp" to Timestamp.now(),
                 "scheduleTitle" to scheduleTitle.value,
                 "userID" to application.loginUserModel.userId,
-                "userNickName" to application.loginUserModel.userNickName
+                "userNickName" to application.loginUserModel.userNickName,
+//                "scheduleInviteList" to listOf(application.loginUserModel.userNickName),
+                "scheduleInviteList" to listOf(application.loginUserModel.userDocId),
+                "scheduleItems" to emptyList<Any>()
             )
 
             // TripSchedule 컬렉션에 새 문서 추가
@@ -143,6 +146,10 @@ class ScheduleAddViewModel @Inject constructor(
                         snapshot.documents.forEach { document ->
                             val itemData = document.data?.toMutableMap() ?: return@forEach
                             val itemDate = (itemData["itemDate"] as? Timestamp)?.seconds ?: return@forEach
+
+
+                            // 기존 값 제거
+                            // itemData.remove("itemDocId")
 
                             // 날짜 변환: 원본 일정의 itemDate를 새 일정에 맞게 변환
                             val adjustedItemDate = getAdjustedItemDate(originalStartDate, originalEndDate, itemDate, scheduleStartDate.value.seconds, scheduleEndDate.value.seconds)
@@ -172,6 +179,27 @@ class ScheduleAddViewModel @Inject constructor(
                         }
                     }
 
+                    // ✅ UserData 컬렉션에서 userDocId에 해당하는 문서를 찾아 userScheduleList 업데이트
+                    val userDocRef = firestore.collection("UserData").document(application.loginUserModel.userDocId)
+
+                    userDocRef.get().addOnSuccessListener { userDoc ->
+                        if (userDoc.exists()) {
+                            val userScheduleList = (userDoc.get("userScheduleList") as? MutableList<String>) ?: mutableListOf()
+                            userScheduleList.add(newScheduleDocId)
+
+                            userDocRef.update("userScheduleList", userScheduleList)
+                                .addOnSuccessListener {
+                                    Log.d("Firestore", "✅ userScheduleList 업데이트 완료")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e("Firestore", "❌ userScheduleList 업데이트 실패", e)
+                                }
+                        }
+                    }.addOnFailureListener { e ->
+                        Log.e("Firestore", "❌ UserData 문서 조회 실패", e)
+                    }
+
+                    application.navHostController.popBackStack()
                     // 일정 상세 화면으로 이동 - newScheduleDoc.id(새로 만들어진 일정 문서 id) 전달
                     application.navHostController.navigate(
                         "${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +

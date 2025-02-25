@@ -1,6 +1,7 @@
 package com.lion.wandertrip.presentation.trip_note_detail_page.component
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Divider
@@ -30,7 +32,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -158,9 +162,11 @@ fun TripNoteScheduleList(
                                             AsyncImage(
                                                 model = imageUrl,
                                                 contentDescription = "Review Image",
+                                                contentScale = ContentScale.Crop,
                                                 modifier = Modifier
-                                                    .size(100.dp)
-                                                    .padding(start = 5.dp, end = 8.dp)
+                                                    .size(90.dp)
+                                                    .padding(start = 5.dp, end = 2.dp, bottom = 3.dp, top = 3.dp)
+                                                    .clip(RoundedCornerShape(12.dp))
                                             )
                                         }
                                     }

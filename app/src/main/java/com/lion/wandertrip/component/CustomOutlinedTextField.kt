@@ -58,7 +58,8 @@ fun CustomOutlinedTextField(
     // 만약 입력에 대한 검사를 체크하는 기능이 필요하다면
     isCheckValue:MutableState<Boolean>? = null,
     // 텍스트 필드 너비
-    width: Dp? = null // 너비를 입력받는 파라미터
+    width: Dp? = null, // 너비를 입력받는 파라미터
+    minLines: Int = 1,
 ) {
 
     // 비밀번호가 보이는지...
@@ -162,6 +163,7 @@ fun CustomOutlinedTextField(
             null
         },
         isError = isError.value,
+        minLines = minLines
     )
 }
 
