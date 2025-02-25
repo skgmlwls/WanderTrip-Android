@@ -1,6 +1,6 @@
 package com.lion.wandertrip.presentation.detail_page.components
 
-import androidx.compose.foundation.Image
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,13 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Save
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,28 +25,32 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lion.wandertrip.R
 import com.lion.wandertrip.component.CustomRatingBar
 import com.lion.wandertrip.presentation.detail_page.DetailViewModel
-import com.lion.wandertrip.ui.theme.wanderBlueColor
 import com.lion.wandertrip.util.CustomFont
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
-fun IntroColumn(detailViewModel: DetailViewModel) {
+fun IntroColumn(detailViewModel: DetailViewModel, contentId : String) {
+    Log.d("test100","contentId")
     val sw = detailViewModel.tripApplication.screenWidth
     val sh = detailViewModel.tripApplication.screenHeight
-    val contentValue = detailViewModel.contentModelValue.value
+    val tripCommonContentValue = detailViewModel.tripCommonContentModelValue.value
 
-    detailViewModel.gettingCityName(
-        detailViewModel.contentModelValue.value.areaCode ?: "",
-        detailViewModel.contentModelValue.value.siGunGuCode ?: "",
-    )
+
+    LaunchedEffect (Unit){
+        Log.d("cotentValue ","contentValue : ${detailViewModel.tripCommonContentModelValue.value.contentId}")
+        detailViewModel.gettingCityName(
+            detailViewModel.tripCommonContentModelValue.value.areaCode ?: "",
+            detailViewModel.tripCommonContentModelValue.value.siGunGuCode ?: "",
+        )
+        detailViewModel.getContentModel(contentId)
+    }
 
     Column(
         modifier = Modifier
@@ -56,15 +58,22 @@ fun IntroColumn(detailViewModel: DetailViewModel) {
             .padding(8.dp)
     ) {
         Text(
-            text = contentValue.title ?: "",
+            text = tripCommonContentValue.title ?: "",
             fontSize = 26.sp,
             fontFamily = CustomFont.customFontBold,
         )
 
         Spacer(modifier = Modifier.height(16.dp)) // 간격
 
-        // 잠시보류
-        CustomRatingBar(4.5f)
+        Row (
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            // 별점 표시
+            CustomRatingBar(detailViewModel.contentValue.value.ratingScore)
+            Text("(${detailViewModel.contentValue.value.ratingScore})", fontFamily = CustomFont.customFontRegular)
+            Text(" ${detailViewModel.reviewCountValue.value}명이 추천중!.", fontFamily = CustomFont.customFontRegular)
+        }
+
 
         Spacer(modifier = Modifier.height(16.dp)) // 간격
 
@@ -92,7 +101,7 @@ fun IntroColumn(detailViewModel: DetailViewModel) {
 
         // 이미지 (전체 width, 높이는 300dp)
         GlideImage(
-            imageModel = contentValue.firstImage,
+            imageModel = tripCommonContentValue.firstImage,
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
@@ -124,7 +133,7 @@ fun IntroColumn(detailViewModel: DetailViewModel) {
         // TODO
         // 지역 소개 (길게)
         Text(
-            text = detailViewModel.contentModelValue.value.overview!!,
+            text = detailViewModel.tripCommonContentModelValue.value.overview!!,
             fontSize = 16.sp,
             fontFamily = CustomFont.customFontRegular
         )

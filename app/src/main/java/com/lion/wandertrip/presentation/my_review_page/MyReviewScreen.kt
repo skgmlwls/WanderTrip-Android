@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.my_review_page
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -17,6 +18,7 @@ import com.lion.wandertrip.presentation.my_review_page.components.VerticalMyRevi
 @Composable
 fun MyReviewScreen(myReviewViewModel: MyReviewViewModel= hiltViewModel()) {
     myReviewViewModel.getReviewList()
+    Log.d("test","MyReviewScreen")
     Scaffold(
         topBar = {
             CustomTopAppBar(

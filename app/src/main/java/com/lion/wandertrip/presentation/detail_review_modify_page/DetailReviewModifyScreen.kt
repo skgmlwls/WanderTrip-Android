@@ -30,7 +30,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,7 +37,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -66,21 +64,14 @@ fun DetailReviewModifyScreen(
     Log.d("test100","DetailReviewModifyScreen")
     Log.d("test100","!!!!!!!!!!!!! contentDocID : $contentDocID, reviewDocID: $reviewDocID")
 
-    val tripApplication = detailReviewModifyViewModel.tripApplication
-
-    val reviewModelValue = detailReviewModifyViewModel.reviewModel.value
     // getReviewModel을 LaunchedEffect로 감싸기
     LaunchedEffect(Unit) {
-        Log.d("test01","launch")
-        detailReviewModifyViewModel.setState(true)
-        detailReviewModifyViewModel.getReviewModel(contentDocID, reviewDocID)
+        detailReviewModifyViewModel.getReviewModel(contentDocId = contentDocID, contentReviewDocId = reviewDocID)
     }
 
-    LaunchedEffect(reviewModelValue) {
-        detailReviewModifyViewModel.settingRatingScore(reviewModelValue.reviewRatingScore)
-        detailReviewModifyViewModel.settingReviewContent(reviewModelValue.reviewContent)
-        detailReviewModifyViewModel.settingReviewImgList(reviewModelValue.reviewImageList.toMutableStateList())
-    }
+
+    val tripApplication = detailReviewModifyViewModel.tripApplication
+
 
     // 앨범용 런처 (여러 개 선택 가능)
     val albumLauncher =
@@ -103,7 +94,7 @@ fun DetailReviewModifyScreen(
         Scaffold(
             topBar = {
                 CustomTopAppBar(
-                    title = detailReviewModifyViewModel.reviewModel.value.reviewTitle,
+                    title = detailReviewModifyViewModel.reviewModelValue.value.reviewTitle,
                     menuItems = {
                         // 작성 완료 아이콘
                         CustomIconButton(

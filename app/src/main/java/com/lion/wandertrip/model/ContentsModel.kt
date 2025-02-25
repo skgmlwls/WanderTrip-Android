@@ -6,8 +6,7 @@ class ContentsModel(
     var contentDocId: String = "",   // 컨텐츠 문서 ID (컬렉션)
     var contentId: String = "",      // 컨텐츠 ID
     var ratingScore: Float = 0.0f,    // 평균 별점
-    var reviewList: List<ReviewModel> = emptyList() // 리뷰 리스트 (서브 컬렉션)
-
+    var reviewList: List<ReviewModel> = emptyList(), // 리뷰 리스트 (서브 컬렉션)
 ) {
     fun toDetailReviewVO(): ContentsVO {
         val detailReviewVO = ContentsVO()
@@ -15,6 +14,7 @@ class ContentsModel(
         detailReviewVO.contentId = contentId
         detailReviewVO.ratingScore = ratingScore
         detailReviewVO.reviewList = reviewList.map { it.toReviewItemVO() }
+
         return detailReviewVO
     }
 }

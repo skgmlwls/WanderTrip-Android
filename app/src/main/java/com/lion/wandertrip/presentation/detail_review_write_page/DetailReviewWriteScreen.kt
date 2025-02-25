@@ -63,6 +63,9 @@ fun DetailReviewWriteScreen(
 
     Log.d("DetailReviewWriteScreen","DetailReviewWriteScreen")
     Log.d("test100","contentId : $contentID")
+    Log.d("test100","contenttitle : $contentTitle")
+
+
     val focusManager = LocalFocusManager.current
 
     val tripApplication = detailReviewWriteViewModel.tripApplication
@@ -94,7 +97,7 @@ fun DetailReviewWriteScreen(
                                ImageVector.vectorResource(R.drawable.ic_check_24px),
                                iconButtonOnClick = {
                                    detailReviewWriteViewModel.isLoading.value=true
-                                   detailReviewWriteViewModel.addContentsReview(contentID)
+                                   detailReviewWriteViewModel.addContentsReview(contentID,contentTitle)
                                }
                            )
                    },

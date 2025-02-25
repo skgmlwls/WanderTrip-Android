@@ -21,11 +21,11 @@ fun BasicInfoDescriptionColumn(detailViewModel : DetailViewModel) {
                 modifier = Modifier.padding(end = 4.dp)
             )
             Text(
-                detailViewModel.contentModelValue.value.addr1?:"",
+                detailViewModel.tripCommonContentModelValue.value.addr1?:"",
                 fontFamily = CustomFont.customFontRegular
             )
         }
-        if(detailViewModel.contentModelValue.value.tel !="")
+        if(detailViewModel.tripCommonContentModelValue.value.tel !="")
         Row(modifier = Modifier.padding(vertical = 10.dp)) {
             Text(
                 "전화 : ",
@@ -33,14 +33,14 @@ fun BasicInfoDescriptionColumn(detailViewModel : DetailViewModel) {
                 modifier = Modifier.padding(end = 4.dp)
             )
             Text(
-                detailViewModel.contentModelValue.value.tel?:"",
+                detailViewModel.tripCommonContentModelValue.value.tel?:"",
                 fontFamily = CustomFont.customFontRegular,
                 modifier = Modifier.clickable {
-                    detailViewModel.onClickTextTel(detailViewModel.contentModelValue.value.tel?:"")
+                    detailViewModel.onClickTextTel(detailViewModel.tripCommonContentModelValue.value.tel?:"")
                 }
             )
         }
-        val homePage = detailViewModel.getHomePage(detailViewModel.contentModelValue.value.homepage?:"")
+        val homePage = detailViewModel.getHomePage(detailViewModel.tripCommonContentModelValue.value.homepage?:"")
         if(homePage!="")
         Row(modifier = Modifier.padding(vertical = 10.dp)) {
             Text(

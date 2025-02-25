@@ -49,7 +49,7 @@ fun CustomRatingBar(rating: Float) {
             Image(
                 painter = painterResource(id = R.drawable.ic_qurter_star_24px), // 1/4 채운 별 이미지
                 contentDescription = "Quarter star",
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(26.dp),
                 colorFilter = ColorFilter.tint(Color(0xFFFFD700)) // 진한 금색 계열
 
             )
@@ -60,7 +60,7 @@ fun CustomRatingBar(rating: Float) {
             Image(
                 painter = painterResource(id = R.drawable.ic_star_24px), // 비어있는 별 이미지
                 contentDescription = "Empty star",
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(20.dp),
                 colorFilter = ColorFilter.tint(Color(0xFFFFD700)) // 진한 금색 계열
 
             )

@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lion.wandertrip.TripApplication
+import com.lion.wandertrip.service.ContentsReviewService
 import com.lion.wandertrip.service.TripNoteService
 import com.lion.wandertrip.service.TripScheduleService
 import com.lion.wandertrip.service.UserService
@@ -25,6 +26,7 @@ class UserInfoViewModel @Inject constructor(
     val userService: UserService,
     val tripScheduleService: TripScheduleService,
     val tripNoteService: TripNoteService,
+    val contentsReviewService: ContentsReviewService
 ) : ViewModel() {
     val tripApplication = context as TripApplication
 
@@ -100,8 +102,13 @@ class UserInfoViewModel @Inject constructor(
                 val work4= async(Dispatchers.IO){
                     tripScheduleService.changeTripScheduleNickName(oldNickName,newNickName)
                 }
+                // 쓴 리뷰 닉네임을 변경한 닉네임으로 수정
+                val work5 = async(Dispatchers.IO){
+                    contentsReviewService.changeReviewNickName(oldNickName,newNickName)
+                }
                 work3.join()
                 work4.join()
+                work5.join()
             }
 
 

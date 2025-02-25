@@ -12,13 +12,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.lion.wandertrip.TripApplication
+import com.lion.wandertrip.model.ContentsModel
 import com.lion.wandertrip.model.ReviewModel
+import com.lion.wandertrip.model.ScheduleItem
 import com.lion.wandertrip.model.TripCommonItem
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.presentation.detail_page.used_dummy_data.TripScheduleDummyData
+import com.lion.wandertrip.presentation.detail_page.used_dummy_data.TripScheduleDummyData.Companion.date3_1
+import com.lion.wandertrip.presentation.detail_page.used_dummy_data.TripScheduleDummyData.Companion.date3_4
+import com.lion.wandertrip.presentation.detail_page.used_dummy_data.TripScheduleDummyData.Companion.dateList3
+import com.lion.wandertrip.presentation.detail_page.used_dummy_data.TripScheduleDummyData.Companion.item3_1
 import com.lion.wandertrip.service.ContentsReviewService
 import com.lion.wandertrip.service.ContentsService
 import com.lion.wandertrip.service.TripCommonItemService
+import com.lion.wandertrip.service.TripScheduleService
+import com.lion.wandertrip.util.ContentTypeId
 import com.lion.wandertrip.util.MainScreenName
 import com.lion.wandertrip.util.Tools
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,14 +47,18 @@ class DetailViewModel @Inject constructor(
     val tripCommonItemService: TripCommonItemService,
     val contentsReviewService: ContentsReviewService,
     val contentsService: ContentsService,
+    val tripScheduleService : TripScheduleService,
 ) : ViewModel() {
     val tripApplication = context as TripApplication
 
     //  일정 추가 시트
     val isAddScheduleSheetOpen = mutableStateOf(false)
 
-    // 컨텐트 모델
-    val contentModelValue = mutableStateOf(TripCommonItem())
+    // api 로 받아온 content 모델
+    val tripCommonContentModelValue = mutableStateOf(TripCommonItem())
+
+    // db 에서 가져온 content ( 별점과, 별점 등록 인원 파악 위함)
+    val contentValue = mutableStateOf(ContentsModel())
 
     // 일정 리스트
     val tripScheduleList = mutableStateListOf<TripScheduleModel>()
@@ -82,13 +94,13 @@ class DetailViewModel @Inject constructor(
         Log.d("test100","state : $isLoading")
     }
 
-    // 컨텐트 ID 로 모델 가져오기
-    fun getContentModel(contentID: String) {
+    // 컨텐트 ID 로 api 에서 받아온  모델 가져오기
+    fun getCommonTripContentModel(contentID: String) {
         viewModelScope.launch {
             val work1 = async(Dispatchers.IO) {
                 tripCommonItemService.getTripCommonItem(contentID, null)
             }
-            contentModelValue.value = work1.await()!!
+            tripCommonContentModelValue.value = work1.await()!!
 
         }
     }
@@ -190,16 +202,15 @@ class DetailViewModel @Inject constructor(
 
     // 일정 리스트 가져오기
     fun getTripSchedule() {
-        tripScheduleList.addAll(
-            TripScheduleDummyData.detailPageTripScheduleDummyData
-        )
-        addMap()
-    }
+        viewModelScope.launch {
+            val work1= async(Dispatchers.IO){
+                tripScheduleService.gettingMyTripSchedules(tripApplication.loginUserModel.userNickName)
+            }
+            val result = work1.await()
+            tripScheduleList.addAll(result)
+            addMap()
 
-
-    //  contentID를 이용해서 TripItemModel 가져오는 메서드
-    fun gettingTripItem() {
-
+        }
     }
 
     // timeStamp -> String 변환
@@ -267,11 +278,61 @@ class DetailViewModel @Inject constructor(
     // 소개 상태
     val isClickIntroState = mutableStateOf(true)
 
+    // 별점 등록 문서 개수
+    val reviewCountValue = mutableStateOf(0)
+
     fun gettingCityName(areaCode: String, siGunGuCode: String) {
         Log.d("test", "areaCode : $areaCode")
         cityNameValue.value = Tools.getAreaDetails(areaCode, siGunGuCode)
 
     }
+
+    // 컨텐트 ID 로 DB 에서 모델 가져오기
+    fun getContentModel(contentID: String) {
+        viewModelScope.launch {
+            val work1 = async(Dispatchers.IO) {
+                contentsService.getContentByContentsId(contentID)
+            }
+            contentValue.value = work1.await()
+
+            val work2 = async(Dispatchers.IO){
+                getReviewCount()
+            }
+            reviewCountValue.value = work2.await()
+            Log.d("test","content Rating : ${contentValue.value.ratingScore}")
+        }
+    }
+
+    // 컨텐츠의 리뷰 개수 가져오기(별점을 얼마나 많은 유저가 등록했는가 알아보기 위함)
+    suspend fun getReviewCount() : Int{
+        return contentsReviewService.getAllReviewsCountWithContents(contentValue.value.contentId)
+    }
+
+    fun addSchedule(
+
+    ) {
+  /*      viewModelScope.launch {
+            val work1 = async(Dispatchers.IO) {
+                val scheduleItem = ScheduleItem(
+                    itemTitle = tripItemModel.title,
+                    itemType = when(tripItemModel.contentTypeId) {
+                        ContentTypeId.TOURIST_ATTRACTION.contentTypeCode.toString() -> "관광지"
+                        ContentTypeId.RESTAURANT.contentTypeCode.toString() -> "음식점"
+                        ContentTypeId.ACCOMMODATION.contentTypeCode.toString() -> "숙소"
+                        else -> ""
+                    },
+                    itemDate = scheduleDate.value,
+                    itemLongitude = tripItemModel.mapLong,
+                    itemLatitude = tripItemModel.mapLat,
+                    itemContentId = tripItemModel.contentId,
+                )
+
+                tripScheduleService.addTripItemToSchedule(tripScheduleDocId.value, scheduleDate.value, scheduleItem)
+            }.await()
+            application.navHostController.popBackStack()
+        }*/
+    }
+
 
 // --------------------------------------------------------------------------------------------
     // 기본정보 관련
@@ -347,7 +408,7 @@ class DetailViewModel @Inject constructor(
         reviewList.clear()
         viewModelScope.launch {
             val list = withContext(Dispatchers.IO) {
-                contentsReviewService.getAllReviewsWithContents(contentModelValue.value.contentId!!)
+                contentsReviewService.getAllReviewsWithContents(tripCommonContentModelValue.value.contentId!!)
             }
 
             reviewList.addAll(list)
@@ -394,7 +455,7 @@ class DetailViewModel @Inject constructor(
                 // 이미지 URL 리스트 가져오기
                 val urlList = contentsReviewService.gettingReviewImage(
                     filterReviewList[index].reviewImageList.toList(),
-                    contentModelValue.value.contentId!!
+                    tripCommonContentModelValue.value.contentId!!
                 )
 
                 // 로그: URL 리스트가 어떻게 나왔는지 확인
@@ -456,14 +517,22 @@ class DetailViewModel @Inject constructor(
         tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_DETAIL_REVIEW_MODIFY.name}/${contentDocID}/${contentsID}/${reviewDocID}")
     }
 
+
     // 리뷰 삭제 버튼
     fun deleteReview(contentDocId: String, contentsReviewDocId : String) {
         Log.d("test100","contentDocId :$contentDocId, contentsReviewDocId:$contentsReviewDocId")
         viewModelScope.launch {
+            // 삭제 진행
             val work1  = async(Dispatchers.IO){
                 contentsReviewService.deleteContentsReview(contentDocId,contentsReviewDocId)
             }
             work1.join()
+            // 컨텐츠 별점 수정
+            val work2 = async(Dispatchers.IO){
+                contentsService.updateContentRating(contentDocId)
+            }
+            work2.join()
+
             getReviewList()
         }
 
