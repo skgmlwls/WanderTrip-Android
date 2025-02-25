@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -131,17 +132,17 @@ fun TripNoteWriteScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.padding(top = 31.dp))
+            Spacer(modifier = Modifier.padding(top = 36.dp))
 
             Text(
-                text = "사진 고르기",
+                text = "사진 선택",
                 fontFamily = NanumSquareRound,
                 fontSize = 23.sp,
                 modifier = Modifier.padding(end = 5.dp)
 
             )
 
-            Spacer(modifier = Modifier.padding(top = 15.dp))
+            Spacer(modifier = Modifier.padding(top = 20.dp))
 
 
             // 사진 추가하기
@@ -152,7 +153,7 @@ fun TripNoteWriteScreen(
                 tripNoteWriteViewModel.tripNotePreviewBitmap.forEachIndexed { index, bitmap ->
                     Box(
                         modifier = Modifier
-                            .size(60.dp) // 이미지 크기
+                            .size(73.dp) // 이미지 크기
                             .padding(end = 10.dp)
                             .clip(shape = RoundedCornerShape(12.dp))
                     ) {
@@ -191,7 +192,8 @@ fun TripNoteWriteScreen(
                             val pickVisualMediaRequest =
                                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                             albumLauncher.launch(pickVisualMediaRequest)
-                        }
+                        },
+                        modifier = Modifier.size(73.dp)
                     )
                 }
             }
@@ -210,7 +212,8 @@ fun TripNoteWriteScreen(
                 supportText = tripNoteWriteViewModel.tripNoteTitleError,  // 에러 메시지 전달
             )
 
-            Spacer(modifier = Modifier.padding(top = 25.dp))
+            Spacer(modifier = Modifier.padding(top = 13.dp))
+
 
             // 여행기 내용 입력하기 텍스트 필드
             CustomOutlinedTextField(
@@ -221,11 +224,13 @@ fun TripNoteWriteScreen(
                 singleLine = false,
                 isError = tripNoteWriteViewModel.tripNoteContentIsError,  // 에러 상태 전달
                 supportText = tripNoteWriteViewModel.tripNoteContentError,  // 에러 메시지 전달
+                minLines = 13
             )
 
 
-            Spacer(modifier = Modifier.padding(top = 20.dp))
+            // Spacer(modifier = Modifier.padding(top = 20.dp))
 
+            Spacer(modifier = Modifier.weight(1f))
 
             // 게시 버튼
             BlueButton(
@@ -268,7 +273,7 @@ fun TripNoteWriteScreen(
                 }
             )
 
-            Spacer(modifier = Modifier.padding(top = 15.dp))
+            Spacer(modifier = Modifier.padding(top = 28.dp))
 
         }
 
@@ -287,6 +292,6 @@ fun TripNoteWriteScreen(
         }
 
 
-        Spacer(modifier = Modifier.padding(top = 30.dp))
+        Spacer(modifier = Modifier.padding(top = 38.dp))
     }
 }

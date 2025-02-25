@@ -80,6 +80,8 @@ class TripNoteSelectDownViewModel @Inject constructor(
 
     // 새 일정에 담기
     fun goScheduleTitleButtonClick(tripNoteScheduleDocId : String, documentId : String){
+        tripApplication.navHostController.popBackStack()
+        tripApplication.navHostController.popBackStack()
         // 일정 제목 + 날짜 선택 입력 화면으로 이동 (documentId 전달)
         tripApplication.navHostController.navigate(
             "${ScheduleScreenName.SCHEDULE_ADD_SCREEN.name}/$tripNoteScheduleDocId"
@@ -196,6 +198,9 @@ class TripNoteSelectDownViewModel @Inject constructor(
                             // itemIndex를 역순으로 적용 (아이템 인덱스를 새로 추가할 때 내림차순으로 넣음)
                             // itemData["itemIndex"] = newItemCountByDate[adjustedItemDateOnly]?.let { it + 1 } ?: 1
 
+                            // 기존의 itemDocId 제거
+                            itemData.remove("itemDocId")
+
                             // 원본 일정 아이템 업데이트
                             scheduleRef.collection("TripScheduleItem").add(itemData).addOnSuccessListener { newDocument ->
                                 scheduleRef.collection("TripScheduleItem").document(newDocument.id)
@@ -207,6 +212,9 @@ class TripNoteSelectDownViewModel @Inject constructor(
                             // 새 일정 날짜별 문서 개수 갱신
                             newItemCountByDate[adjustedItemDateOnly] = newItemCount + 1
                         }
+
+                        tripApplication.navHostController.popBackStack()
+                        tripApplication.navHostController.popBackStack()
 
                         // 일정 상세 화면으로 이동 - newScheduleDoc.id(새로 만들어진 일정 문서 id) 전달
                         tripApplication.navHostController.navigate(
