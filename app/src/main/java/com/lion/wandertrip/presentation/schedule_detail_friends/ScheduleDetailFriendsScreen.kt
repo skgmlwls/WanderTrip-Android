@@ -84,7 +84,7 @@ fun ScheduleDetailFriendsScreen(
                 .fillMaxSize()
         ) {
             ScheduleDetailFriendsList(
-                friends = viewModel.friendsList,
+                friends = viewModel.friendsUserList,
                 profileImageUrl = "http://tong.visitkorea.or.kr/cms/resource/69/3383069_image2_1.JPG"
             )
             // 다이얼로그 표시

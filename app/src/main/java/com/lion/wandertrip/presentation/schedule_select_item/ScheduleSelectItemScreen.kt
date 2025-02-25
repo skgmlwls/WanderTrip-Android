@@ -4,19 +4,15 @@ import ScheduleItemCategoryChips
 import ScheduleItemSearchBar
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,6 +24,7 @@ import com.lion.wandertrip.presentation.schedule_select_item.component.ScheduleI
 import com.lion.wandertrip.ui.theme.NanumSquareRound
 import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 import com.lion.wandertrip.util.ContentTypeId
+import com.lion.wandertrip.util.SharedTripItemList
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,6 +47,8 @@ fun ScheduleSelectItemScreen(
     LaunchedEffect(Unit) {
         viewModel.scheduleDate.value = Timestamp(scheduleDate, 0)
         viewModel.tripScheduleDocId.value = tripScheduleDocId
+        // viewModel.observeUserScheduleDocIdList()
+        viewModel.observeUserLikeList()
 
         if (isFirstLaunch.value) { // ✅ 처음 실행될 때만 실행
             viewModel.loadTripItems(
@@ -131,7 +130,7 @@ fun ScheduleSelectItemScreen(
                 )
 
                 // ✅ 필터링된 여행지 리스트
-                val filteredList = viewModel.tripItemList.filter {
+                val filteredList = SharedTripItemList.sharedTripItemList.filter {
                     val matchesCategory = when (itemCode) {
                         12 -> selectedCategoryCode == null || it.cat2 == selectedCategoryCode
                         39, 32 -> selectedCategoryCode == null || it.cat3 == selectedCategoryCode
@@ -140,9 +139,11 @@ fun ScheduleSelectItemScreen(
                     val matchesSearchQuery = it.title.contains(searchQuery, ignoreCase = true)
                     matchesCategory && matchesSearchQuery
                 }
+                Log.d("ScheduleSelectItemScreen", "sharedTripItemList : ${SharedTripItemList.sharedTripItemList.size}")
 
                 ScheduleItemList(
                     tripItemList = filteredList,
+                    viewModel,
                     onItemClick = { selectItem -> viewModel.addTripItemToSchedule(selectItem) }
                 )
             }

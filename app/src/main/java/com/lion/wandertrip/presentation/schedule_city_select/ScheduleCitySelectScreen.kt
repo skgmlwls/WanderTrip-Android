@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.Timestamp
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.wandertrip.R
+import com.lion.wandertrip.component.LottieLoadingIndicator
 import com.lion.wandertrip.presentation.schedule_city_select.component.ScheduleCitySelectList
 import com.lion.wandertrip.presentation.schedule_city_select.component.ScheduleCitySelectSearchBar
 import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
@@ -53,91 +55,99 @@ fun ScheduleCitySelectScreen(
     // 포커스 관리 객체 생성
     val focusManager = LocalFocusManager.current
 
+    val isLoading by remember { viewModel.isLoading }
+
     // 검색어
     var searchQuery by remember { mutableStateOf("") }
 
-
-    Scaffold(
-        containerColor = Color.White,
-        topBar = {
-            CustomTopAppBar(
-                title = "지역 선택",
-                navigationIconImage = Icons.Filled.ArrowBack,
-                navigationIconOnClick = { viewModel.backScreen() },
-            )
-        },
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(it)
-                .fillMaxSize()
-                .pointerInput(Unit) { // 터치 이벤트 감지 바깥쪽 클릭 시 포커스 해제
-                    detectTapGestures(
-                        onTap = { focusManager.clearFocus() }
-                    )
-                },
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            containerColor = Color.White,
+            topBar = {
+                CustomTopAppBar(
+                    title = "지역 선택",
+                    navigationIconImage = Icons.Filled.ArrowBack,
+                    navigationIconOnClick = { viewModel.backScreen() },
+                )
+            },
         ) {
-            // 검색 바
-            ScheduleCitySelectSearchBar(
-                query = searchQuery,
-                onSearchQueryChanged = {
-                    searchQuery = it
-                    // 검색어 변경 시 필터링 실행
-                    viewModel.updateFilteredCities(it)
-                },
-                onSearchClicked = {
-                    Log.d("ScheduleCitySelectScreen","검색 실행: $searchQuery")
-                },
-                onClearQuery = {
-                    searchQuery = "" // ✅ 검색어 초기화
-                    viewModel.updateFilteredCities("") // X 버튼 클릭 시 전체 도시 목록 복원
-                }
-            )
-
-            Button(
-                onClick = {
-                    // 도시 룰렛 화면 으로 이동
-                    viewModel.moveToRouletteCityScreen(scheduleTitle, scheduleStartDate, scheduleEndDate)
-                },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White, // ✅ 버튼 배경색: 흰색
-                    contentColor = Color(0xFF435C8F) // ✅ 버튼 텍스트 색상: 파란색 (변경 가능)
-                ),
-                shape = RectangleShape // ✅ 버튼을 사각형으로 변경
+            Column(
+                modifier = Modifier
+                    .padding(it)
+                    .fillMaxSize()
+                    .pointerInput(Unit) { // 터치 이벤트 감지 바깥쪽 클릭 시 포커스 해제
+                        detectTapGestures(
+                            onTap = { focusManager.clearFocus() }
+                        )
+                    },
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.roulette_picture), // ✅ drawable 리소스 추가
-                    contentDescription = "룰렛 이미지",
-                    modifier = Modifier.size(70.dp).padding(end = 16.dp) // ✅ 아이콘 크기 조정 가능
+                // 검색 바
+                ScheduleCitySelectSearchBar(
+                    query = searchQuery,
+                    onSearchQueryChanged = {
+                        searchQuery = it
+                        // 검색어 변경 시 필터링 실행
+                        viewModel.updateFilteredCities(it)
+                    },
+                    onSearchClicked = {
+                        Log.d("ScheduleCitySelectScreen","검색 실행: $searchQuery")
+                    },
+                    onClearQuery = {
+                        searchQuery = "" // ✅ 검색어 초기화
+                        viewModel.updateFilteredCities("") // X 버튼 클릭 시 전체 도시 목록 복원
+                    }
                 )
-                Text(
-                    text = "룰렛 돌리기",
-                    fontFamily = NanumSquareRoundRegular,
-                    fontSize = 35.sp,
-                    color = Color.Black
-                )
-            }
 
-
-            // 도시 목록
-            ScheduleCitySelectList(
-                dataList = viewModel.filteredCities,
-                scheduleTitle = viewModel.scheduleTitle.value,
-                scheduleStartDate = viewModel.scheduleStartDate.value,
-                scheduleEndDate = viewModel.scheduleEndDate.value,
-                onSelectedCity = {areaCode ->
-                    // 일정 제목 날짜 아이디 저장 후 일정 상세로 넘어 간다
-                    viewModel.addTripSchedule(
-                        scheduleTitle = scheduleTitle,
-                        scheduleStartDate = scheduleStartDate,
-                        scheduleEndDate = scheduleEndDate,
-                        areaName = areaCode.areaName,
-                        areaCode = areaCode.areaCode
+                Button(
+                    onClick = {
+                        // 도시 룰렛 화면 으로 이동
+                        viewModel.moveToRouletteCityScreen(scheduleTitle, scheduleStartDate, scheduleEndDate)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White, // ✅ 버튼 배경색: 흰색
+                        contentColor = Color(0xFF435C8F) // ✅ 버튼 텍스트 색상: 파란색 (변경 가능)
+                    ),
+                    shape = RectangleShape // ✅ 버튼을 사각형으로 변경
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.roulette_picture), // ✅ drawable 리소스 추가
+                        contentDescription = "룰렛 이미지",
+                        modifier = Modifier.size(70.dp).padding(end = 16.dp) // ✅ 아이콘 크기 조정 가능
+                    )
+                    Text(
+                        text = "룰렛 돌리기",
+                        fontFamily = NanumSquareRoundRegular,
+                        fontSize = 35.sp,
+                        color = Color.Black
                     )
                 }
-            )
 
+
+                // 도시 목록
+                ScheduleCitySelectList(
+                    dataList = viewModel.filteredCities,
+                    scheduleTitle = viewModel.scheduleTitle.value,
+                    scheduleStartDate = viewModel.scheduleStartDate.value,
+                    scheduleEndDate = viewModel.scheduleEndDate.value,
+                    onSelectedCity = {areaCode ->
+                        // 일정 제목 날짜 아이디 저장 후 일정 상세로 넘어 간다
+                        viewModel.addTripSchedule(
+                            scheduleTitle = scheduleTitle,
+                            scheduleStartDate = scheduleStartDate,
+                            scheduleEndDate = scheduleEndDate,
+                            areaName = areaCode.areaName,
+                            areaCode = areaCode.areaCode
+                        )
+                    }
+                )
+
+            }
+        }
+
+        // ✅ 로딩 화면 추가 (투명 오버레이)
+        if (isLoading) {
+            LottieLoadingIndicator() // ✅ 로딩 애니메이션
         }
     }
 
