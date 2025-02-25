@@ -3,12 +3,15 @@ package com.lion.wandertrip.presentation.schedule_detail_friends
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.FirebaseFirestore
 import com.lion.wandertrip.TripApplication
+import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.service.TripScheduleService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -34,15 +37,35 @@ class ScheduleDetailFriendsViewModel @Inject constructor(
     val friendAddError = mutableStateOf("")
 
     // 함께 하는 친구 목록
-    val friendsList = mutableListOf<String>(
-        "친구1",
-        "친구2",
-        "친구3",
-    )
+    val friendsList = mutableStateListOf<String>()
 
     // 일정 문서 ID 설정
     fun setScheduleDocId(id: String) {
         scheduleDocId.value = id
+    }
+
+    // 유저 일정 리스트들 옵저버
+    fun observeScheduleDocIdList() {
+        val firestore = FirebaseFirestore.getInstance()
+        val userDocRef = firestore.collection("TripSchedule").document(scheduleDocId.value)
+
+        // 문서 변경 감지 리스너 등록
+        userDocRef.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                Log.e("observeUserData", "Error: ${error.message}")
+                return@addSnapshotListener
+            }
+            if (snapshot != null && snapshot.exists()) {
+                // userScheduleList 필드를 List<String> 형태로 가져오기 (없으면 빈 리스트)
+                val schedule = snapshot.get("scheduleInviteList") as? List<String> ?: emptyList()
+
+                // 기존 리스트 클리어 후 업데이트
+                friendsList.clear()
+                friendsList.addAll(schedule)
+
+                Log.d("ScheduleDetailFriendsViewModel", "friendsList: $friendsList")
+            }
+        }
     }
 
     // 이전 화면 으로 이동 (일정 상세 화면)
@@ -50,7 +73,7 @@ class ScheduleDetailFriendsViewModel @Inject constructor(
         application.navHostController.popBackStack()
     }
 
-    // 기존 함수 유지, 단 결과에 따라 friendAddError와 showAddFriendDialog 상태를 업데이트함
+    // 결과에 따라 friendAddError와 showAddFriendDialog 상태를 업데이트함
     fun addFriendByNickName(inviteNickname: String) {
         viewModelScope.launch {
             val work1 = async(Dispatchers.IO) {
