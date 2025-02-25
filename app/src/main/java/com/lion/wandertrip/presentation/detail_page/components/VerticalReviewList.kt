@@ -51,6 +51,7 @@ fun VerticalReviewList(detailViewModel: DetailViewModel) {
                 .height((sh).dp)
         ) {
             items(detailViewModel.filteredReviewList) {
+                Log.d("test100"," it : ${it.contentsDocId}")
                 ReviewItem(
                     it,
                     detailViewModel,
@@ -65,6 +66,7 @@ fun VerticalReviewList(detailViewModel: DetailViewModel) {
 
 @Composable
 fun ReviewItem(reviewModel: ReviewModel, detailViewModel: DetailViewModel, pos: Int) {
+    Log.d("test ReviewModel ","reviewModel.contentDocId: ${reviewModel.contentsDocId}")
     val sh = detailViewModel.tripApplication.screenHeight
 
     Column(
@@ -101,18 +103,23 @@ fun ReviewItem(reviewModel: ReviewModel, detailViewModel: DetailViewModel, pos: 
             // 수정 / 삭제 버튼 (우측 정렬)
             if(detailViewModel.tripApplication.loginUserModel.userNickName==reviewModel.reviewWriterNickname)
             Row {
+                // 수정 버튼
                 CustomIconButton(
                     ImageVector.vectorResource(R.drawable.ic_edit_24px),
                     iconButtonOnClick = {
                         detailViewModel.onClickIconReviewModify(
                             reviewModel.contentsDocId,
+                            reviewModel.contentsId,
                             reviewModel.reviewDocId
                         )
                     })
                 Spacer(modifier = Modifier.width(8.dp))
+                // 삭제버튼
                 CustomIconButton(
                     ImageVector.vectorResource(R.drawable.ic_delete_24px),
-                    iconButtonOnClick = {})
+                    iconButtonOnClick = {
+                        detailViewModel.deleteReview(contentDocId = reviewModel.contentsDocId, reviewModel.reviewDocId)
+                    })
             }
         }
 

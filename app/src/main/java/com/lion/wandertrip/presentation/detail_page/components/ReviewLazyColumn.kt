@@ -27,17 +27,19 @@ import com.lion.wandertrip.presentation.detail_page.DetailViewModel
 @Composable
 fun ReviewLazyColumn(detailViewModel: DetailViewModel) {
     val sh = detailViewModel.tripApplication.screenHeight
-
-    LaunchedEffect(detailViewModel.reviewList) {
-        Log.d("test10","detailViewModel.reviewList")
+    val contentModel = detailViewModel.contentModelValue.value
+    LaunchedEffect(Unit) {
+        Log.d("test100","unit")
+        detailViewModel.setState(true)
         detailViewModel.getReviewList()
         detailViewModel.getFilteredReviewList()
+        detailViewModel.getUri(detailViewModel.filteredReviewList)
+
     }
 
-    LaunchedEffect(detailViewModel.filteredReviewList){
-        detailViewModel.getUri(detailViewModel.filteredReviewList)
-    }
-    val contentModel = detailViewModel.contentModelValue.value
+    if(detailViewModel.isLoading.value){
+        LottieLoadingIndicator()
+    }else{
         LazyColumn(
             modifier = Modifier
                 .padding(8.dp)
@@ -47,7 +49,8 @@ fun ReviewLazyColumn(detailViewModel: DetailViewModel) {
             item {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween) {
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Text(
                         text = "리뷰 : ${detailViewModel.filteredReviewList.size}",
                         fontWeight = FontWeight.Bold,
@@ -57,7 +60,10 @@ fun ReviewLazyColumn(detailViewModel: DetailViewModel) {
                         ImageVector.vectorResource(R.drawable.ic_add_24px),
                         iconButtonOnClick = {
                             // 리뷰 쓰기 화면 띄우기
-                            detailViewModel.onClickIconReviewWrite(contentModel.contentId?:"",contentModel.title?:"")
+                            detailViewModel.onClickIconReviewWrite(
+                                contentModel.contentId ?: "",
+                                contentModel.title ?: ""
+                            )
                         })
                 }
             }
@@ -81,7 +87,6 @@ fun ReviewLazyColumn(detailViewModel: DetailViewModel) {
             }
         }
 
-
-
+    }
 
 }

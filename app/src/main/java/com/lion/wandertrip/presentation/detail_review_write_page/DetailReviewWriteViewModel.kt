@@ -62,15 +62,14 @@ class DetailReviewWriteViewModel @Inject constructor(
     // 올린 contents Doc Id 리턴
     fun addContentsReview(contentId: String) {
         viewModelScope.launch {
+
             val imagePathList = mutableListOf<String>()
             val serverFilePathList = mutableListOf<String>()
             var contentsDocId = ""
             var imageUrlList = listOf<String>()
 
-            Log.d("addContentsReview", "함수 시작 - contentId: $contentId")
 
             if (isImagePicked.value) {
-                Log.d("addContentsReview", "이미지 선택됨, 저장 시작")
 
                 // 외장 메모리에 bitmap 저장
                 mutableBitMapList.forEachIndexed { index, bitmap ->
@@ -78,27 +77,24 @@ class DetailReviewWriteViewModel @Inject constructor(
                     serverFilePathList.add(name)
 
                     val savedFilePath = Tools.saveBitmaps(tripApplication, bitmap!!, name)
-                    Log.d("checkFile", "파일 저장 경로: $savedFilePath")
 
                     imagePathList.add(savedFilePath)
                 }
-                Log.d("addContentsReview", "이미지 저장 완료 - 총 ${imagePathList.size}개")
             }
 
             if (isImagePicked.value) {
-                Log.d("addContentsReview", "이미지 업로드 시작")
                 val work1 = async(Dispatchers.IO) {
                     uploadImage(imagePathList, serverFilePathList, contentId)
                 }
                 imageUrlList = work1.await()
-                Log.d("getUri", "이미지 업로드 완료 - URL 리스트: $imageUrlList")
             } else {
                 Log.d("addContentsReview", "이미지 선택 안 됨, 업로드 스킵")
             }
 
-            // 📌 업로드가 끝난 후 리뷰 데이터 저장
-            Log.d("addContentsReview", "리뷰 데이터 생성 시작")
+            //  업로드가 끝난 후 리뷰 데이터 저장
+
             val review = ReviewModel().apply {
+                contentsId = contentId
                 reviewContent = reviewContentValue.value
                 reviewImageList = imageUrlList // ✅ 업로드 완료 후 URL 리스트 저장
                 reviewRatingScore = ratingScoreValue.value
@@ -107,12 +103,8 @@ class DetailReviewWriteViewModel @Inject constructor(
                     userService.gettingImage(tripApplication.loginUserModel.userProfileImageURL)
                         .toString()
             }
-            Log.d("addContentsReview", "리뷰 데이터 생성 완료: $review")
 
-            // 문서 존재 여부 확인 후 저장
-            Log.d("addContentsReview", "콘텐츠 문서 존재 여부 확인 시작")
             contentsDocId = contentsService.isContentExists(contentId)
-            Log.d("addContentsReview", "콘텐츠 문서 확인 완료 - contentsDocId: $contentsDocId")
 
             if (contentsDocId.isNotEmpty()) {
                 Log.d("addContentsReview", "기존 콘텐츠 문서 있음 - 리뷰 추가 중")
@@ -123,17 +115,14 @@ class DetailReviewWriteViewModel @Inject constructor(
                 contentsDocId = contentsService.addContents(contents)
                 contentsReviewService.addContentsReview(contentId, review)
             }
-            Log.d("addContentsReview", "리뷰 추가 완료")
 
-            Log.d("addContentsReview", "리뷰 저장 후 컨텐츠 업데이트 시작")
             val work2 = async(Dispatchers.IO) {
                 addReviewAndUpdateContents(contentsDocId)
             }
             work2.join()
-            Log.d("addContentsReview", "리뷰 저장 후 컨텐츠 업데이트 완료")
 
-            Log.d("addContentsReview", "화면 뒤로 이동")
             tripApplication.navHostController.popBackStack()
+            isLoading.value=false
         }
     }
 

@@ -2,7 +2,9 @@ package com.lion.wandertrip.repository
 
 import android.net.Uri
 import android.util.Log
+import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
 import com.lion.wandertrip.vo.ReviewVO
 import kotlinx.coroutines.tasks.await
@@ -120,39 +122,43 @@ class ContentsReviewRepository {
         }
     }
 
-    suspend fun modifyContentsReview(contentsDocId: String, reviewVO: ReviewVO): Boolean {
-        return try {
-            // Firestore 인스턴스 가져오기
-            val db = FirebaseFirestore.getInstance()
-            Log.d("ContentsReviewRepository", "Firestore 인스턴스 가져오기 성공")
+// 리뷰 수정
+// 리뷰 수정
+suspend fun modifyContentsReview(contentsDocId: String, reviewVO: ReviewVO): Boolean {
+    return try {
+        Log.d("ContentsReviewRepository", "docId : $contentsDocId reviewVO : ${reviewVO.contentsId} , ReviewContent : ${reviewVO.reviewContent}")
 
-            // ContentsData 컬렉션의 해당 문서 참조
-            val contentsRef = db.collection("ContentsData").document(contentsDocId)
-            Log.d(
-                "ContentsReviewRepository",
-                "ContentsData 문서 참조 성공: contentsDocId = $contentsDocId"
-            )
+        // Firestore 인스턴스 가져오기
+        val db = FirebaseFirestore.getInstance()
+        Log.d("ContentsReviewRepository", "Firestore 인스턴스 가져오기 성공")
 
-            // 리뷰 수정할 컬렉션의 문서 참조
-            val reviewRef = contentsRef.collection("ContentsReview").document(reviewVO.reviewDocId)
-            Log.d(
-                "ContentsReviewRepository",
-                "ContentsReview 컬렉션의 문서 참조 성공: reviewDocId = ${reviewVO.reviewDocId}"
-            )
-
-            // 리뷰 덮어쓰기
-            reviewRef.set(reviewVO).await()
-            Log.d("ContentsReviewRepository", "리뷰 덮어쓰기 성공: ${reviewVO.reviewDocId}")
-
-            // 수정 성공
-            true
-        } catch (e: Exception) {
-            // 예외 발생 시 에러 로그
-            Log.e("ContentsReviewRepository", "리뷰 덮어쓰기 실패: ${reviewVO.reviewDocId}", e)
-            // 수정 실패
-            false
+        // 🔥 리뷰 문서 ID 검증 (빈 값이면 오류 방지)
+        if (reviewVO.reviewDocId.isNullOrEmpty()) {
+            Log.e("ContentsReviewRepository", "리뷰 문서 ID가 없음! reviewVO.reviewDocId = ${reviewVO.reviewDocId}")
+            return false
         }
+
+        // ContentsData 컬렉션의 해당 문서 참조
+        val contentsRef = db.collection("ContentsData").document(contentsDocId)
+        Log.d("ContentsReviewRepository", "ContentsData 문서 참조 성공: contentsDocId = $contentsDocId")
+
+        // 리뷰 문서 참조
+        val reviewRef = contentsRef.collection("ContentsReview").document(reviewVO.reviewDocId)
+        Log.d("ContentsReviewRepository", "ContentsReview 컬렉션의 문서 참조 성공: reviewDocId = ${reviewVO.reviewDocId}")
+
+        // 🔥 Firestore에 업데이트
+        reviewRef.set(reviewVO).await()
+        Log.d("ContentsReviewRepository", "리뷰 덮어쓰기 성공: ${reviewVO.reviewDocId}")
+
+        // 수정 성공
+        true
+    } catch (e: Exception) {
+        // 예외 발생 시 에러 로그
+        Log.e("ContentsReviewRepository", "리뷰 덮어쓰기 실패: ${reviewVO.reviewDocId}", e)
+        false
     }
+}
+
 
     /*
         //닉네임 바꿀 때 사용하기
@@ -248,5 +254,33 @@ class ContentsReviewRepository {
             emptyList()
         }
     }
+
+    // 삭제 메서드
+    suspend fun deleteContentsReview(contentsDocId: String, contentsReviewDocId: String) {
+        try {
+            // Firestore 인스턴스 가져오기
+            val db = FirebaseFirestore.getInstance()
+
+            // ContentsData 컬렉션에서 contentsDocId 문서 접근
+            // 그 하위 ContentsReview 서브컬렉션에서 특정 리뷰 문서 삭제
+            db.collection("ContentsData")
+                .document(contentsDocId)
+                .collection("ContentsReview")
+                .document(contentsReviewDocId)
+                .delete()
+                .await()  // 비동기 처리
+
+            // Firebase Storage에서 관련 이미지 삭제 (예시)
+            val storageReference = FirebaseStorage.getInstance().reference
+            val imageRef = storageReference.child("reviews/$contentsDocId/$contentsReviewDocId.jpg")  // 이미지 경로
+            imageRef.delete().await()  // 이미지 삭제
+
+            Log.d("Firestore", "Review and related image deleted successfully.")
+        } catch (e: Exception) {
+            Log.e("Firestore", "Error deleting review or image", e)
+        }
+    }
+
+
 
 }
