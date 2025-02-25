@@ -136,6 +136,8 @@ class ScheduleCitySelectViewModel @Inject constructor(
         tripScheduleModel.scheduleStartDate = scheduleStartDate
         tripScheduleModel.scheduleEndDate = scheduleEndDate
         tripScheduleModel.scheduleDateList = scheduleDateList
+        tripScheduleModel.scheduleInviteList += application.loginUserModel.userNickName
+
 
 
         viewModelScope.launch {
@@ -143,6 +145,15 @@ class ScheduleCitySelectViewModel @Inject constructor(
                 tripScheduleService.addTripSchedule(tripScheduleModel)
             }.await()
             tripScheduleModel.tripScheduleDocId = work
+            Log.d("ScheduleCitySelectViewModel", "tripScheduleModel.tripScheduleDocId: ${tripScheduleModel.tripScheduleDocId}")
+            Log.d("ScheduleCitySelectViewModel", "tripScheduleModel.userID: ${application.loginUserModel.userId}")
+
+            val work2 = async(Dispatchers.IO) {
+                tripScheduleService.addTripDocIdToUserScheduleList(
+                    application.loginUserModel.userDocId,
+                    tripScheduleModel.tripScheduleDocId
+                )
+            }.await()
 
             // 일정 상세 화면 으로 이동
             moveToScheduleDetailScreen(areaName, areaCode)

@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Card
@@ -92,6 +93,29 @@ fun ScheduleItemList(
                             verticalAlignment = Alignment.CenterVertically // ✅ 수직 중앙 정렬
                         ) {
                             Icon(
+                                imageVector = Icons.Filled.Person, // ✅ 머티리얼 아이콘 사용
+                                contentDescription = "함께 하는 사람 아이콘",
+                                modifier = Modifier
+                                    .padding(end = 2.dp)
+                                    .size(12.5.dp)  // ✅ 크기 조절
+                            )
+
+                            // 일정  지역
+                            Text(
+                                text = dataList[index].scheduleInviteList.size.toString(),
+                                fontFamily = NanumSquareRound,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(end = 5.dp)
+                            )
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 5.dp),
+                            verticalAlignment = Alignment.CenterVertically // ✅ 수직 중앙 정렬
+                        ) {
+                            Icon(
                                 imageVector = Icons.Filled.Place, // ✅ 머티리얼 아이콘 사용
                                 contentDescription = "홈 아이콘",
                                 modifier = Modifier
@@ -118,34 +142,11 @@ fun ScheduleItemList(
                                     .padding(top = 0.5.dp),
                             )
                         }
+                        
                     }
 
                 }
             }
         }
     }
-}
-
-
-
-// 미리 보기
-@Preview(showBackground = true)
-@Composable
-fun PreviewItemListScreen() {
-    val dataList : List<TripScheduleModel> = listOf(
-        TripScheduleModel(
-            scheduleTitle = "제주 힐링여행",
-            // scheduleStartDate = "2025.03.01",
-            scheduleCity = "서울",
-            // scheduleEndDate = "2025.03.05",
-        ),
-        TripScheduleModel(
-            scheduleTitle = "서울 힐링여행",
-            // scheduleStartDate = "2025.03.06",
-            scheduleCity = "서울",
-            // scheduleEndDate = "2025.03.11",
-        )
-    )
-
-    ScheduleItemList(dataList)
 }

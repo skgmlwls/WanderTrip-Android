@@ -127,7 +127,6 @@ fun ScheduleCitySelectScreen(
                 scheduleStartDate = viewModel.scheduleStartDate.value,
                 scheduleEndDate = viewModel.scheduleEndDate.value,
                 onSelectedCity = {areaCode ->
-                    
                     // 일정 제목 날짜 아이디 저장 후 일정 상세로 넘어 간다
                     viewModel.addTripSchedule(
                         scheduleTitle = scheduleTitle,
@@ -136,7 +135,6 @@ fun ScheduleCitySelectScreen(
                         areaName = areaCode.areaName,
                         areaCode = areaCode.areaCode
                     )
-
                 }
             )
 

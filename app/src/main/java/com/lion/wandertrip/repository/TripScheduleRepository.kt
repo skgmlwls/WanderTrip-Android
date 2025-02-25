@@ -34,6 +34,14 @@ class TripScheduleRepository {
         return docRef.id
     }
 
+    // 일정 문서 id를 유저 일정 리스트에 추가
+    suspend fun addTripDocIdToUserScheduleList(userDocId: String, tripScheduleDocId: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        val userDocRef = firestore.collection("UserData").document(userDocId)
+        // userScheduleList 필드에 tripScheduleDocId 추가 (중복 시 추가되지 않음)
+        userDocRef.update("userScheduleList", FieldValue.arrayUnion(tripScheduleDocId)).await()
+    }
+
     // 일정 조회 (VO 리턴)
     suspend fun getTripSchedule(docId: String): TripScheduleVO? {
         val firestore = FirebaseFirestore.getInstance()
@@ -245,6 +253,30 @@ class TripScheduleRepository {
         } else {
             false
         }
+    }
+
+    // 유저 일정 docId로 일정 항목 가져 오기
+    suspend fun fetchScheduleList(scheduleDocId: List<String>): List<TripScheduleVO> {
+        val firestore = FirebaseFirestore.getInstance()
+        val scheduleItemList = mutableListOf<TripScheduleVO>()
+        for (docId in scheduleDocId) {
+            try {
+                val snapshot = firestore.collection("TripSchedule")
+                    .document(docId)
+                    .get()
+                    .await()
+                if (snapshot.exists()) {
+                    val item = snapshot.toObject(TripScheduleVO::class.java)
+                    item?.let { scheduleItemList.add(it) }
+                } else {
+                    Log.d("fetchUserScheduleList", "Document $docId does not exist")
+                }
+            } catch (e: Exception) {
+                Log.e("fetchUserScheduleList", "Error fetching docId: $docId", e)
+            }
+        }
+        // scheduleTimeStamp 기준 내림차순 정렬 (최신순)
+        return scheduleItemList.sortedByDescending { it.scheduleTimeStamp }
     }
 
     // 공공 데이터 관련 //////////////////////////////////////////////////////////////////////////////

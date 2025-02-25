@@ -3,13 +3,10 @@ package com.lion.wandertrip.service
 import android.graphics.Bitmap
 import android.util.Log
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.FirebaseFirestore
 import com.lion.wandertrip.model.ScheduleItem
 import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.repository.TripScheduleRepository
-import com.lion.wandertrip.vo.ScheduleItemVO
-import kotlinx.coroutines.tasks.await
 
 class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
 
@@ -23,6 +20,11 @@ class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
 
         // Repository에 VO를 넘겨서 Firestore에 저장
         return docId
+    }
+
+    // 일정 문서 id를 유저 일정 리스트에 추가
+    suspend fun addTripDocIdToUserScheduleList(userDocId: String, tripScheduleDocId: String) {
+        tripScheduleRepository.addTripDocIdToUserScheduleList(userDocId, tripScheduleDocId)
     }
 
     // 일정 조회 (Firestore → VO 변환 → Model 변환)
@@ -83,6 +85,12 @@ class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
         val isCheckInvite = tripScheduleRepository.addInviteUserByInviteNickname(scheduleDocId, inviteNickname)
 
         return isCheckInvite
+    }
+
+    // 유저 일정 docId로 일정 항목 가져 오기
+    suspend fun fetchScheduleList(scheduleDocId: List<String>): List<TripScheduleModel> {
+        val scheduleItemList = tripScheduleRepository.fetchScheduleList(scheduleDocId)
+        return scheduleItemList.map { it.toTripScheduleModel() }
     }
 
     // 공공 데이터 관련 ///////////////////////////////////////////////////////////////////////////////
