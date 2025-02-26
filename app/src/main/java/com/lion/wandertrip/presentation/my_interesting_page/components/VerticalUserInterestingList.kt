@@ -34,6 +34,7 @@ import com.lion.wandertrip.R
 import com.lion.wandertrip.component.CustomRatingBar
 import com.lion.wandertrip.model.UserInterestingModel
 import com.lion.wandertrip.presentation.my_interesting_page.MyInterestingViewModel
+import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 import com.lion.wandertrip.util.CustomFont
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
@@ -77,7 +78,7 @@ fun UserInterestingItem(viewModel : MyInterestingViewModel, interestingItem: Use
             Text(text = "저장 ${interestingItem.saveCount}회/추천 : ${interestingItem.starRatingCount}", fontSize = 14.sp, color = Color.Gray, fontFamily = CustomFont.customFontRegular)
             Spacer(modifier = Modifier.height(4.dp))
 
-            Text(text = "주소: ${interestingItem.addr1} ${interestingItem.addr2}", fontSize = 14.sp, color = Color.Gray, fontFamily = CustomFont.customFontRegular)
+            Text(text = "주소: ${interestingItem.addr1} ${interestingItem.addr2}", fontSize = 14.sp, color = Color.Gray, fontFamily = NanumSquareRoundRegular)
         }
 
         // 우측: 이미지 + 하트 아이콘

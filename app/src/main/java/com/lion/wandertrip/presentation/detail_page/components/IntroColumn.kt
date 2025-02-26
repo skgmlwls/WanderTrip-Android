@@ -44,12 +44,11 @@ fun IntroColumn(detailViewModel: DetailViewModel, contentId : String) {
 
 
     LaunchedEffect (Unit){
-        Log.d("cotentValue ","contentValue : ${detailViewModel.tripCommonContentModelValue.value.contentId}")
+        detailViewModel.getContentModel(contentId)
         detailViewModel.gettingCityName(
             detailViewModel.tripCommonContentModelValue.value.areaCode ?: "",
             detailViewModel.tripCommonContentModelValue.value.siGunGuCode ?: "",
         )
-        detailViewModel.getContentModel(contentId)
     }
 
     Column(
@@ -132,7 +131,6 @@ fun IntroColumn(detailViewModel: DetailViewModel, contentId : String) {
 
         Spacer(modifier = Modifier.height(16.dp)) // 간격
 
-        // TODO
         // 지역 소개 (길게)
         Text(
             text = detailViewModel.tripCommonContentModelValue.value.overview!!,

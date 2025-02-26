@@ -84,9 +84,9 @@ class DetailViewModel @Inject constructor(
 
 
     fun setState(value: Boolean) {
-        Log.d("test100", "state : $isLoading")
+        //Log.d("test100", "state : $isLoading")
         isLoading.value = value
-        Log.d("test100", "state : $isLoading")
+        //Log.d("test100", "state : $isLoading")
     }
 
     // 컨텐트 ID 로 api 에서 받아온  모델 가져오기
@@ -96,6 +96,12 @@ class DetailViewModel @Inject constructor(
                 tripCommonItemService.getTripCommonItem(contentID, null)
             }
             tripCommonContentModelValue.value = work1.await()!!
+
+            // 지역이름 받기
+            gettingCityName(
+                tripCommonContentModelValue.value.areaCode ?: "",
+                tripCommonContentModelValue.value.siGunGuCode ?: "",
+            )
 
         }
     }
@@ -295,6 +301,7 @@ class DetailViewModel @Inject constructor(
             }
             reviewCountValue.value = work2.await()
             Log.d("test", "content Rating : ${contentValue.value.ratingScore}")
+
         }
     }
 
@@ -304,7 +311,14 @@ class DetailViewModel @Inject constructor(
     }
 
     // 내일정에 지금 컨텐츠 추가하기
-    fun addSchedule(tripScheduleDocId: String, title: String, type: String, date: Timestamp, lat: Double, lng: Double, contentId: String
+    fun addSchedule(
+        tripScheduleDocId: String,
+        title: String,
+        type: String,
+        date: Timestamp,
+        lat: Double,
+        lng: Double,
+        contentId: String
     ) {
         viewModelScope.launch {
             val work1 = async(Dispatchers.IO) {
@@ -323,12 +337,10 @@ class DetailViewModel @Inject constructor(
                 )
 
                 tripScheduleService.addTripItemToSchedule(
-                    tripScheduleDocId,
-                    date,
-                    scheduleItem
+                    tripScheduleDocId, date, scheduleItem
                 )
             }.join()
-            isAddScheduleSheetOpen.value=false
+            isAddScheduleSheetOpen.value = false
         }
     }
 
@@ -422,21 +434,15 @@ class DetailViewModel @Inject constructor(
         filteredReviewList.clear()
         // 최신순 정렬
         if (isRecentFilter.value) {
-            filteredReviewList.addAll(
-                reviewList.sortedByDescending { it.reviewTimeStamp }
-            )
+            filteredReviewList.addAll(reviewList.sortedByDescending { it.reviewTimeStamp })
         }
         // 별점 낮은순 정렬
         else if (isRatingAsc.value) {
-            filteredReviewList.addAll(
-                reviewList.sortedBy { it.reviewRatingScore }
-            )
+            filteredReviewList.addAll(reviewList.sortedBy { it.reviewRatingScore })
         }
         // 별점 높은순 정렬
         else {
-            filteredReviewList.addAll(
-                reviewList.sortedByDescending { it.reviewRatingScore }
-            )
+            filteredReviewList.addAll(reviewList.sortedByDescending { it.reviewRatingScore })
         }
     }
 
@@ -445,11 +451,11 @@ class DetailViewModel @Inject constructor(
         // url map 초기화
         reviewImageUrlMap.clear()
         // 로그 추가: 함수가 호출되었는지 확인
-        Log.d("getUri", "getUri() 함수 호출됨, 이미지 URL 가져오기 시작")
+        //Log.d("getUri", "getUri() 함수 호출됨, 이미지 URL 가져오기 시작")
 
         viewModelScope.launch {
             filterReviewList.forEachIndexed { index, reviewModel ->
-                Log.d("getUri", "$index 번째 리뷰에 대한 이미지 URL 가져오기 시작")
+                //Log.d("getUri", "$index 번째 리뷰에 대한 이미지 URL 가져오기 시작")
 
                 // 이미지 URL 리스트 가져오기
                 val urlList = contentsReviewService.gettingReviewImage(
@@ -458,11 +464,11 @@ class DetailViewModel @Inject constructor(
                 )
 
                 // 로그: URL 리스트가 어떻게 나왔는지 확인
-                Log.d("getUri", "$index 번째 리뷰의 URL 리스트: $urlList")
+                //Log.d("getUri", "$index 번째 리뷰의 URL 리스트: $urlList")
 
                 // URL 맵에 추가
                 reviewImageUrlMap[index] = urlList.toMutableStateList()
-                Log.d("test100", "map[$index] : $reviewImageUrlMap[$index]")
+                //Log.d("test100", "map[$index] : $reviewImageUrlMap[$index]")
             }
 
             // 로그: 작업이 끝났는지 확인
@@ -519,7 +525,7 @@ class DetailViewModel @Inject constructor(
 
     // 리뷰 삭제 버튼
     fun deleteReview(contentDocId: String, contentsReviewDocId: String) {
-        Log.d("test100", "contentDocId :$contentDocId, contentsReviewDocId:$contentsReviewDocId")
+        //Log.d("test100", "contentDocId :$contentDocId, contentsReviewDocId:$contentsReviewDocId")
         viewModelScope.launch {
             // 삭제 진행
             val work1 = async(Dispatchers.IO) {

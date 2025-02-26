@@ -60,13 +60,13 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
                             detailViewModel.onClickIconMap()
                         }
                     )
-                    // 일정 추가 아이콘
+                    /*// 일정 추가 아이콘
                     CustomIconButton(
                         ImageVector.vectorResource(R.drawable.ic_calendar_add_on_24px),
                         iconButtonOnClick = {
                             detailViewModel.onClickIconAddSchedule()
                         }
-                    )
+                    )*/
                 },
                 navigationIconImage = Icons.AutoMirrored.Filled.ArrowBack,
                 navigationIconOnClick = {
