@@ -120,10 +120,10 @@ class TripCommonItemRepository(private val api: TripCommonItemInterface) {
                                     ratingScore = 0.0f,
                                     starRatingCount = 0,
                                     saveCount = 0,
-                                    cat2 = item.cat2?:"none",
-                                    cat3 = item.cat3?:"none",
-                                    addr1 = item.addr1?:"none",
-                                    addr2 = item.addr2?:"none"
+                                    cat2 = item.cat2 ?: "none",
+                                    cat3 = item.cat3 ?: "none",
+                                    addr1 = item.addr1 ?: "none",
+                                    addr2 = item.addr2 ?: "none"
                                 )
                             )
                         } else {
@@ -131,7 +131,10 @@ class TripCommonItemRepository(private val api: TripCommonItemInterface) {
                         }
                     }
                 } else {
-                    Log.e("test100", "❌ API 요청 실패 | HTTP 코드: ${response.code()} | 오류 메시지: ${response.message()}")
+                    Log.e(
+                        "test100",
+                        "❌ API 요청 실패 | HTTP 코드: ${response.code()} | 오류 메시지: ${response.message()}"
+                    )
                 }
             }
 

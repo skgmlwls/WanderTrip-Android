@@ -24,19 +24,21 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.wandertrip.presentation.bottom.home_page.components.PopularTripItem
 import com.lion.wandertrip.presentation.bottom.home_page.components.TravelSpotItem
+import com.lion.wandertrip.ui.theme.NanumSquareRound
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
-    val tripItems by viewModel.tripItemList.observeAsState(emptyList())
+    val tripItems by viewModel.randomTourItems.observeAsState(emptyList())
     val topTrips by viewModel.topScrapedTrips.observeAsState(emptyList())
     val imageUrlMap = viewModel.imageUrlMap
 
     LaunchedEffect(Unit) {
         viewModel.fetchTripNotes()
         viewModel.getTopScrapedTrips()
+        viewModel.fetchRandomTourItems()
     }
 
     Scaffold(
@@ -80,7 +82,7 @@ fun HomeScreen(
                     Text(
                         text = "추천 관광지",
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontFamily = NanumSquareRound,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                 }
@@ -96,7 +98,7 @@ fun HomeScreen(
                     Text(
                         text = "🔥 인기 많은 여행기",
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontFamily = NanumSquareRound,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                 }
