@@ -1,9 +1,7 @@
 package com.lion.wandertrip.presentation.bottom.schedule_page
 
 import android.content.Context
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -127,7 +125,49 @@ class ScheduleViewModel @Inject constructor(
         return localDate.format(formatter)
     }
 
+    // 내 일정 삭제
+    fun removeUserSchedule(tripScheduleDocId: String) {
+        Log.d("ScheduleViewModel", "deleteSchedule: $tripScheduleDocId")
+        viewModelScope.launch {
+            val work1 = async(Dispatchers.IO) {
+                tripScheduleService.removeUserScheduleList(
+                    application.loginUserModel.userDocId,
+                    tripScheduleDocId
+                )
+            }.await()
 
+            val work2 = async(Dispatchers.IO) {
+                tripScheduleService.removeScheduleInviteList(
+                    tripScheduleDocId,
+                    application.loginUserModel.userDocId
+                )
+            }.await()
+        }
+    }
+
+    // 초대 받은 일정 삭제
+    fun removeInvitedSchedule(tripScheduleDocId: String) {
+        Log.d("ScheduleViewModel", "deleteSchedule: $tripScheduleDocId")
+        viewModelScope.launch {
+            val work1 = async(Dispatchers.IO) {
+                tripScheduleService.removeInvitedScheduleList(
+                    application.loginUserModel.userDocId,
+                    tripScheduleDocId
+                )
+            }.await()
+
+            val work2 = async(Dispatchers.IO) {
+                tripScheduleService.removeScheduleInviteList(
+                    tripScheduleDocId,
+                    application.loginUserModel.userDocId
+                )
+            }.await()
+        }
+    }
+
+
+
+    // 해당 일정 상세 화면으로 이동
     fun moveToScheduleDetailScreen(scheduleModel: TripScheduleModel) {
         // scheduleCity와 일치하는 AreaCode 찾기 (없으면 0 반환)
         val areaCodeValue = AreaCode.entries.firstOrNull { it.areaName == scheduleModel.scheduleCity }?.areaCode ?: 0

@@ -375,6 +375,46 @@ class TripScheduleRepository {
         return scheduleItemList.sortedByDescending { it.scheduleTimeStamp }
     }
 
+    // 유저 일정 리스트에서 일정 삭제
+    suspend fun removeUserScheduleList(userDocId: String, userScheduleDocId: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        val userDocRef = firestore.collection("UserData").document(userDocId)
+
+        val snapshot = userDocRef.get().await()
+        if (!snapshot.exists()) return
+
+        val scheduleList = snapshot.get("userScheduleList") as? List<String> ?: emptyList()
+        if (scheduleList.contains(userScheduleDocId)) {
+            userDocRef.update("userScheduleList", FieldValue.arrayRemove(userScheduleDocId)).await()
+        }
+    }
+
+    // 초대 받은 일정 리스트에서 일정 삭제
+    suspend fun removeInvitedScheduleList(userDocId: String, invitedScheduleDocId: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        val userDocRef = firestore.collection("UserData").document(userDocId)
+
+        val snapshot = userDocRef.get().await()
+        if (!snapshot.exists()) return
+
+        val scheduleList = snapshot.get("invitedScheduleList") as? List<String> ?: emptyList()
+        if (scheduleList.contains(invitedScheduleDocId)) {
+            userDocRef.update("invitedScheduleList", FieldValue.arrayRemove(invitedScheduleDocId)).await()
+        }
+    }
+
+    // 일정에서 초대된 유저 문서 Id 삭제
+    suspend fun removeScheduleInviteList(tripScheduleDocId: String, userDocId: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        val scheduleDocRef = firestore.collection("TripSchedule").document(tripScheduleDocId)
+
+        // 문서가 존재하는지 확인 후, scheduleInviteList에서 userDocId 제거
+        val snapshot = scheduleDocRef.get().await()
+        if (snapshot.exists()) {
+            scheduleDocRef.update("scheduleInviteList", FieldValue.arrayRemove(userDocId)).await()
+        }
+    }
+
     // 공공 데이터 관련 //////////////////////////////////////////////////////////////////////////////
 
     // API 호출 및 데이터 로드
