@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step3_page
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,15 +10,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.a02_boardcloneproject.component.CustomOutlinedTextField
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.a02_boardcloneproject.component.LikeLionOutlinedTextFieldEndIconMode
 import com.lion.a02_boardcloneproject.component.LikeLionOutlinedTextFieldInputType
-import com.lion.wandertrip.R
 import com.lion.wandertrip.component.BlueButton
 
 // 카카오 로그인으로 가입시
@@ -26,6 +24,7 @@ fun UserSignUpStep3Screen(
     kakaoToken: String,
     userSignUpStep3ViewModel: UserSignUpStep3ViewModel = hiltViewModel()
 ) {
+    Log.d("test","UserSignUpStep3Screen -> kakaoTk $kakaoToken")
     Scaffold(
         topBar = {
             CustomTopAppBar(
@@ -75,7 +74,7 @@ fun UserSignUpStep3Screen(
                 text = "회원가입 완료",
                 paddingTop = 10.dp,
                 onClick = {
-                    userSignUpStep3ViewModel.onClickButtonSignUp(kakaoToken = kakaoToken)
+                    userSignUpStep3ViewModel.onClickKaKaoButtonSignUp(kakaoToken = kakaoToken.toLong())
                 }
             )
         }

@@ -112,7 +112,7 @@ class UserService (val userRepository: UserRepository) {
     }
 
     // 카카오 로그인 토큰 값으로 사용자 정보를 가져오는 메서드
-    suspend fun selectUserDataByKakaoLoginToken(kToken:String) : UserModel?{
+    suspend fun selectUserDataByKakaoLoginToken(kToken:Long) : UserModel?{
         val userVO = userRepository.selectUserDataByKakaoLoginToken(kToken)
 
         return userVO?.toUserModel()

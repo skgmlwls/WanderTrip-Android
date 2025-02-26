@@ -66,7 +66,7 @@ class UserSignUpStep3ViewModel @Inject constructor(
 
     // 다음 버튼을 누르면 호출되는 메서드
     // 회원가입 메서드
-    fun onClickButtonSignUp(kakaoToken:String){
+    fun onClickKaKaoButtonSignUp(kakaoToken:Long){
         // 기본에 있는 에러 메시지는 모두 초기화
         textFieldUserJoinStep1NickNameErrorText.value=""
         textFieldUserJoinStep1NickNameIsError.value=false
@@ -83,7 +83,7 @@ class UserSignUpStep3ViewModel @Inject constructor(
             // TODO 유저 정보 등록
             val userModel = UserModel(
                 userNickName = textFieldUserJoinStep1NickNameValue.value,
-                userKakaoToken = kakaoToken
+                kakaoId = kakaoToken
             )
 
             CoroutineScope(Dispatchers.Main).launch {
@@ -101,7 +101,7 @@ class UserSignUpStep3ViewModel @Inject constructor(
                 // SharedPreference에 저장한다.
                 val pref = tripApplication.getSharedPreferences("KakaoToken", Context.MODE_PRIVATE)
                 pref.edit {
-                    putString("kToken", kakaoToken)
+                    putLong("kToken", kakaoToken)
                 }
 
                 // 프로필사진 설정 화면으로 이동, userDocId 값을 경로에 포함시켜 전달
