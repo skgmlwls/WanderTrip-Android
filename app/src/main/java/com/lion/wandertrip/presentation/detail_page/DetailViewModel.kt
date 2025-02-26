@@ -21,6 +21,7 @@ import com.lion.wandertrip.service.ContentsReviewService
 import com.lion.wandertrip.service.ContentsService
 import com.lion.wandertrip.service.TripCommonItemService
 import com.lion.wandertrip.service.TripScheduleService
+import com.lion.wandertrip.service.UserService
 import com.lion.wandertrip.util.ContentTypeId
 import com.lion.wandertrip.util.MainScreenName
 import com.lion.wandertrip.util.Tools
@@ -43,6 +44,7 @@ class DetailViewModel @Inject constructor(
     val contentsReviewService: ContentsReviewService,
     val contentsService: ContentsService,
     val tripScheduleService: TripScheduleService,
+    val userService: UserService,
 ) : ViewModel() {
     val tripApplication = context as TripApplication
 
@@ -282,9 +284,39 @@ class DetailViewModel @Inject constructor(
     // 별점 등록 문서 개수
     val reviewCountValue = mutableStateOf(0)
 
+    // 유저 좋아요 목록에 해당 페이지 있는가를 나타내는 상태변수
+    val isLikeContentValue = mutableStateOf(false)
+
+    // 코드로 지역 이름 가져오기
     fun gettingCityName(areaCode: String, siGunGuCode: String) {
         Log.d("test", "areaCode : $areaCode")
         cityNameValue.value = Tools.getAreaDetails(areaCode, siGunGuCode)
+    }
+
+    // 좋아요 목록에 해당 글이 있는가?
+    fun isLikeContent(contentId: String) {
+        viewModelScope.launch {
+            val work1=async(Dispatchers.IO){
+                userService.isLikeContent(tripApplication.loginUserModel.userDocId,contentId)
+            }
+            isLikeContentValue.value = work1.await()
+        }
+    }
+
+    // 좋아요 버튼 누를때 리스너 메서드
+    fun onClickIconIsLikeContent(contentId:String) {
+        viewModelScope.launch {
+            // 좋아요상태를 변경한다.
+            val work1= async(Dispatchers.IO){
+                when (isLikeContentValue.value) {
+                    true -> userService.removeLikeItem(tripApplication.loginUserModel.userDocId,contentId)
+                    false -> userService.addLikeItem(tripApplication.loginUserModel.userDocId,contentId)
+                }
+            }
+            work1.join()
+            // 변경 상태를 화면에 반영한다
+            isLikeContent(contentId)
+        }
 
     }
 

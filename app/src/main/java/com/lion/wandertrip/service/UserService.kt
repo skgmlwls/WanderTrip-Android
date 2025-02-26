@@ -170,4 +170,14 @@ class UserService (val userRepository: UserRepository) {
         userRepository.removeLikeCnt(likeItemContentId)
     }
 
+    // 해당 컨텐츠가 관심목록에 있는가?
+    suspend fun isLikeContent(userDocId: String ,contentId : String): Boolean {
+        var result = false
+        val userLikeContentList = userRepository.gettingUserInterestingContentIdList(userDocId)
+
+        if(userLikeContentList.contains(contentId)) result = true
+
+        return result
+    }
+
 }

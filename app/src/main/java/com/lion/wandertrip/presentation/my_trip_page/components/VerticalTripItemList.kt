@@ -1,6 +1,7 @@
 package com.lion.wandertrip.presentation.my_trip_page.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -65,7 +66,9 @@ fun VerticalTripItemList(myTripViewModel: MyTripViewModel) {
 @Composable
 fun TripItem(trip: TripScheduleModel,myTripViewModel: MyTripViewModel,pos : Int) {
     Row(
-        modifier = Modifier
+        modifier = Modifier.clickable {
+            myTripViewModel.onClickScheduleItemGoScheduleDetail(trip.tripScheduleDocId,trip.scheduleCity)
+        }
             .fillMaxWidth()
             .padding(10.dp)
     ) {

@@ -2,6 +2,7 @@ package com.lion.wandertrip.presentation.my_trip_note.components
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -69,7 +70,9 @@ fun TripNoteItem(tripNote: TripNoteModel, pos: Int, myTripNoteViewModel: MyTripN
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp)
+            .padding(10.dp).clickable {
+                myTripNoteViewModel.onClickTripNoteItemGoTripNoteDetail(tripNote.tripNoteDocumentId)
+            }
     ) {
         Column(
             modifier = Modifier.padding(10.dp)

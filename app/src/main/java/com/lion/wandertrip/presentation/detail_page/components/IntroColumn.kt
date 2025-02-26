@@ -36,19 +36,20 @@ import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
-fun IntroColumn(detailViewModel: DetailViewModel, contentId : String) {
-    Log.d("test100","contentId")
+fun IntroColumn(detailViewModel: DetailViewModel, contentId: String) {
+    Log.d("test100", "contentId")
     val sw = detailViewModel.tripApplication.screenWidth
     val sh = detailViewModel.tripApplication.screenHeight
     val tripCommonContentValue = detailViewModel.tripCommonContentModelValue.value
 
 
-    LaunchedEffect (Unit){
+    LaunchedEffect(Unit) {
         detailViewModel.getContentModel(contentId)
         detailViewModel.gettingCityName(
             detailViewModel.tripCommonContentModelValue.value.areaCode ?: "",
             detailViewModel.tripCommonContentModelValue.value.siGunGuCode ?: "",
         )
+        detailViewModel.isLikeContent(contentId)
     }
 
     Column(
@@ -64,37 +65,43 @@ fun IntroColumn(detailViewModel: DetailViewModel, contentId : String) {
 
         Spacer(modifier = Modifier.height(16.dp)) // 간격
 
-        Row (
+        Row(
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
             // 별점 표시
             CustomRatingBar(detailViewModel.contentValue.value.ratingScore)
-            Text("(${detailViewModel.contentValue.value.ratingScore})", fontFamily = CustomFont.customFontRegular)
-            Text(" ${detailViewModel.reviewCountValue.value}명이 추천중!.", fontFamily = CustomFont.customFontRegular)
+            Text(
+                "(${detailViewModel.contentValue.value.ratingScore})",
+                fontFamily = CustomFont.customFontRegular
+            )
+            Text(
+                " ${detailViewModel.reviewCountValue.value}명이 추천중!.",
+                fontFamily = CustomFont.customFontRegular
+            )
         }
 
 
         Spacer(modifier = Modifier.height(16.dp)) // 간격
 
         // 로케이션 아이콘과 텍스트
-        if(detailViewModel.cityNameValue.value!="")
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.LocationOn,
-                contentDescription = "로케이션 아이콘",
-                modifier = Modifier.size(24.dp),
-                tint = Color.Gray
-            )
-            // model 에 area코드, sigungu code 없어 못가져옴 추가할지 버릴지 선택해야함
-            Text(
-                detailViewModel.cityNameValue.value,
-                fontSize = 16.sp,
-                fontFamily = CustomFont.customFontRegular
-            )
-        }
+        if (detailViewModel.cityNameValue.value != "")
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.LocationOn,
+                    contentDescription = "로케이션 아이콘",
+                    modifier = Modifier.size(24.dp),
+                    tint = Color.Gray
+                )
+                // model 에 area코드, sigungu code 없어 못가져옴 추가할지 버릴지 선택해야함
+                Text(
+                    detailViewModel.cityNameValue.value,
+                    fontSize = 16.sp,
+                    fontFamily = CustomFont.customFontRegular
+                )
+            }
 
         Spacer(modifier = Modifier.height(16.dp)) // 간격
 
@@ -117,9 +124,15 @@ fun IntroColumn(detailViewModel: DetailViewModel, contentId : String) {
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier.fillMaxWidth()
         ) {
+            val img = when (detailViewModel.isLikeContentValue.value) {
+                true -> R.drawable.ic_heart_filled_24px
+                false -> R.drawable.ic_heart_empty_24px
+            }
             DetailColumnIconAndText(
-                ImageVector.vectorResource(R.drawable.ic_heart_filled_24px),
-                "저장하기", onClick = {}
+                ImageVector.vectorResource(img),
+                "저장하기", onClick = {
+                    detailViewModel.onClickIconIsLikeContent(contentId)
+                },true
             )
             DetailColumnIconAndText(
                 ImageVector.vectorResource(R.drawable.ic_calendar_add_on_24px),
@@ -128,14 +141,17 @@ fun IntroColumn(detailViewModel: DetailViewModel, contentId : String) {
                 }
             )
         }
-
-        Spacer(modifier = Modifier.height(16.dp)) // 간격
-
-        // 지역 소개 (길게)
-        Text(
-            text = detailViewModel.tripCommonContentModelValue.value.overview!!,
-            fontSize = 16.sp,
-            fontFamily = CustomFont.customFontRegular
-        )
     }
+
+
+
+    Spacer(modifier = Modifier.height(16.dp)) // 간격
+
+    // 지역 소개 (길게)
+    Text(
+        text = detailViewModel.tripCommonContentModelValue.value.overview!!,
+        fontSize = 16.sp,
+        fontFamily = CustomFont.customFontRegular
+    )
 }
+
