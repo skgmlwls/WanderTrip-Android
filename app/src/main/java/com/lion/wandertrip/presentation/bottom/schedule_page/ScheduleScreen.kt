@@ -11,18 +11,22 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.wandertrip.presentation.bottom.schedule_page.component.ScheduleIconButton
 import com.lion.wandertrip.presentation.bottom.schedule_page.component.ScheduleItemList
 import com.lion.wandertrip.ui.theme.NanumSquareRound
+import com.lion.wandertrip.ui.theme.wanderBlueColor
 import kotlinx.coroutines.launch
 
 @Composable
@@ -47,6 +51,7 @@ fun ScheduleScreen(
 
     Scaffold(
         modifier = Modifier,
+        containerColor = Color.White
     ) {
         Column(
             modifier = Modifier
@@ -73,7 +78,16 @@ fun ScheduleScreen(
             }
 
             // 탭 레이아웃
-            TabRow(selectedTabIndex = pagerState.currentPage) {
+            TabRow(
+                selectedTabIndex = pagerState.currentPage,
+                containerColor = Color.White, // 전체 배경색 설정 (필요하면 변경 가능)
+                indicator = { tabPositions ->
+                    TabRowDefaults.Indicator(
+                        modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
+                        color = wanderBlueColor // 🔥 선택된 탭의 아래 indicator 색상 변경
+                    )
+                }
+            ) {
                 tabTitles.forEachIndexed { index, title ->
                     Tab(
                         selected = pagerState.currentPage == index,

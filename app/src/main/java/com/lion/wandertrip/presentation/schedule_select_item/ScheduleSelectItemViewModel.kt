@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.lion.wandertrip.TripApplication
+import com.lion.wandertrip.model.ContentsModel
 import com.lion.wandertrip.model.ScheduleItem
 import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.service.TripScheduleService
@@ -46,35 +47,14 @@ class ScheduleSelectItemViewModel @Inject constructor(
     // 관심 지역 목록
     val userLikeList = mutableStateListOf<String>()
 
+    // 일정 리뷰 관련 리스트
+    val contentsList = mutableStateListOf<ContentsModel>()
+
 
     // 이전 화면 으로 이동 (일정 상세 화면)
     fun backScreen() {
         application.navHostController.popBackStack()
     }
-
-    // 유저 일정 리스트들 옵저버
-//    fun observeUserScheduleDocIdList() {
-//        val firestore = FirebaseFirestore.getInstance()
-//        // application.loginUserModel.userDocId 를 통해 유저 문서 ID 획득 (null 아님을 가정)
-//        val userDocId = application.loginUserModel.userDocId
-//        val userDocRef = firestore.collection("UserData").document(userDocId)
-//
-//        // 문서 변경 감지 리스너 등록
-//        userDocRef.addSnapshotListener { snapshot, error ->
-//            if (error != null) {
-//                Log.e("observeUserData", "Error: ${error.message}")
-//                return@addSnapshotListener
-//            }
-//            if (snapshot != null && snapshot.exists()) {
-//                // userLikeList 필드를 List<String> 형태로 가져오기 (없으면 빈 리스트)
-//                val likeItem = snapshot.get("userLikeList") as? List<String> ?: emptyList()
-//
-//                // 기존 리스트 클리어 후 업데이트
-//                userLikeList.clear()
-//                userLikeList.addAll(likeItem)
-//            }
-//        }
-//    }
 
     // 유저 관심 지역 옵저브
     fun observeUserLikeList() {
@@ -101,6 +81,29 @@ class ScheduleSelectItemViewModel @Inject constructor(
             }
         }
     }
+
+    // 리뷰 데이터 컬렉션 옵저브
+    fun observeContentsData() {
+        val firestore = FirebaseFirestore.getInstance()
+        firestore.collection("ContentsData")
+            .addSnapshotListener { querySnapshot, error ->
+                if (error != null) {
+                    Log.e("observeContentsData", "데이터 옵저브 에러: ${error.message}")
+                    return@addSnapshotListener
+                }
+                querySnapshot?.let { snapshot ->
+                    val resultContentsList = snapshot.documents.mapNotNull { doc ->
+                        doc.toObject(ContentsModel::class.java)
+                    }
+                    // 기존 리스트를 클리어하고 최신 데이터로 업데이트
+                    contentsList.clear()
+                    contentsList.addAll(resultContentsList)
+                    Log.d("observeContentsData", "총 ${contentsList.size}개의 문서를 가져왔습니다.")
+                }
+            }
+    }
+
+
 
     // 여행지 항목 가져 오기
     fun loadTripItems(serviceKey: String, areaCode: String, contentTypeId: String) {

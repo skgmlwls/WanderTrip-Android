@@ -66,6 +66,7 @@ fun TripItemList(
                     .fillMaxWidth()
                     .padding(vertical = 4.dp)
                     .clickable { onItemClick(tripItem) },
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp), // 카드 그림자 효과
                 colors = CardDefaults.cardColors(
                     containerColor = if (isSelected) Color(0xFFB3E5FC) else Color.White
                 )
@@ -138,13 +139,13 @@ fun TripItemList(
                         Text(
                             text = when(tripItem.contentTypeId) {
                                 ContentTypeId.TOURIST_ATTRACTION.contentTypeCode.toString() -> {
-                                    fromCodeTripItemCat2(tripItem.cat2)!!.catName
+                                    fromCodeTripItemCat2(tripItem.cat2)?.catName ?: ""
                                 }
                                 ContentTypeId.RESTAURANT.contentTypeCode.toString() -> {
-                                    fromCodeRestaurantItemCat3(tripItem.cat3)!!.catName
+                                    fromCodeRestaurantItemCat3(tripItem.cat3)?.catName ?: ""
                                 }
                                 ContentTypeId.ACCOMMODATION.contentTypeCode.toString() -> {
-                                    fromCodeAccommodationItemCat3(tripItem.cat3)!!.catName
+                                    fromCodeAccommodationItemCat3(tripItem.cat3)?.catName ?: ""
                                 }
                                 else -> ""
                             },

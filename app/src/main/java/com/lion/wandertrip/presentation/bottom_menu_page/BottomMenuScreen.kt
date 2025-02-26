@@ -49,6 +49,7 @@ fun BottomMenuScreen(bottomMenuViewModel: BottomMenuViewModel = hiltViewModel())
     /*var selectedItem by remember { mutableStateOf(0) }*/
 
     Scaffold(
+        containerColor = Color.White,
         bottomBar = {
             BottomAppBar {
                 Row(
