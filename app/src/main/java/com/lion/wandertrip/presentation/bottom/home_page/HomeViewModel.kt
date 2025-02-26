@@ -1,12 +1,15 @@
 package com.lion.wandertrip.presentation.bottom.home_page
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.lion.wandertrip.service.TripNoteService
 import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.SimpleTripItemModel
@@ -20,6 +23,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -31,7 +36,6 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel(){
 
     val tripApplication = context as TripApplication
-
     
     var popularTripList = mutableStateListOf<SimpleTripItemModel>()
 
@@ -45,6 +49,54 @@ class HomeViewModel @Inject constructor(
 
     private val _tripNoteList = MutableLiveData<List<TripNoteModel>>()
     val tripNoteList: LiveData<List<TripNoteModel>> get() = _tripNoteList
+
+    private val _imageUrlMap = mutableStateMapOf<String, String?>()
+    val imageUrlMap: Map<String, String?> get() = _imageUrlMap
+
+    fun fetchTripNotes() {
+        viewModelScope.launch {
+            try {
+                val firestore = FirebaseFirestore.getInstance()
+                val collectionReference = firestore.collection("TripNoteData")
+
+                val result = collectionReference
+                    .orderBy("tripNoteTimeStamp", Query.Direction.DESCENDING)
+                    .get()
+                    .await()
+
+                val tripNotes = result.documents.mapNotNull { document ->
+                    val tripNoteVO = document.toObject(TripNoteVO::class.java)
+                    tripNoteVO?.toTripNoteModel(document.id)
+                }
+
+                _tripNoteList.value = tripNotes // ✅ Firestore 데이터 업데이트
+                fetchImageUrls() // ✅ 여행기 데이터 가져온 후 이미지 URL도 가져오기
+
+            } catch (e: Exception) {
+                Log.e("Firestore", "Error fetching trip notes", e)
+            }
+        }
+    }
+
+    fun fetchImageUrls() {
+        val tripNotes = tripNoteList.value ?: return // 🔥 LiveData에서 최신 데이터를 가져옴
+
+        tripNotes.forEach { tripNote ->
+            val fileName = tripNote.tripNoteImage.firstOrNull() ?: return@forEach
+
+            // 이미 로딩 중이거나 가져온 데이터가 있으면 다시 요청하지 않음
+            if (_imageUrlMap.containsKey(fileName)) return@forEach
+
+            // 🔥 초기 로딩 상태를 빈 문자열("")로 설정하여 Compose가 감지할 수 있도록 변경
+            _imageUrlMap[fileName] = ""
+
+            viewModelScope.launch {
+                val imageUrl = tripNoteService.gettingImage(fileName)
+                _imageUrlMap[fileName] = imageUrl?.toString() ?: ""  // 🚀 URL이 null이면 빈 문자열로 처리
+            }
+        }
+    }
+
 
     fun getTopScrapedTrips() {
         viewModelScope.launch {

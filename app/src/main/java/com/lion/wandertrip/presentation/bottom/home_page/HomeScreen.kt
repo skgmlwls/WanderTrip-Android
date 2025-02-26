@@ -22,10 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.lion.wandertrip.model.SimpleTripItemModel
 import com.lion.wandertrip.presentation.bottom.home_page.components.PopularTripItem
 import com.lion.wandertrip.presentation.bottom.home_page.components.TravelSpotItem
-import com.lion.wandertrip.util.ContentTypeId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,8 +32,10 @@ fun HomeScreen(
 ) {
     val tripItems by viewModel.tripItemList.observeAsState(emptyList())
     val topTrips by viewModel.topScrapedTrips.observeAsState(emptyList())
+    val imageUrlMap = viewModel.imageUrlMap
 
     LaunchedEffect(Unit) {
+        viewModel.fetchTripNotes()
         viewModel.getTopScrapedTrips()
     }
 
@@ -103,6 +103,7 @@ fun HomeScreen(
                 items(topTrips) { tripNote ->
                     PopularTripItem(
                         tripItem = tripNote,
+                        imageUrl = imageUrlMap[tripNote.tripNoteImage.firstOrNull()],
                         onItemClick = { viewModel.onClickTripNote(tripNote.tripNoteDocumentId) }
                     )
                 }
