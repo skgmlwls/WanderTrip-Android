@@ -2,6 +2,7 @@ package com.lion.wandertrip.presentation.bottom.my_info_page
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -12,7 +13,9 @@ import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.model.UserModel
 import com.lion.wandertrip.service.TripScheduleService
 import com.lion.wandertrip.service.UserService
+import com.lion.wandertrip.util.AreaCode
 import com.lion.wandertrip.util.MainScreenName
+import com.lion.wandertrip.util.ScheduleScreenName
 import com.lion.wandertrip.util.Tools
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -69,6 +72,18 @@ class MyInfoViewModel @Inject constructor(
     // 최근 게시물 클릭 리스너
     fun onClickCardRecentContent(contentId: String) {
         tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_DETAIL.name}/$contentId")
+    }
+
+    // 내 여행 상세로 화면 전환 메서드
+    fun onClickScheduleItemGoScheduleDetail(tripScheduleDocId : String, areaName:String ) {
+
+        // scheduleCity와 일치하는 AreaCode 찾기 (없으면 0 반환)
+        val areaCodeValue = AreaCode.entries.firstOrNull { it.areaName == areaName }?.areaCode ?: 0
+        Log.d("ScheduleViewModel", "areaCodeValue: $areaCodeValue")
+
+
+        tripApplication.navHostController.navigate("${ScheduleScreenName.SCHEDULE_DETAIL_SCREEN.name}?" +
+                "tripScheduleDocId=${tripScheduleDocId}&areaName=${areaName}&areaCode=$areaCodeValue")
     }
 
     // userModel 가져오기

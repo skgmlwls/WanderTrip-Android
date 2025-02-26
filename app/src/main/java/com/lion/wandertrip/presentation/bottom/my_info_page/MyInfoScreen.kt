@@ -49,7 +49,7 @@ fun MyInfoScreen(myInfoViewModel: MyInfoViewModel = hiltViewModel()) {
             Spacer(modifier = Modifier.height(16.dp))  // 프로필 카드와 일정 리스트 사이 간격
 
             // 일정 리스트
-            HorizontalScheduleList(myInfoViewModel.recentScheduleList)
+            HorizontalScheduleList(myInfoViewModel,myInfoViewModel.recentScheduleList)
 
             // 최근 게시글 리스트
             HorizontalRecentPostsList(

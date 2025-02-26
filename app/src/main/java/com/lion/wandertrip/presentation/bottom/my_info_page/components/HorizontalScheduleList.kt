@@ -1,6 +1,7 @@
 package com.lion.wandertrip.presentation.bottom.my_info_page.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -20,10 +21,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lion.wandertrip.model.TripScheduleModel
+import com.lion.wandertrip.presentation.bottom.my_info_page.MyInfoViewModel
 import com.lion.wandertrip.util.Tools
 
 @Composable
-fun HorizontalScheduleList(schedules: List<TripScheduleModel>) {
+fun HorizontalScheduleList(viewModel : MyInfoViewModel,schedules: List<TripScheduleModel>) {
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
@@ -32,15 +34,17 @@ fun HorizontalScheduleList(schedules: List<TripScheduleModel>) {
         horizontalArrangement = Arrangement.spacedBy(12.dp) // 아이템 간격
     ) {
         items(schedules) { schedule ->
-            ScheduleItemView(schedule)
+            ScheduleItemView(viewModel,schedule)
         }
     }
 }
 
 @Composable
-fun ScheduleItemView(schedule: TripScheduleModel) {
+fun ScheduleItemView(viewModel :MyInfoViewModel, scheduleItem: TripScheduleModel) {
     Row(
-        modifier = Modifier
+        modifier = Modifier.clickable {
+            viewModel.onClickScheduleItemGoScheduleDetail(scheduleItem.tripScheduleDocId,scheduleItem.scheduleCity)
+        }
             .width(330.dp)
             .height(50.dp) // 아이템 높이 조정
             .background(Color.LightGray, shape = RoundedCornerShape(10.dp)) // 배경 추가
@@ -49,9 +53,9 @@ fun ScheduleItemView(schedule: TripScheduleModel) {
         horizontalArrangement = Arrangement.SpaceBetween // 일정 이름과 남은 날짜를 좌우 정렬
     ) {
         // 일정 이름
-        Text(text = "${schedule.scheduleCity} 일정", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(text = "${scheduleItem.scheduleCity} 일정", fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
         // 남은 일정 (D-5 같은 형식)
-        Text(text = "D-${Tools.getRemainingDays(schedule.scheduleStartDate)}", fontSize = 14.sp, color = Color.Red)
+        Text(text = "D-${Tools.getRemainingDays(scheduleItem.scheduleStartDate)}", fontSize = 14.sp, color = Color.Red)
     }
 }

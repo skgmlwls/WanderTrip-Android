@@ -3,6 +3,7 @@ package com.lion.wandertrip.presentation.my_interesting_page
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -58,6 +59,45 @@ class MyInterestingViewModel @Inject constructor(
     // 로딩 상태 변수
     val isLoading = mutableStateOf(false)
 
+    // 유저 좋아요 목록에 해당 페이지 있는가를 나타내는 상태변수
+    val isLikeContentValue = mutableStateOf(false)
+
+    // 리스트 좋아요 상태 저장하는 맵
+    val likeMap = mutableStateMapOf<Int,Boolean>()
+
+    // 하트 변경 메서드
+    fun onClickIconHeart(contentId : String ,pos : Int) {
+        likeMap[pos] = !likeMap[pos]!!
+        onClickIconIsLikeContent(contentId)
+    }
+
+    // 좋아요 목록에 해당 글이 있는가?
+    fun isLikeContent(contentId: String) {
+        viewModelScope.launch {
+            val work1=async(Dispatchers.IO){
+                userService.isLikeContent(tripApplication.loginUserModel.userDocId,contentId)
+            }
+            isLikeContentValue.value = work1.await()
+        }
+    }
+
+    // 좋아요 버튼 누를때 리스너 메서드
+    fun onClickIconIsLikeContent(contentId:String) {
+        viewModelScope.launch {
+            // 좋아요상태를 변경한다.
+            val work1= async(Dispatchers.IO){
+                when (isLikeContentValue.value) {
+                    true -> userService.removeLikeItem(tripApplication.loginUserModel.userDocId,contentId)
+                    false -> userService.addLikeItem(tripApplication.loginUserModel.userDocId,contentId)
+                }
+            }
+            work1.join()
+            // 변경 상태를 화면에 반영한다
+            isLikeContent(contentId)
+        }
+
+    }
+
     // 뒤로가기
     fun onClickNavIconBack() {
         tripApplication.navHostController.popBackStack()
@@ -84,7 +124,6 @@ class MyInterestingViewModel @Inject constructor(
 
 
             // 컨텐츠 model을 가져와야 함
-
             userInterestingModelList.forEach {
                 val work3 = async(Dispatchers.IO){
                     contentsService.getContentByContentsId(it.contentID)
@@ -94,14 +133,15 @@ class MyInterestingViewModel @Inject constructor(
                 it.starRatingCount = contentModel.getRatingCount
             }
 
-            userInterestingModelList.forEach {
+           /* userInterestingModelList.forEach {
                 Log.d("test100", "item : $it")
-            }
+            }*/
             interestingListAll.addAll(userInterestingModelList)
             getInterestingFilter(filteredCityName.value)
-            getLocalList()
-
-
+            val work4 = async(Dispatchers.Main){
+                getLocalList()
+            }
+            work4.join()
             isLoading.value = false
         }
     }
@@ -151,17 +191,29 @@ class MyInterestingViewModel @Inject constructor(
                 ContentTypeId.ACCOMMODATION.contentTypeCode.toString() == it.contentTypeID
             }
         }
+        // 맵 초기화
+        likeMap.clear()
+        // 맵 생성
+        interestingListFilterByCity.forEachIndexed { index, userInterestingModel ->
+            likeMap[index] = true
+        }
+
     }
 
     // 관심 지역 가져오기
     fun getLocalList() {
+        Log.d("test100","interListAll $interestingListAll")
         localList.add("전체")
         interestingListAll.forEach {
+            Log.d("test100","interListItem $it")
+
             val cityName = Tools.getAreaDetails(it.areacode,it.sigungucode)
             if (!localList.contains(cityName)) {
                 localList.add(cityName)
             }
         }
+        Log.d("test100","LocalList $localList")
+
     }
 
     // 관광지 클릭 리스너

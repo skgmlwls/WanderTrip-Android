@@ -244,9 +244,6 @@ class Tools {
             return file.absolutePath
         }
 
-
-
-        // 이미지 뷰에 있는 이미지를 파일로 저장한다.
         // 이미지 뷰에 있는 이미지를 파일로 저장한다.
         fun saveBitmapList(context: Context, bitmap: Bitmap, index: Int) {
             // 외부 저장소의 경로를 가져온다.
@@ -453,6 +450,102 @@ class Tools {
                     "1" to "세종특별자치시"
                 )
             ),
+            "31" to mapOf(
+                "name" to "경기도",
+                "subAreas" to mapOf(
+                    "1" to "가평군",
+                    "2" to "고양시",
+                    "3" to "과천시",
+                    "4" to "광명시",
+                    "5" to "광주시",
+                    "6" to "구리시",
+                    "7" to "군포시",
+                    "8" to "김포시",
+                    "9" to "남양주시",
+                    "10" to "동두천시",
+                    "11" to "부천시",
+                    "12" to "성남시",
+                    "13" to "수원시",
+                    "14" to "시흥시",
+                    "15" to "안산시",
+                    "16" to "안성시",
+                    "17" to "안양시",
+                    "18" to "양주시",
+                    "19" to "양평군",
+                    "20" to "여주시",
+                    "21" to "연천군",
+                    "22" to "오산시",
+                    "23" to "용인시",
+                    "24" to "의왕시",
+                    "25" to "의정부시",
+                    "26" to "이천시",
+                    "27" to "파주시",
+                    "28" to "평택시",
+                    "29" to "포천시",
+                    "30" to "하남시",
+                    "31" to "화성시"
+                )
+            ),
+            "32" to mapOf(
+                "name" to "강원도",
+                "subAreas" to mapOf(
+                    "1" to "강릉시",
+                    "2" to "고성군",
+                    "3" to "동해시",
+                    "4" to "삼척시",
+                    "5" to "속초시",
+                    "6" to "양구군",
+                    "7" to "양양군",
+                    "8" to "영월군",
+                    "9" to "원주시",
+                    "10" to "인제군",
+                    "11" to "정선군",
+                    "12" to "철원군",
+                    "13" to "춘천시",
+                    "14" to "태백시",
+                    "15" to "평창군",
+                    "16" to "홍천군",
+                    "17" to "화천군",
+                    "18" to "횡성군"
+                )
+            ),
+            "33" to mapOf(
+                "name" to "충청북도",
+                "subAreas" to mapOf(
+                    "1" to "괴산군",
+                    "2" to "단양군",
+                    "3" to "보은군",
+                    "4" to "영동군",
+                    "5" to "옥천군",
+                    "6" to "음성군",
+                    "7" to "제천시",
+                    "8" to "진천군",
+                    "9" to "청원군",
+                    "10" to "청주시",
+                    "11" to "충주시",
+                    "12" to "증평군"
+                )
+            ),
+            "34" to mapOf(
+                "name" to "충청남도",
+                "subAreas" to mapOf(
+                    "1" to "공주시",
+                    "2" to "금산군",
+                    "3" to "논산시",
+                    "4" to "당진시",
+                    "5" to "보령시",
+                    "6" to "부여군",
+                    "7" to "서산시",
+                    "8" to "서천군",
+                    "9" to "아산시",
+                    "10" to "예산군",
+                    "11" to "천안시",
+                    "12" to "청양군",
+                    "13" to "태안군",
+                    "14" to "홍성군",
+                    "15" to "계룡시"
+                )
+            ),
             "35" to mapOf(
                 "name" to "경상북도",
                 "subAreas" to mapOf(
@@ -561,14 +654,21 @@ class Tools {
                 )
             )
         )
-        // 코드로 지역 출력 하는 메서드,
+        // 코드로 지역 출력하는 메서드
         fun getAreaDetails(areaCode: String, subAreaCode: String? = null): String {
             val areaDetails = AreaCityMap[areaCode]
+
+            // 로그: 해당 지역 코드에 대한 상세 정보가 있는지 확인
+            println("areaCode: $areaCode, subAreaCode: $subAreaCode")
+            println("지역 정보 조회 중...")
+
             return if (areaDetails != null) {
                 val cityName = areaDetails["name"]
+                println("도시명: $cityName")
 
                 if (subAreaCode == null) {
                     // 에어리어 코드만 주어진 경우, 도시 이름 리턴
+                    println("subAreaCode가 null인 경우, 도시명만 리턴")
                     "도시명: $cityName"
                 } else {
                     val subAreas = areaDetails["subAreas"] as Map<String, String>
@@ -576,12 +676,17 @@ class Tools {
 
                     if (subAreaName != null) {
                         // 시군구 코드가 주어진 경우 해당 구 리턴
+                        println("subAreaCode에 해당하는 구를 찾음: $subAreaName")
                         "$cityName $subAreaName"
                     } else {
+                        // 해당 구가 존재하지 않을 경우
+                        println("subAreaCode에 해당하는 구가 없음")
                         "$cityName 의 작은도시"
                     }
                 }
             } else {
+                // 해당 지역 코드가 없을 경우
+                println("주어진 areaCode에 해당하는 지역 정보가 없습니다.")
                 ""
             }
         }

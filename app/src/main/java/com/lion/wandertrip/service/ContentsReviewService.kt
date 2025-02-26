@@ -125,17 +125,17 @@ class ContentsReviewService(val contentsReviewRepository: ContentsReviewReposito
     suspend fun getAllReviewsCountWithContents(contentID: String): Int {
         Log.d("test100","getAllReviewsCountWithContents")
         return try {
-            Log.d("test100", "📌 리뷰 개수 조회 시작: contentsDocId = $contentID")
+            //Log.d("test100", "📌 리뷰 개수 조회 시작: contentsDocId = $contentID")
 
             // 컨텐츠에 관련된 모든 리뷰를 가져옴
             val voList = contentsReviewRepository.getAllReviewsWithContents(contentID)
 
             // 가져온 리스트가 null이 아닌지 확인
-            Log.d("test100", "📌 가져온 리뷰 리스트: $voList")
+           // Log.d("test100", "📌 가져온 리뷰 리스트: $voList")
 
             // 리스트 개수 확인 후 리턴
             val count = voList.size
-            Log.d("test100", "✅ 리뷰 개수: $count")
+            //Log.d("test100", "✅ 리뷰 개수: $count")
 
             count
         } catch (e: Exception) {

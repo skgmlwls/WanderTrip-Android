@@ -81,7 +81,7 @@ class TripCommonItemRepository(private val api: TripCommonItemInterface) {
             val interestingList = mutableListOf<UserInterestingModel>()
 
             contentIdList.forEach { contentId ->
-                Log.d("test100", "📌 API 요청 시작 | 콘텐츠 ID: $contentId")
+                //Log.d("test100", "📌 API 요청 시작 | 콘텐츠 ID: $contentId")
 
                 val response = api.getCommonTripItem(
                     serviceKey = myKey,
@@ -107,7 +107,7 @@ class TripCommonItemRepository(private val api: TripCommonItemInterface) {
                         val item = apiResponse.response.body.items.item.firstOrNull()
 
                         if (item != null) {
-                            Log.d("test100", "🎯 API 응답 데이터 확인 | 제목: ${item.title ?: "제목 없음"}")
+                            //Log.d("test100", "🎯 API 응답 데이터 확인 | 제목: ${item.title ?: "제목 없음"}")
 
                             interestingList.add(
                                 UserInterestingModel(

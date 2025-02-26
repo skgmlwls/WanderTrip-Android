@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,31 +35,48 @@ import com.lion.wandertrip.R
 import com.lion.wandertrip.component.CustomRatingBar
 import com.lion.wandertrip.model.UserInterestingModel
 import com.lion.wandertrip.presentation.my_interesting_page.MyInterestingViewModel
+import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 import com.lion.wandertrip.util.CustomFont
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
 
 
 @Composable
-fun VerticalUserInterestingList(viewModel : MyInterestingViewModel,items: List<UserInterestingModel>) {
+fun VerticalUserInterestingList(
+    viewModel: MyInterestingViewModel,
+    items: List<UserInterestingModel>
+) {
     LazyColumn(
-        modifier = Modifier.fillMaxSize().padding(16.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
     ) {
         items(items) { item ->
-            UserInterestingItem(viewModel,interestingItem = item)
+            UserInterestingItem(viewModel, interestingItem = item, items.indexOf(item))
             Spacer(modifier = Modifier.height(12.dp))
         }
     }
 }
 
 
-
 @Composable
-fun UserInterestingItem(viewModel : MyInterestingViewModel, interestingItem: UserInterestingModel) {
+fun UserInterestingItem(
+    viewModel: MyInterestingViewModel,
+    interestingItem: UserInterestingModel,
+    pos: Int
+) {
+
+    val contentId = interestingItem.contentID
+    viewModel.isLikeContent(contentId)
+    val isLike = viewModel.likeMap[pos]
+
+
+
     Row(
-        modifier = Modifier.clickable {
-            viewModel.onClickListItemToDetailScreen(interestingItem.contentID)
-        }
+        modifier = Modifier
+            .clickable {
+                viewModel.onClickListItemToDetailScreen(interestingItem.contentID)
+            }
             .fillMaxWidth()
             .background(Color.White, RoundedCornerShape(8.dp))
             .padding(12.dp),
@@ -68,25 +86,43 @@ fun UserInterestingItem(viewModel : MyInterestingViewModel, interestingItem: Use
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            Text(text = interestingItem.contentTitle, fontSize = 18.sp, fontWeight = FontWeight.Bold, fontFamily = CustomFont.customFontBold)
+            Text(
+                text = interestingItem.contentTitle,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                fontFamily = CustomFont.customFontBold
+            )
             Spacer(modifier = Modifier.height(4.dp))
 
             CustomRatingBar(interestingItem.ratingScore)
             Spacer(modifier = Modifier.height(4.dp))
 
-            Text(text = "저장 ${interestingItem.saveCount}회/추천 : ${interestingItem.starRatingCount}", fontSize = 14.sp, color = Color.Gray, fontFamily = CustomFont.customFontRegular)
+            Text(
+                text = "저장 ${interestingItem.saveCount}회/추천 : ${interestingItem.starRatingCount}",
+                fontSize = 14.sp,
+                color = Color.Gray,
+                fontFamily = CustomFont.customFontRegular
+            )
             Spacer(modifier = Modifier.height(4.dp))
 
-            Text(text = "주소: ${interestingItem.addr1} ${interestingItem.addr2}", fontSize = 14.sp, color = Color.Gray, fontFamily = CustomFont.customFontRegular)
+            Text(
+                text = "주소: ${interestingItem.addr1} ${interestingItem.addr2}",
+                fontSize = 14.sp,
+                color = Color.Gray,
+                fontFamily = NanumSquareRoundRegular
+            )
         }
 
         // 우측: 이미지 + 하트 아이콘
         Box(
             modifier = Modifier
-                .size(80.dp).padding(start = 10.dp).fillMaxHeight()
+                .size(80.dp)
+                .padding(start = 10.dp)
+                .fillMaxHeight()
                 .clip(RoundedCornerShape(8.dp))
-                .background(Color.LightGray).clickable {
-
+                .background(Color.LightGray)
+                .clickable {
+                    viewModel.onClickIconHeart(contentId,pos)
                 },
             contentAlignment = Alignment.TopEnd
         ) {
@@ -101,9 +137,13 @@ fun UserInterestingItem(viewModel : MyInterestingViewModel, interestingItem: Use
                     placeHolder = ImageBitmap.imageResource(R.drawable.img_image_holder),
                 )
             }
-
+            val vector = when (isLike) {
+                true -> R.drawable.ic_heart_filled_24px
+                false -> R.drawable.ic_heart_empty_24px
+                null -> TODO()
+            }
             Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.ic_heart_filled_24px),
+                imageVector = ImageVector.vectorResource(vector),
                 contentDescription = "Save",
                 tint = Color.Red,
                 modifier = Modifier

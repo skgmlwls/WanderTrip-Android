@@ -13,6 +13,7 @@ import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.presentation.my_trip_note.used_dummy_data.TripNoteListDummyData
 import com.lion.wandertrip.service.TripNoteService
+import com.lion.wandertrip.util.TripNoteScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -129,5 +130,10 @@ class MyTripNoteViewModel @Inject constructor(
             // 삭제 성공 시 리스트 다시 가져오기
             getTripNoteList()
         }
+    }
+
+    // 여행기 상세로 이동하는 메서드
+    fun onClickTripNoteItemGoTripNoteDetail(tripNoteDocId : String) {
+        tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_DETAIL.name}/${tripNoteDocId}")
     }
 }
