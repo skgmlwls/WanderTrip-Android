@@ -2,12 +2,15 @@ package com.lion.wandertrip
 
 import com.lion.wandertrip.repository.ContentsRepository
 import com.lion.wandertrip.repository.ContentsReviewRepository
+import com.lion.wandertrip.repository.TripAreaBaseItemRepository
 import com.lion.wandertrip.repository.TripCommonItemRepository
 import com.lion.wandertrip.repository.TripScheduleRepository
 import com.lion.wandertrip.repository.UserRepository
+import com.lion.wandertrip.retrofit_for_practice.TripAreaBaseItemInterface
 import com.lion.wandertrip.retrofit_for_practice.TripCommonItemInterface
 import com.lion.wandertrip.service.ContentsReviewService
 import com.lion.wandertrip.service.ContentsService
+import com.lion.wandertrip.service.TripAreaBaseItemService
 import com.lion.wandertrip.service.TripCommonItemService
 import com.lion.wandertrip.service.TripScheduleService
 import com.lion.wandertrip.service.UserService
@@ -82,7 +85,26 @@ object TripAppModule {
     fun tripCommonItemServiceProvider(repository: TripCommonItemRepository): TripCommonItemService {
         return TripCommonItemService(repository)
     }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // TripAreaBase
+    @Provides
+    @Singleton
+    fun tripItemAreaBaseInterfaceProvider(retrofit: Retrofit): TripAreaBaseItemInterface {
+        return retrofit.create(TripAreaBaseItemInterface::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun tripAreaBaseItemRepositoryProvider(api: TripAreaBaseItemInterface): TripAreaBaseItemRepository {
+        return TripAreaBaseItemRepository(api)
+    }
+
+    @Provides
+    @Singleton
+    fun tripAreaBaseItemServiceProvider(repository: TripAreaBaseItemRepository): TripAreaBaseItemService {
+        return TripAreaBaseItemService(repository)
+    }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     // contents

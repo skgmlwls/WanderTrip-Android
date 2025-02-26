@@ -27,6 +27,7 @@ import coil.compose.AsyncImage
 import com.lion.wandertrip.R
 import com.lion.wandertrip.model.SimpleTripItemModel
 import com.lion.wandertrip.model.TripNoteModel
+import com.lion.wandertrip.ui.theme.NanumSquareRound
 import com.lion.wandertrip.util.ContentTypeId
 
 @Composable
@@ -47,6 +48,15 @@ fun PopularTripItem(
                 .fillMaxWidth()
                 .background(Color.White)
         ) {
+
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = tripItem.tripNoteTitle,
+                    fontSize = 18.sp,
+                    fontFamily = NanumSquareRound,
+                )
+            }
+
             when {
                 imageUrl == "" -> { // 🔥 로딩 중 상태
                     Box(
@@ -84,9 +94,9 @@ fun PopularTripItem(
 
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = tripItem.tripNoteTitle,
+                    text = tripItem.tripNoteContent,
                     fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
+                    fontFamily = NanumSquareRound,
                 )
             }
         }

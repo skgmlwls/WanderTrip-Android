@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lion.wandertrip.presentation.search_page.SearchViewModel
+import com.lion.wandertrip.ui.theme.NanumSquareRound
 
 @Composable
 fun RecentItem(searchViewModel: SearchViewModel) {
@@ -42,12 +43,13 @@ fun RecentItem(searchViewModel: SearchViewModel) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "최근 검색", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(text = "최근 검색", fontFamily = NanumSquareRound, fontSize = 18.sp)
 
             Text(
                 text = "모두 삭제",
                 color = Color.Gray,
                 fontSize = 14.sp,
+                fontFamily = NanumSquareRound,
                 modifier = Modifier
                     .clickable { searchViewModel.clearRecentSearches() }
                     .padding(4.dp)
@@ -67,7 +69,8 @@ fun RecentItem(searchViewModel: SearchViewModel) {
                         Text(
                             text = search.title,
                             modifier = Modifier.weight(1f),
-                            fontSize = 16.sp
+                            fontSize = 16.sp,
+                            fontFamily = NanumSquareRound
                         )
 
                         Spacer(modifier = Modifier.width(8.dp)) // 🔹 간격 추가
@@ -93,7 +96,8 @@ fun RecentItem(searchViewModel: SearchViewModel) {
                 Text(
                     text = "최근 검색어가 없습니다",
                     color = Color.Gray,
-                    fontSize = 14.sp
+                    fontSize = 14.sp,
+                    fontFamily = NanumSquareRound,
                 )
             }
         }

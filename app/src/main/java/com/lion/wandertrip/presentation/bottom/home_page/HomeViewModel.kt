@@ -13,8 +13,12 @@ import com.google.firebase.firestore.Query
 import com.lion.wandertrip.service.TripNoteService
 import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.SimpleTripItemModel
+import com.lion.wandertrip.model.TripCommonItem
 import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.model.TripNoteModel
+import com.lion.wandertrip.repository.TripAreaBaseItemRepository
+import com.lion.wandertrip.repository.TripCommonItemRepository
+import com.lion.wandertrip.service.TripAreaBaseItemService
 import com.lion.wandertrip.service.TripScheduleService
 import com.lion.wandertrip.util.MainScreenName
 import com.lion.wandertrip.util.TripNoteScreenName
@@ -33,13 +37,10 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     @ApplicationContext context: Context,
     val tripNoteService: TripNoteService,
+    val tripAreaBaseItemService: TripAreaBaseItemService
 ) : ViewModel(){
 
     val tripApplication = context as TripApplication
-    
-    var popularTripList = mutableStateListOf<SimpleTripItemModel>()
-
-    var myNoteItemList = mutableStateListOf<TripNoteModel>()
 
     private val _tripItemList = MutableLiveData<List<TripItemModel>>()
     val tripItemList: LiveData<List<TripItemModel>> get() = _tripItemList
@@ -52,6 +53,20 @@ class HomeViewModel @Inject constructor(
 
     private val _imageUrlMap = mutableStateMapOf<String, String?>()
     val imageUrlMap: Map<String, String?> get() = _imageUrlMap
+
+    private val _randomTourItems = MutableLiveData<List<TripItemModel>>() // ✅ LiveData 추가
+    val randomTourItems: LiveData<List<TripItemModel>> get() = _randomTourItems
+
+    private var hasFetched = false // ✅ 실행 여부를 ViewModel에서 관리
+
+    // 🔥 무작위 관광지 데이터를 가져오는 함수
+    fun fetchRandomTourItems(onComplete: () -> Unit) {
+        viewModelScope.launch {
+            val items = tripAreaBaseItemService.getTripAreaBaseItem()
+            _randomTourItems.value = items ?: emptyList()
+            onComplete() // ✅ 완료 후 호출
+        }
+    }
 
     fun fetchTripNotes() {
         viewModelScope.launch {

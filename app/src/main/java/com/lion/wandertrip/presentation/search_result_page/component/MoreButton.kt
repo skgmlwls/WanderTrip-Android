@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.lion.wandertrip.ui.theme.NanumSquareRound
 
 @Composable
 fun MoreButton(category: String) {
@@ -24,7 +25,8 @@ fun MoreButton(category: String) {
         Text(
             text = "$category 검색결과 더보기",
             color = Color.Gray,
-            fontSize = 14.sp
+            fontSize = 14.sp,
+            fontFamily = NanumSquareRound
         )
     }
 }
