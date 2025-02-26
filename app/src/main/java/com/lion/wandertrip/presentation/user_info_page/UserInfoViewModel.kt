@@ -171,14 +171,29 @@ class UserInfoViewModel @Inject constructor(
        /* val prefItem = tripApplication.getSharedPreferences("RecentItem", Context.MODE_PRIVATE)
         val item = prefItem.getString("recentItemList", null)
         Log.d("test100", "item: $item")*/
-        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) {
-            popUpTo(0) { inclusive = true } // 모든 백스택 제거
-            launchSingleTop = true // 로그인 화면을 새로운 단일 인스턴스로 띄움
-        }
 
         tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) {
             popUpTo(tripApplication.navHostController.graph.startDestinationId) { inclusive = true }
         }
     }
+
+    // 백스텍 지우고 로그인 화면으로 이동
+    fun KakaoLogOut() {
+        clearLoginToken()
+         // Preference에 login token이 있는지 확인한다.
+         val kakaoPref = tripApplication.getSharedPreferences("KakaoToken", Context.MODE_PRIVATE)
+         val kToken = kakaoPref.getString("kToken", null)
+         Log.d("test100", "kToken: $kToken")
+        clearAllRecentData()
+        // Preference에 login token이 있는지 확인한다.
+         val prefItem = tripApplication.getSharedPreferences("RecentItem", Context.MODE_PRIVATE)
+         val item = prefItem.getString("recentItemList", null)
+         Log.d("test100", "item: $item")
+
+        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) {
+            popUpTo(tripApplication.navHostController.graph.startDestinationId) { inclusive = true }
+        }
+    }
+
 
 }

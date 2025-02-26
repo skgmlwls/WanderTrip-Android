@@ -101,7 +101,7 @@ class UserSignUpStep3ViewModel @Inject constructor(
                 // SharedPreference에 저장한다.
                 val pref = tripApplication.getSharedPreferences("KakaoToken", Context.MODE_PRIVATE)
                 pref.edit {
-                    putLong("kToken", kakaoToken)
+                    putString("kToken", kakaoToken.toString())
                 }
 
                 // 프로필사진 설정 화면으로 이동, userDocId 값을 경로에 포함시켜 전달

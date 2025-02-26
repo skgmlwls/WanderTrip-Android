@@ -47,9 +47,9 @@ class StartViewModel @Inject constructor(
 
         // Preference에 login token이 있는지 확인한다.
         val kakaoPref = tripApplication.getSharedPreferences("KakaoToken", Context.MODE_PRIVATE)
-        val kToken = kakaoPref.getLong("kToken",0L)
+        val kToken = kakaoPref.getString("kToken",null)
 
-       // Log.d("test100", "kToken : $kToken")
+        Log.d("test100", "kToken : $kToken")
 
         CoroutineScope(Dispatchers.Main).launch {
             if (loginToken != null) {
@@ -75,13 +75,13 @@ class StartViewModel @Inject constructor(
                     // 로그인 화면으로 이동한다.
                     tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name)
                 }
-            } else if (kToken != 0L) {
+            } else if (kToken != null) {
 
                 showKakaoLoginMessageState.value = true
 
                 // 카카오토큰으로 사용자 정보를 가져온다.
                 val work1 = async(Dispatchers.IO) {
-                    userService.selectUserDataByKakaoLoginToken(kToken)
+                    userService.selectUserDataByKakaoLoginToken(kToken.toLong())
                 }
                 val loginUserModel = work1.await()
                 // 가져온 사용자 데이터가 있다면
