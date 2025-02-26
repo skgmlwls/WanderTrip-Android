@@ -237,6 +237,7 @@ class UserRepository {
 
     // 사용자의 관심 콘텐츠 ID 리스트를 가져오는 함수
     suspend fun gettingUserInterestingContentIdList(userDocId: String): List<String> {
+        Log.d("UserRepo","gettingUserInterestingContentIdList")
         return try {
             val firebase = FirebaseFirestore.getInstance()
             val contentIdList = mutableListOf<String>()

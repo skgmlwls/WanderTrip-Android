@@ -31,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.a02_boardcloneproject.component.CustomIconButton
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.wandertrip.R
+import com.lion.wandertrip.model.RecentTripItemModel
 import com.lion.wandertrip.presentation.detail_page.components.BasicInfoDescriptionColumn
 import com.lion.wandertrip.presentation.detail_page.components.BottomSheetAddSchedule
 import com.lion.wandertrip.presentation.detail_page.components.BottomSheetReviewFilter
@@ -38,7 +39,9 @@ import com.lion.wandertrip.presentation.detail_page.components.IndicatorButton
 import com.lion.wandertrip.presentation.detail_page.components.IntroColumn
 import com.lion.wandertrip.presentation.detail_page.components.ReviewLazyColumn
 import com.lion.wandertrip.presentation.detail_page.components.ViewGoogleMap
+import com.lion.wandertrip.presentation.start_page.used_dummy_data.RecentDummyData
 import com.lion.wandertrip.util.CustomFont
+import com.lion.wandertrip.util.Tools
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
@@ -47,8 +50,13 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
     Log.d("test", "contentID : $contentID")
     LaunchedEffect(Unit) {
         detailViewModel.getCommonTripContentModel(contentID)
+
+
+
+
     }
     Scaffold(
+        //containerColor = Color.White,
         topBar = {
             CustomTopAppBar(
                 title = "상세페이지",

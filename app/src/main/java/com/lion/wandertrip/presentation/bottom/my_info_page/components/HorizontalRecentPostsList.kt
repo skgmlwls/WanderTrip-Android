@@ -50,9 +50,9 @@ fun TouristItem(tripItem: RecentTripItemModel,myInfoViewModel: MyInfoViewModel) 
     // 지역 타입으로 나누기
 
     val spotType = when(tripItem.contentTypeID){
-        ContentTypeId.TOURIST_ATTRACTION->{"관광명소"}
-        ContentTypeId.ACCOMMODATION->{"숙박시설"}
-        else -> {"맛집"}
+        "${ContentTypeId.TOURIST_ATTRACTION.contentTypeCode}"->{"관광명소"}
+        "${ContentTypeId.ACCOMMODATION.contentTypeCode}"->{"숙박시설"}
+        else -> {"식당"}
     }
 
     Card(

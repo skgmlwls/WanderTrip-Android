@@ -712,14 +712,22 @@ class Tools {
             return null // 해당 지역을 찾지 못한 경우 null 반환
         }
 
-        // 최근 목록 더미 저장
         fun addRecentItemList(context: Context, newItem: RecentTripItemModel) {
             // SharedPreferences 인스턴스 가져오기
             val sharedPreferences = context.getSharedPreferences("RecentItem", Context.MODE_PRIVATE)
 
             // 현재 저장된 리스트 가져오기
             val currentList = getRecentItemList(context).toMutableList()
-             Log.d("test100","currentList?? : $currentList")
+            Log.d("test100", "currentList?? : $currentList")
+
+            // 내 최근목록에 있다면 그 아이템을 삭제하고 새로운 아이템을 맨 앞에 추가
+            // indexOfFirst -> 조건에 맞는 가정 첫 인덱스를 리턴한다, 조건에 맞는걸 찾지 못한다면 -1을 리턴한다.
+            val existingIndex = currentList.indexOfFirst { it.contentID == newItem.contentID }
+
+            if (existingIndex != -1) {
+                // 아이템이 이미 있으면 해당 아이템 삭제
+                currentList.removeAt(existingIndex)
+            }
 
             // 리스트의 크기가 20을 넘으면 가장 오래된 항목(19번)을 삭제
             if (currentList.size >= 20) {

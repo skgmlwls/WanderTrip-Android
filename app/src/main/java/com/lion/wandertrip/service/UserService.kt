@@ -2,6 +2,7 @@ package com.lion.wandertrip.service
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.core.content.edit
 import com.lion.wandertrip.model.UserModel
 import com.lion.wandertrip.repository.UserRepository
