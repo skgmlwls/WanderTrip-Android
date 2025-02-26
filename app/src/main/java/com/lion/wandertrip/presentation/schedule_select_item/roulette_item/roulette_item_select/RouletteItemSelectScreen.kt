@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -36,6 +37,7 @@ fun RouletteItemSelectScreen(
     var selectedCategoryCode by remember { mutableStateOf<String?>(null) }
     
     Scaffold(
+        containerColor = Color.White,
         topBar = {
             TopAppBar(
                 title = { Text("여행지 선택", fontFamily = NanumSquareRoundRegular) },
@@ -43,7 +45,10 @@ fun RouletteItemSelectScreen(
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "뒤로 가기")
                     }
-                }
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent // ✅ 투명색 적용
+                ),
             )
         }
     ) { paddingValues ->

@@ -51,6 +51,7 @@ fun ScheduleSelectItemScreen(
         viewModel.tripScheduleDocId.value = tripScheduleDocId
         // viewModel.observeUserScheduleDocIdList()
         viewModel.observeUserLikeList()
+        viewModel.observeContentsData()
 
         if (isFirstLaunch.value) { // ✅ 처음 실행될 때만 실행
             viewModel.loadTripItems(

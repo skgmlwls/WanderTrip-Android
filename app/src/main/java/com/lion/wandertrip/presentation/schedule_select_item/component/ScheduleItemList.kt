@@ -6,15 +6,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -88,20 +93,20 @@ fun ScheduleItemList(
 
                         // ✅ 카테고리 텍스트
                         Text(
-                            text = when(sortedTripItemList[index].contentTypeId){
-                                ContentTypeId.TOURIST_ATTRACTION.contentTypeCode.toString() ->{
-                                    "관광지·" +
-                                    fromCodeTripItemCat2(sortedTripItemList[index].cat2)!!.catName
+                            text = when(sortedTripItemList[index].contentTypeId) {
+                                ContentTypeId.TOURIST_ATTRACTION.contentTypeCode.toString() -> {
+                                    val catName = fromCodeTripItemCat2(sortedTripItemList[index].cat2)?.catName ?: ""
+                                    "관광지·$catName"
                                 }
                                 ContentTypeId.RESTAURANT.contentTypeCode.toString() -> {
-                                    "음식점·" +
-                                    fromCodeRestaurantItemCat3(sortedTripItemList[index].cat3)!!.catName
+                                    val catName = fromCodeRestaurantItemCat3(sortedTripItemList[index].cat3)?.catName ?: ""
+                                    "음식점·$catName"
                                 }
                                 ContentTypeId.ACCOMMODATION.contentTypeCode.toString() -> {
-                                    "숙소·" +
-                                    fromCodeAccommodationItemCat3(sortedTripItemList[index].cat3)!!.catName
+                                    val catName = fromCodeAccommodationItemCat3(sortedTripItemList[index].cat3)?.catName ?: ""
+                                    "숙소·$catName"
                                 }
-                                else -> { "" }
+                                else -> ""
                             },
                             fontSize = 12.sp,
                             fontFamily = NanumSquareRound,
@@ -120,6 +125,62 @@ fun ScheduleItemList(
                             overflow = TextOverflow.Ellipsis, // ✅ 너무 길면 "..." 표시
                             lineHeight = 14.sp // ✅ 줄 간격을 조정 (기본값보다 약간 좁게)
                         )
+
+                        val contentModel = viewModel.contentsList.firstOrNull {
+                            it.contentId == sortedTripItemList[index].contentId
+                        }
+                        if (contentModel != null) {
+
+                            Spacer(
+                                modifier = Modifier.height(10.dp)
+                            )
+
+                            Row {
+                                Icon(
+                                    imageVector = Icons.Default.Favorite, // 또는 다른 하트 아이콘
+                                    contentDescription = "관심 지역",
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(15.dp)
+                                )
+
+                                Spacer(
+                                    modifier = Modifier.width(3.dp)
+                                )
+
+                                Text(
+                                    text = "${contentModel.interestingCount}",
+                                    fontSize = 15.sp,
+                                    fontFamily = NanumSquareRoundRegular,
+                                    maxLines = 3,
+                                    overflow = TextOverflow.Ellipsis,
+                                    lineHeight = 14.sp
+                                )
+
+                                Spacer(
+                                    modifier = Modifier.width(10.dp)
+                                )
+
+                                Icon(
+                                    imageVector = Icons.Default.Star, // 또는 다른 하트 아이콘
+                                    contentDescription = "평점",
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(15.dp)
+                                )
+
+                                Spacer(
+                                    modifier = Modifier.width(3.dp)
+                                )
+
+                                Text(
+                                    text = "${contentModel.ratingScore}",
+                                    fontSize = 15.sp,
+                                    fontFamily = NanumSquareRoundRegular,
+                                    maxLines = 3,
+                                    overflow = TextOverflow.Ellipsis,
+                                    lineHeight = 14.sp
+                                )
+                            }
+                        }
 
                     }
 
