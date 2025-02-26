@@ -105,52 +105,6 @@ class TripScheduleRepository {
         }
     }
 
-    // 관심 지역(또는 콘텐츠) 추가
-    suspend fun addLikeItem(userDocId: String, likeItemContentId: String) {
-
-        Log.d("addLikeItem", "userDocId: $userDocId, likeItemContentId: $likeItemContentId")
-        val firestore = FirebaseFirestore.getInstance()
-        // 루트 컬렉션은 "UserData"이어야 함
-        val subCollectionRef = firestore.collection("UserData")
-            .document(userDocId)
-            .collection("UserLikeList")
-
-        // 먼저, 같은 콘텐츠 ID가 이미 있는지 확인
-        val querySnapshot = subCollectionRef
-            .whereEqualTo("contentId", likeItemContentId)
-            .get()
-            .await()
-
-        if (!querySnapshot.isEmpty) {
-            // 이미 존재하면 추가하지 않음
-        } else {
-            // 존재하지 않으면 새 문서를 추가
-            subCollectionRef.add(mapOf("contentId" to likeItemContentId)).await()
-        }
-    }
-
-    // 관심 지역(또는 콘텐츠) 삭제
-    suspend fun removeLikeItem(userDocId: String, likeItemContentId: String) {
-        val firestore = FirebaseFirestore.getInstance()
-        val subCollectionRef = firestore.collection("UserData")
-            .document(userDocId)
-            .collection("UserLikeList")
-
-        // 같은 콘텐츠 ID가 있는 문서 쿼리
-        val querySnapshot = subCollectionRef
-            .whereEqualTo("contentId", likeItemContentId)
-            .get()
-            .await()
-
-        // 쿼리 결과가 비어있지 않으면 해당 문서 삭제
-        if (!querySnapshot.isEmpty) {
-            for (doc in querySnapshot.documents) {
-                doc.reference.delete().await()
-            }
-        }
-    }
-
-
     // 일정 항목 삭제 후 itemIndex 재조정
     suspend fun removeTripScheduleItem(scheduleDocId: String, itemDocId: String) {
         val firestore = FirebaseFirestore.getInstance()

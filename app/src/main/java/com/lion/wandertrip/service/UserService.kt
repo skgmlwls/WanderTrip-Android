@@ -149,4 +149,25 @@ class UserService (val userRepository: UserRepository) {
     suspend fun gettingUserInterestingContentIdList(userDocId: String): List<String> {
         return userRepository.gettingUserInterestingContentIdList(userDocId)
     }
+
+    // 관심 지역 추가
+    suspend fun addLikeItem(userDocId: String, likeItemContentId: String) {
+        userRepository.addLikeItem(userDocId, likeItemContentId)
+    }
+
+    // 관심 지역(또는 콘텐츠) 카운트 증가
+    suspend fun addLikeCnt(likeItemContentId: String) {
+        userRepository.addLikeCnt(likeItemContentId)
+    }
+
+    // 관심 지역 삭제
+    suspend fun removeLikeItem(userDocId: String, likeItemContentId: String) {
+        userRepository.removeLikeItem(userDocId, likeItemContentId)
+    }
+
+    // 관심 지역(또는 콘텐츠) 카운트 감소
+    suspend fun removeLikeCnt(likeItemContentId: String) {
+        userRepository.removeLikeCnt(likeItemContentId)
+    }
+
 }
