@@ -48,16 +48,6 @@ class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
         tripScheduleRepository.addTripItemToSchedule(docId, scheduleDate, scheduleItemVO)
     }
 
-    // 관심 지역 추가
-    suspend fun addLikeItem(userDocId: String, likeItemContentId: String) {
-        tripScheduleRepository.addLikeItem(userDocId, likeItemContentId)
-    }
-
-    // 관심 지역 삭제
-    suspend fun removeLikeItem(userDocId: String, likeItemContentId: String) {
-        tripScheduleRepository.removeLikeItem(userDocId, likeItemContentId)
-    }
-
     // 일정 항목 삭제 후 itemIndex 재조정
     suspend fun removeTripScheduleItem(scheduleDocId: String, itemDocId: String, itemDate: Timestamp) {
         Log.d("removeTripScheduleItem", "scheduleDocId: $scheduleDocId, itemDocId: $itemDocId")

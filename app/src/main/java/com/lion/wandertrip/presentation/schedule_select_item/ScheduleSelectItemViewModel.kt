@@ -12,6 +12,7 @@ import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.ScheduleItem
 import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.service.TripScheduleService
+import com.lion.wandertrip.service.UserService
 import com.lion.wandertrip.util.ContentTypeId
 import com.lion.wandertrip.util.RouletteScreenName
 import com.lion.wandertrip.util.SharedTripItemList
@@ -25,7 +26,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ScheduleSelectItemViewModel @Inject constructor(
     @ApplicationContext val context: Context,
-    val tripScheduleService: TripScheduleService
+    val tripScheduleService: TripScheduleService,
+    val userService: UserService
 ) : ViewModel() {
 
     val application = context as TripApplication
@@ -118,21 +120,29 @@ class ScheduleSelectItemViewModel @Inject constructor(
         }
     }
 
-    // 관심 지역 추가
+    // 관심 지역 추가, 관심 지역 카운트 증가
     fun addLikeItem(likeItemContentId: String) {
         viewModelScope.launch {
             val work1 = async(Dispatchers.IO) {
-                tripScheduleService.addLikeItem(application.loginUserModel.userDocId, likeItemContentId)
-            }.await()
+                userService.addLikeItem(application.loginUserModel.userDocId, likeItemContentId)
+            }
+
+            val work2 = async(Dispatchers.IO) {
+                userService.addLikeCnt(likeItemContentId)
+            }
         }
     }
 
-    // 관심 지역 삭제
+    // 관심 지역 삭제, 관심 지역 카운트 감소
     fun removeLikeItem(likeItemContentId: String) {
         viewModelScope.launch {
             val work1 = async(Dispatchers.IO) {
-                tripScheduleService.removeLikeItem(application.loginUserModel.userDocId, likeItemContentId)
-            }.await()
+                userService.removeLikeItem(application.loginUserModel.userDocId, likeItemContentId)
+            }
+
+            val work2 = async(Dispatchers.IO) {
+                userService.removeLikeCnt(likeItemContentId)
+            }
         }
     }
 

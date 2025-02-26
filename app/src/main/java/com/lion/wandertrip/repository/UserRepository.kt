@@ -2,6 +2,7 @@ package com.lion.wandertrip.repository
 
 import android.net.Uri
 import android.util.Log
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.lion.wandertrip.util.UserState
@@ -264,4 +265,104 @@ class UserRepository {
         }
     }
 
+    // 관심 지역(또는 콘텐츠) 추가
+    suspend fun addLikeItem(userDocId: String, likeItemContentId: String) {
+
+        Log.d("addLikeItem", "userDocId: $userDocId, likeItemContentId: $likeItemContentId")
+        val firestore = FirebaseFirestore.getInstance()
+        // 루트 컬렉션은 "UserData"이어야 함
+        val subCollectionRef = firestore.collection("UserData")
+            .document(userDocId)
+            .collection("UserLikeList")
+
+        // 먼저, 같은 콘텐츠 ID가 이미 있는지 확인
+        val querySnapshot = subCollectionRef
+            .whereEqualTo("contentId", likeItemContentId)
+            .get()
+            .await()
+
+        if (!querySnapshot.isEmpty) {
+            // 이미 존재하면 추가하지 않음
+        } else {
+            // 존재하지 않으면 새 문서를 추가
+            subCollectionRef.add(mapOf("contentId" to likeItemContentId)).await()
+        }
+    }
+
+    // 관심 지역(또는 콘텐츠) 카운트 증가
+    suspend fun addLikeCnt(likeItemContentId: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        val collectionReference = firestore.collection("ContentsData")
+
+        // contentId 필드가 likeItemContentId와 일치하는 문서를 쿼리
+        val querySnapshot = collectionReference
+            .whereEqualTo("contentId", likeItemContentId)
+            .get()
+            .await()
+
+        if (!querySnapshot.isEmpty) {
+            // 이미 존재하는 문서들의 interestingCount를 1 증가
+            for (document in querySnapshot.documents) {
+                document.reference.update("interestingCount", FieldValue.increment(1))
+                    .await()
+            }
+            Log.d("addLikeCnt", "interestingCount incremented for contentId: $likeItemContentId")
+        } else {
+            // 문서가 없으면 새 문서를 생성 (초기값: interestingCount = 1, 나머지는 기본값)
+            val newDoc = hashMapOf(
+                "contentId" to likeItemContentId,
+                "ratingScore" to 0.0f,
+                "reviewList" to emptyList<Any>(),
+                "getRatingCount" to 0,
+                "interestingCount" to 1
+            )
+            collectionReference.add(newDoc).await()
+            Log.d("addLikeCnt", "New document created for contentId: $likeItemContentId with interestingCount = 1")
+        }
+    }
+
+
+    // 관심 지역(또는 콘텐츠) 삭제
+    suspend fun removeLikeItem(userDocId: String, likeItemContentId: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        val subCollectionRef = firestore.collection("UserData")
+            .document(userDocId)
+            .collection("UserLikeList")
+
+        // 같은 콘텐츠 ID가 있는 문서 쿼리
+        val querySnapshot = subCollectionRef
+            .whereEqualTo("contentId", likeItemContentId)
+            .get()
+            .await()
+
+        // 쿼리 결과가 비어있지 않으면 해당 문서 삭제
+        if (!querySnapshot.isEmpty) {
+            for (doc in querySnapshot.documents) {
+                doc.reference.delete().await()
+            }
+        }
+    }
+
+    // 관심 지역(또는 콘텐츠) 카운트 감소
+    suspend fun removeLikeCnt(likeItemContentId: String) {
+        val firestore = FirebaseFirestore.getInstance()
+        val collectionReference = firestore.collection("ContentsData")
+
+        // contentId 필드가 likeItemContentId와 일치하는 문서를 쿼리
+        val querySnapshot = collectionReference
+            .whereEqualTo("contentId", likeItemContentId)
+            .get()
+            .await()
+
+        if (!querySnapshot.isEmpty) {
+            for (document in querySnapshot.documents) {
+                document.reference.update("interestingCount", FieldValue.increment(-1))
+                    .await()
+            }
+            Log.d("removeLikeCnt", "Decremented interestingCount for contentId: $likeItemContentId")
+        } else {
+            Log.d("removeLikeCnt", "No document found with contentId: $likeItemContentId")
+        }
+    }
+    
 }
