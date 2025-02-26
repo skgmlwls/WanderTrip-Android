@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.service.TripScheduleService
+import com.lion.wandertrip.service.UserService
 import com.lion.wandertrip.util.ScheduleScreenName
 import com.lion.wandertrip.util.SharedTripItemList
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class RouletteItemSelectViewModel @Inject constructor(
     @ApplicationContext val context: Context,
-    val tripScheduleService: TripScheduleService
+    val tripScheduleService: TripScheduleService,
+    val userService: UserService
 ) : ViewModel() {
 
     val application = context as TripApplication
@@ -65,7 +67,7 @@ class RouletteItemSelectViewModel @Inject constructor(
     fun addLikeItem(likeItemContentId: String) {
         viewModelScope.launch {
             val work1 = async(Dispatchers.IO) {
-                tripScheduleService.addLikeItem(application.loginUserModel.userDocId, likeItemContentId)
+                userService.addLikeItem(application.loginUserModel.userDocId, likeItemContentId)
             }.await()
         }
     }
@@ -74,7 +76,7 @@ class RouletteItemSelectViewModel @Inject constructor(
     fun removeLikeItem(likeItemContentId: String) {
         viewModelScope.launch {
             val work1 = async(Dispatchers.IO) {
-                tripScheduleService.removeLikeItem(application.loginUserModel.userDocId, likeItemContentId)
+                userService.removeLikeItem(application.loginUserModel.userDocId, likeItemContentId)
             }.await()
         }
     }
