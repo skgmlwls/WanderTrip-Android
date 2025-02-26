@@ -3,7 +3,9 @@ package com.lion.wandertrip.presentation.user_info_page
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lion.wandertrip.TripApplication
@@ -11,6 +13,7 @@ import com.lion.wandertrip.service.ContentsReviewService
 import com.lion.wandertrip.service.TripNoteService
 import com.lion.wandertrip.service.TripScheduleService
 import com.lion.wandertrip.service.UserService
+import com.lion.wandertrip.util.MainScreenName
 import com.lion.wandertrip.util.Tools
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -135,6 +138,46 @@ class UserInfoViewModel @Inject constructor(
                 }
                 showImageUri.value = work2.await()
             }
+        }
+    }
+
+    // 내장 메모리에 있는 로그인 토큰 삭제
+    fun clearLoginToken() {
+        val pref = tripApplication.getSharedPreferences("LoginToken", Context.MODE_PRIVATE)
+        pref.edit {
+            clear() // 모든 키 삭제
+            apply() // 비동기 적용
+        }
+    }
+
+    // 내장 메모리에 있는 최근 본 아이템 목록 삭제
+    fun clearAllRecentData() {
+        val sharedPreferences = tripApplication.getSharedPreferences("RecentItem", Context.MODE_PRIVATE)
+        sharedPreferences.edit {
+            clear() // 모든 데이터 삭제
+            apply()
+        }
+    }
+
+    // 백스텍 지우고 로그인 화면으로 이동
+    fun logOut() {
+        clearLoginToken()
+       /* // Preference에 login token이 있는지 확인한다.
+        val pref = tripApplication.getSharedPreferences("LoginToken", Context.MODE_PRIVATE)
+        val loginToken = pref.getString("token", null)
+        Log.d("test100", "token: $loginToken")*/
+        clearAllRecentData()
+        // Preference에 login token이 있는지 확인한다.
+       /* val prefItem = tripApplication.getSharedPreferences("RecentItem", Context.MODE_PRIVATE)
+        val item = prefItem.getString("recentItemList", null)
+        Log.d("test100", "item: $item")*/
+        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) {
+            popUpTo(0) { inclusive = true } // 모든 백스택 제거
+            launchSingleTop = true // 로그인 화면을 새로운 단일 인스턴스로 띄움
+        }
+
+        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) {
+            popUpTo(tripApplication.navHostController.graph.startDestinationId) { inclusive = true }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.user_info_page
 
+import android.content.Context
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -35,6 +36,7 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.edit
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.a02_boardcloneproject.component.CustomDividerComponent
 import com.lion.a02_boardcloneproject.component.CustomIconButton
@@ -160,6 +162,17 @@ fun UserInfoScreen(userInfoViewModel: UserInfoViewModel = hiltViewModel()) {
                     CustomDividerComponent()
                     BlueButton(text = "로그아웃") {
                        // 로그아웃
+
+                        // 일반 로그아웃
+                        when (tripApplication.loginUserModel.userId) {
+                            // 카카오 로그인
+                            ""->{}
+                            // 일반 로그인
+                            else->{
+                                // 자동 로그인 토큰 지우기
+                                userInfoViewModel.logOut()
+                            }
+                        }
                     }
                 }
             }
