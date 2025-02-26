@@ -60,14 +60,14 @@ class HomeViewModel @Inject constructor(
     private var hasFetched = false // ✅ 실행 여부를 ViewModel에서 관리
 
     // 🔥 무작위 관광지 데이터를 가져오는 함수
-    fun fetchRandomTourItems() {
-        if (hasFetched) return // ✅ 한 번 실행되면 다시 실행하지 않음
+    fun fetchRandomTourItems(onComplete: () -> Unit) {
         viewModelScope.launch {
             val items = tripAreaBaseItemService.getTripAreaBaseItem()
             _randomTourItems.value = items ?: emptyList()
-            hasFetched = true // ✅ 실행 완료 후 true 설정
+            onComplete() // ✅ 완료 후 호출
         }
     }
+
     fun fetchTripNotes() {
         viewModelScope.launch {
             try {
