@@ -18,19 +18,30 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.sp
 import com.lion.wandertrip.model.UserModel
+import com.lion.wandertrip.presentation.schedule_detail_friends.ScheduleDetailFriendsViewModel
 import com.lion.wandertrip.ui.theme.NanumSquareRound
 import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 
 @Composable
 fun ScheduleDetailFriendsList(
     friends: List<UserModel>,      // 예: 친구 이름 목록
+    scheduleWriteNickName: String,
+    viewModel: ScheduleDetailFriendsViewModel,
     profileImageUrl: String     // 예: 공통 프로필 URL 또는 각 친구별 URL을 사용하고 싶다면 데이터 클래스로 관리
 ) {
+
+    var showDeleteFriendDialog by remember { mutableStateOf(false) }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(8.dp)
@@ -46,6 +57,7 @@ fun ScheduleDetailFriendsList(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .height(60.dp)
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -71,11 +83,36 @@ fun ScheduleDetailFriendsList(
                         modifier = Modifier.weight(1f)
                     )
 
-                    // 더보기(메뉴) 아이콘
-                    IconButton(onClick = {  }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "더보기 메뉴"
+                    if (viewModel.application.loginUserModel.userNickName == scheduleWriteNickName) {
+                        if (friend.userNickName != scheduleWriteNickName) {
+                            // 더보기(메뉴) 아이콘
+                            IconButton(
+                                onClick = {
+                                    showDeleteFriendDialog = true
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "초대 유저 삭제"
+                                )
+                            }
+                        }
+                    }
+
+                    // 다이얼로그 표시
+                    if (showDeleteFriendDialog) {
+                        DeleteFriendDialog(
+                            friend.userNickName,
+                            onDelete = {
+                                viewModel.removeInvitedSchedule(
+                                    friend.userDocId,
+                                    viewModel.scheduleDocId.value
+                                )
+                                showDeleteFriendDialog = false
+                            },
+                            onDismiss = {
+                                showDeleteFriendDialog = false
+                            }
                         )
                     }
                 }

@@ -98,9 +98,10 @@ fun ScheduleScreen(
                         // 첫 번째 페이지: 내 일정
                         ScheduleItemList(
                             dataList = viewModel.userScheduleList,
+                            scheduleType = 0,  // 0: 내 일정 1: 초대 받은 일정
                             viewModel = viewModel,
-                            onRowClick = { userScheduleList ->
-                                viewModel.moveToScheduleDetailScreen(userScheduleList)
+                            onRowClick = { userSchedule ->
+                                viewModel.moveToScheduleDetailScreen(userSchedule)
                             }
                         )
                     }
@@ -109,6 +110,7 @@ fun ScheduleScreen(
                         ScheduleItemList(
                             dataList = viewModel.invitedScheduleList,
                             viewModel = viewModel,
+                            scheduleType = 1,
                             onRowClick = { invitedScheduleList ->
                                 viewModel.moveToScheduleDetailScreen(invitedScheduleList)
                             }

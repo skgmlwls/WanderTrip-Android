@@ -1,7 +1,5 @@
 package com.lion.wandertrip.presentation.bottom.schedule_page.component
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,36 +11,28 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.firebase.Timestamp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.lion.a02_boardcloneproject.component.CustomIconButton
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.presentation.bottom.schedule_page.ScheduleViewModel
 import com.lion.wandertrip.ui.theme.NanumSquareRound
-import com.lion.wandertrip.ui.theme.NanumSquareRoundLight
 import com.lion.wandertrip.ui.theme.NanumSquareRoundRegular
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun ScheduleItemList(
     dataList: List<TripScheduleModel>,
     viewModel: ScheduleViewModel = hiltViewModel(),
+    scheduleType: Int,
     onRowClick: (TripScheduleModel) -> Unit = {}, // 클릭 이벤트 추가
 ) {
     LazyColumn(
@@ -83,6 +73,14 @@ fun ScheduleItemList(
                                 icon = Icons.Filled.MoreVert,
                                 size = 15,
                                 menuItems = listOf("삭제"),
+                                dataList[index].tripScheduleDocId,
+                                onDeleteSchedule = { scheduleDocId ->
+                                    if (scheduleType == 0) {
+                                        viewModel.removeUserSchedule(scheduleDocId)
+                                    } else {
+                                        viewModel.removeInvitedSchedule(scheduleDocId)
+                                    }
+                                }
                             )
                         }
 

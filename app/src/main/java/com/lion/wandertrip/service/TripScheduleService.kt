@@ -115,6 +115,21 @@ class TripScheduleService(val tripScheduleRepository: TripScheduleRepository) {
         return scheduleItemList.map { it.toTripScheduleModel() }
     }
 
+    // 유저 일정 리스트에서 일정 삭제
+    suspend fun removeUserScheduleList(userDocId: String, userScheduleDocId: String) {
+        tripScheduleRepository.removeUserScheduleList(userDocId, userScheduleDocId)
+    }
+
+    // 초대 받은 일정 리스트에서 일정 삭제
+    suspend fun removeInvitedScheduleList(userDocId: String, invitedScheduleDocId: String) {
+        tripScheduleRepository.removeInvitedScheduleList(userDocId, invitedScheduleDocId)
+    }
+
+    // 일정에서 초대된 유저 문서 Id 삭제
+    suspend fun removeScheduleInviteList(tripScheduleDocId: String, userDocId: String) {
+        tripScheduleRepository.removeScheduleInviteList(tripScheduleDocId, userDocId)
+    }
+
     // 공공 데이터 관련 ///////////////////////////////////////////////////////////////////////////////
 
     // API 호출 및 데이터 로드

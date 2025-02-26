@@ -263,13 +263,15 @@ fun MyApp() {
         // 일정 초대한 친구 목록 화면
         composable(
             route = "${ScheduleScreenName.SCHEDULE_DETAIL_FRIENDS_SCREEN.name}?" +
-                    "scheduleDocId={scheduleDocId}",
+                    "scheduleDocId={scheduleDocId}&userNickName={userNickName}",
             arguments = listOf(
-                navArgument("scheduleDocId") { type = NavType.StringType }
+                navArgument("scheduleDocId") { type = NavType.StringType },
+                navArgument("userNickName") { type = NavType.StringType }
             )
         ) {
             val scheduleDocId = it.arguments?.getString("scheduleDocId") ?: ""
-            ScheduleDetailFriendsScreen(scheduleDocId)
+            val userNickName = it.arguments?.getString("userNickName") ?: ""
+            ScheduleDetailFriendsScreen(scheduleDocId, userNickName)
         }
 
         composable(

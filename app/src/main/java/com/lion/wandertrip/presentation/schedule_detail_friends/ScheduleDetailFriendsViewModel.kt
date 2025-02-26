@@ -2,8 +2,10 @@ package com.lion.wandertrip.presentation.schedule_detail_friends
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
@@ -26,6 +28,8 @@ class ScheduleDetailFriendsViewModel @Inject constructor(
 
     // 다이얼로그 표시 여부를 기억하는 상태
     val showAddFriendDialog = mutableStateOf(false)
+
+    val showDeleteFriendDialog = mutableStateOf(false)
 
     // 일정 문서 ID
     val scheduleDocId = mutableStateOf("")
@@ -110,6 +114,26 @@ class ScheduleDetailFriendsViewModel @Inject constructor(
 
             friendsUserList.clear()
             friendsUserList.addAll(work1)
+        }
+    }
+
+    // 초대 받은 일정 삭제
+    fun removeInvitedSchedule(invitedUser: String, tripScheduleDocId: String) {
+        Log.d("ScheduleDetailFriendsViewModel", "invitedUser: $invitedUser")
+        viewModelScope.launch {
+            val work1 = async(Dispatchers.IO) {
+                tripScheduleService.removeInvitedScheduleList(
+                    invitedUser,
+                    tripScheduleDocId
+                )
+            }.await()
+
+            val work2 = async(Dispatchers.IO) {
+                tripScheduleService.removeScheduleInviteList(
+                    tripScheduleDocId,
+                    invitedUser
+                )
+            }.await()
         }
     }
 

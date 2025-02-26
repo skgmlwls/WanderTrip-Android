@@ -69,7 +69,7 @@ fun ScheduleDetailScreen(
                         containerColor = Color.White
                     ),
                     title = {
-                        Text(text = "일정 상세", fontFamily = NanumSquareRound)
+                        Text(text = viewModel.tripSchedule.value.scheduleTitle, fontFamily = NanumSquareRound)
                     },
                     navigationIcon = {
                         IconButton(onClick = { viewModel.backScreen() }) {

@@ -31,6 +31,7 @@ import com.lion.wandertrip.ui.theme.NanumSquareRound
 @Composable
 fun ScheduleDetailFriendsScreen(
     scheduleDocId: String,
+    scheduleWriteNickName: String,
     viewModel: ScheduleDetailFriendsViewModel = hiltViewModel()
 ) {
     Log.d("ScheduleDetailFriendsScreen", "scheduleDocId: $scheduleDocId")
@@ -69,10 +70,12 @@ fun ScheduleDetailFriendsScreen(
                     }
                 },
                 actions = {
-                    IconButton(
-                        onClick = { showAddFriendDialog = true }
-                    ) {
-                        Icon(imageVector = Icons.Filled.PersonAdd, contentDescription = "친구 초대")
+                    if (scheduleWriteNickName == viewModel.application.loginUserModel.userNickName) {
+                        IconButton(
+                            onClick = { showAddFriendDialog = true }
+                        ) {
+                            Icon(imageVector = Icons.Filled.PersonAdd, contentDescription = "친구 초대")
+                        }
                     }
                 },
             )
@@ -85,6 +88,8 @@ fun ScheduleDetailFriendsScreen(
         ) {
             ScheduleDetailFriendsList(
                 friends = viewModel.friendsUserList,
+                scheduleWriteNickName = scheduleWriteNickName,
+                viewModel = viewModel,
                 profileImageUrl = "http://tong.visitkorea.or.kr/cms/resource/69/3383069_image2_1.JPG"
             )
             // 다이얼로그 표시

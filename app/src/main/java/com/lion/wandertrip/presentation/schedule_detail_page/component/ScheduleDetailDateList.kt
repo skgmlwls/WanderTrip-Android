@@ -2,7 +2,7 @@ package com.lion.wandertrip.presentation.schedule_detail_page.component
 
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,6 +24,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.google.android.gms.maps.model.LatLng
 import com.lion.wandertrip.R
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.presentation.schedule_detail_page.ScheduleDetailViewModel
@@ -34,7 +38,6 @@ import com.google.firebase.Timestamp
 import com.lion.a02_boardcloneproject.component.CustomDividerComponent
 import org.burnoutcrew.reorderable.ReorderableItem
 import org.burnoutcrew.reorderable.detectReorder
-import org.burnoutcrew.reorderable.detectReorderAfterLongPress
 import org.burnoutcrew.reorderable.reorderable
 import org.burnoutcrew.reorderable.rememberReorderableLazyListState
 
@@ -85,7 +88,10 @@ fun ScheduleDetailDateList(
                             scheduleItems = viewModel.tripScheduleItems
                                 .filter { it.itemDate.seconds == date.seconds }
                                 .sortedBy { it.itemIndex },
-                            onTouch = { touched -> isMapTouched = touched }
+                            viewModel = viewModel,
+                            onTouch = { touched -> isMapTouched = touched },
+                            mapScheduleDate = tripSchedule.scheduleDateList[index],
+                            selectedLocation = viewModel.selectedLocation.value
                         )
                     }
                 }
@@ -142,7 +148,13 @@ fun ScheduleDetailDateList(
                                 key = { it.itemDocId }
                             ) { scheduleItem ->
                                 ReorderableItem(reorderState, key = scheduleItem.itemDocId) {
-                                    Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+                                    Row(
+                                        modifier = Modifier.height(IntrinsicSize.Min)
+                                            .clickable {
+                                                viewModel.selectedLocation.value = LatLng(scheduleItem.itemLatitude, scheduleItem.itemLongitude)
+                                                viewModel.selectedDate.value = scheduleItem.itemDate
+                                            }
+                                    ) {
                                         ScheduleDetailVerticalDividerWithCircle()
                                         Column(
                                             modifier = Modifier
@@ -169,19 +181,37 @@ fun ScheduleDetailDateList(
                                                 scheduleItem.itemReviewImagesURL.forEach { imageUrl ->
                                                     val painter: AsyncImagePainter =
                                                         rememberAsyncImagePainter(model = imageUrl)
+
                                                     Box(
                                                         modifier = Modifier
                                                             .size(80.dp)
                                                             .padding(horizontal = 5.dp)
                                                             .clip(RoundedCornerShape(10.dp))
                                                     ) {
-                                                        Image(
-                                                            painter = painter,
-                                                            contentDescription = "Review Image",
-                                                            contentScale = ContentScale.Crop,
-                                                            modifier = Modifier.fillMaxSize()
-                                                        )
+                                                        // 첫번째 if: 로딩 상태일 때 Lottie 애니메이션을 표시
+                                                        if (painter.state is AsyncImagePainter.State.Loading) {
+                                                            val composition by rememberLottieComposition(
+                                                                LottieCompositionSpec.RawRes(R.raw.lottie_shimmer)
+                                                            )
+                                                            LottieAnimation(
+                                                                composition = composition,
+                                                                contentScale = ContentScale.Crop,
+                                                                modifier = Modifier.fillMaxSize()
+                                                            )
+                                                        }
+                                                        // 두번째 if: 로딩 상태일 때 새 painter2를 생성해 최신 상태를 반영하고, 이미지가 로드되면 이를 표시
+                                                        if (painter.state is AsyncImagePainter.State.Loading) {
+                                                            val painter2 = rememberAsyncImagePainter(model = imageUrl)
+                                                            Log.d("ScheduleDetailDateList3", "imageUrl: $imageUrl")
+                                                            Image(
+                                                                painter = painter2,
+                                                                contentDescription = "후기 이미지",
+                                                                contentScale = ContentScale.Crop,
+                                                                modifier = Modifier.fillMaxSize()
+                                                            )
+                                                        }
                                                     }
+
                                                 }
                                             }
                                             if (scheduleItem.itemReviewText.isNotEmpty()) {

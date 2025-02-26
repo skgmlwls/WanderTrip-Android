@@ -2,12 +2,16 @@ package com.lion.wandertrip.presentation.schedule_detail_page
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -21,6 +25,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -40,6 +45,10 @@ class ScheduleDetailViewModel @Inject constructor(
     val areaCode = mutableIntStateOf(0)
     // 일정 문서 ID
     val tripScheduleDocId = mutableStateOf("")
+
+    var selectedLocation = mutableStateOf<LatLng?>(null)
+    var selectedDate = mutableStateOf<Timestamp?>(null)
+
 
 
     // val tripSchedule = TripScheduleModel()
@@ -100,6 +109,7 @@ class ScheduleDetailViewModel @Inject constructor(
             // Firestore Snapshot Listener 활성화
             observeTripScheduleItems()
 
+            delay(2000)
             isLoading.value = false // ✅ 로딩 완료
         }
     }
@@ -133,36 +143,28 @@ class ScheduleDetailViewModel @Inject constructor(
         return sdf.format(Date(timestamp.seconds * 1000))
     }
 
-    // 일정 항목 선택 화면 으로 이동
-    fun moveToScheduleSelectItemScreen(itemCode: Int, scheduleDate: Timestamp) {
-        application.navHostController.navigate(
-            "${ScheduleScreenName.SCHEDULE_SELECT_ITEM_SCREEN.name}?" +
-                "itemCode=${itemCode}&areaName=${areaName.value}&areaCode=${areaCode.intValue}&scheduleDate=${scheduleDate.seconds}&tripScheduleDocId=${tripScheduleDocId.value}")
-    }
-
-    // 함께 하는 친구 목록으로 이동
-    fun moveToScheduleDetailFriendsScreen(scheduleDocId: String) {
-        application.navHostController.navigate(
-            "${ScheduleScreenName.SCHEDULE_DETAIL_FRIENDS_SCREEN.name}?" +
-                "scheduleDocId=${scheduleDocId}"
-        )
-    }
-
-    // 일정 항목 후기 화면으로 이동
-    fun moveToScheduleItemReviewScreen(
-        tripScheduleDocId: String,
-        scheduleItemDocId: String,
-        scheduleItemTitle: String,
-    ) {
-        application.navHostController.navigate(
-            ScheduleScreenName.SCHEDULE_ITEM_REVIEW_SCREEN.name +
-                    "/$tripScheduleDocId/$scheduleItemDocId/$scheduleItemTitle"
-        )
-    }
-
-    // 이전 화면 으로 이동 (메인 일정 화면)
-    fun backScreen() {
-        application.navHostController.popBackStack()
+    // 지역 이름에 따른 기본 위치 좌표 반환 함수
+    fun getDefaultLocation(areaName: String): LatLng {
+        return when (areaName) {
+            "서울" -> LatLng(37.5665, 126.9780)
+            "인천" -> LatLng(37.4563, 126.7052)
+            "대전" -> LatLng(36.3504, 127.3845)
+            "대구" -> LatLng(35.8722, 128.6025)
+            "광주" -> LatLng(35.1595, 126.8526)
+            "부산" -> LatLng(35.1796, 129.0756)
+            "울산" -> LatLng(35.5384, 129.3114)
+            "세종시" -> LatLng(36.4800, 127.2890)
+            "경기도" -> LatLng(37.4138, 127.5183)
+            "강원도" -> LatLng(37.7519, 128.8969)
+            "충청북도" -> LatLng(36.6357, 127.4910)
+            "충청남도" -> LatLng(36.5184, 126.8000)
+            "경상북도" -> LatLng(36.4919, 128.8889)
+            "경상남도" -> LatLng(35.2383, 128.6920)
+            "전라북도" -> LatLng(35.7175, 127.1441)
+            "전라남도" -> LatLng(34.8161, 126.4630)
+            "제주도" -> LatLng(33.4996, 126.5312)
+            else -> LatLng(37.5665, 126.9780) // 기본값은 서울
+        }
     }
 
     // LazyColumn Reorderable 관련 //////////////////////////////////////////////////////////////////
@@ -199,4 +201,37 @@ class ScheduleDetailViewModel @Inject constructor(
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // 화면 이동 관련 ////////////////////////////////////////////////////////////////////////////////
+
+    // 일정 항목 선택 화면 으로 이동
+    fun moveToScheduleSelectItemScreen(itemCode: Int, scheduleDate: Timestamp) {
+        application.navHostController.navigate(
+            "${ScheduleScreenName.SCHEDULE_SELECT_ITEM_SCREEN.name}?" +
+                    "itemCode=${itemCode}&areaName=${areaName.value}&areaCode=${areaCode.intValue}&scheduleDate=${scheduleDate.seconds}&tripScheduleDocId=${tripScheduleDocId.value}")
+    }
+
+    // 함께 하는 친구 목록으로 이동
+    fun moveToScheduleDetailFriendsScreen(scheduleDocId: String) {
+        application.navHostController.navigate(
+            "${ScheduleScreenName.SCHEDULE_DETAIL_FRIENDS_SCREEN.name}?" +
+                    "scheduleDocId=${scheduleDocId}&userNickName=${tripSchedule.value.userNickName}"
+        )
+    }
+
+    // 일정 항목 후기 화면으로 이동
+    fun moveToScheduleItemReviewScreen(
+        tripScheduleDocId: String,
+        scheduleItemDocId: String,
+        scheduleItemTitle: String,
+    ) {
+        application.navHostController.navigate(
+            ScheduleScreenName.SCHEDULE_ITEM_REVIEW_SCREEN.name +
+                    "/$tripScheduleDocId/$scheduleItemDocId/$scheduleItemTitle"
+        )
+    }
+
+    // 이전 화면 으로 이동 (메인 일정 화면)
+    fun backScreen() {
+        application.navHostController.popBackStack()
+    }
 }

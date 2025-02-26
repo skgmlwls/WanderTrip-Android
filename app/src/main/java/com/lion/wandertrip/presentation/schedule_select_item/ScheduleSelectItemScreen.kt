@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.firebase.Timestamp
+import com.lion.a02_boardcloneproject.component.CustomDividerComponent
 import com.lion.wandertrip.R
 import com.lion.wandertrip.component.LottieLoadingIndicator
 import com.lion.wandertrip.presentation.schedule_select_item.component.ScheduleItemList
@@ -38,6 +39,7 @@ fun ScheduleSelectItemScreen(
 ) {
     // 🔍 검색어 상태
     var searchQuery by remember { mutableStateOf("") }
+    // 선택된 카태고리 상태
     var selectedCategoryCode by remember { mutableStateOf<String?>(null) }
 
     val isLoading by viewModel.isLoading // ✅ 로딩 상태 가져오기
@@ -87,12 +89,29 @@ fun ScheduleSelectItemScreen(
             }
         ) {
             Column(modifier = Modifier.padding(it)) {
+
+                // 🔍 검색 바 추가
+                ScheduleItemSearchBar(
+                    query = searchQuery,
+                    onSearchQueryChanged = { searchQuery = it },
+                    onSearchClicked = {},
+                    onClearQuery = { searchQuery = "" }
+                )
+
+                // 🎯 카테고리 칩 버튼 추가
+                ScheduleItemCategoryChips(
+                    itemCode = itemCode,
+                    selectedCategoryCode = selectedCategoryCode,
+                    onCategorySelected = { newCategoryCode ->
+                        selectedCategoryCode = newCategoryCode
+                    }
+                )
+
                 // 룰렛 이동 버튼
                 Button(
                     onClick = { viewModel.moveToRouletteItemScreen(tripScheduleDocId, areaName, areaCode) },
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 10.dp),
+                        .fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White,
                         contentColor = Color(0xFF435C8F)
@@ -112,22 +131,9 @@ fun ScheduleSelectItemScreen(
                     )
                 }
 
-                // 🔍 검색 바 추가
-                ScheduleItemSearchBar(
-                    query = searchQuery,
-                    onSearchQueryChanged = { searchQuery = it },
-                    onSearchClicked = {},
-                    onClearQuery = { searchQuery = "" }
-                )
+                CustomDividerComponent()
 
-                // 🎯 카테고리 칩 버튼 추가
-                ScheduleItemCategoryChips(
-                    itemCode = itemCode,
-                    selectedCategoryCode = selectedCategoryCode,
-                    onCategorySelected = { newCategoryCode ->
-                        selectedCategoryCode = newCategoryCode
-                    }
-                )
+                Log.d("ScheduleSelectItemScreen", "itemCode : ${itemCode}")
 
                 // ✅ 필터링된 여행지 리스트
                 val filteredList = SharedTripItemList.sharedTripItemList.filter {
