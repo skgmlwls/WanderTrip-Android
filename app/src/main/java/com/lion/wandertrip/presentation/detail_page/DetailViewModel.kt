@@ -17,11 +17,6 @@ import com.lion.wandertrip.model.ReviewModel
 import com.lion.wandertrip.model.ScheduleItem
 import com.lion.wandertrip.model.TripCommonItem
 import com.lion.wandertrip.model.TripScheduleModel
-import com.lion.wandertrip.presentation.detail_page.used_dummy_data.TripScheduleDummyData
-import com.lion.wandertrip.presentation.detail_page.used_dummy_data.TripScheduleDummyData.Companion.date3_1
-import com.lion.wandertrip.presentation.detail_page.used_dummy_data.TripScheduleDummyData.Companion.date3_4
-import com.lion.wandertrip.presentation.detail_page.used_dummy_data.TripScheduleDummyData.Companion.dateList3
-import com.lion.wandertrip.presentation.detail_page.used_dummy_data.TripScheduleDummyData.Companion.item3_1
 import com.lion.wandertrip.service.ContentsReviewService
 import com.lion.wandertrip.service.ContentsService
 import com.lion.wandertrip.service.TripCommonItemService
@@ -47,7 +42,7 @@ class DetailViewModel @Inject constructor(
     val tripCommonItemService: TripCommonItemService,
     val contentsReviewService: ContentsReviewService,
     val contentsService: ContentsService,
-    val tripScheduleService : TripScheduleService,
+    val tripScheduleService: TripScheduleService,
 ) : ViewModel() {
     val tripApplication = context as TripApplication
 
@@ -88,10 +83,10 @@ class DetailViewModel @Inject constructor(
     val isLoading = mutableStateOf(false)
 
 
-    fun setState(value : Boolean) {
-        Log.d("test100","state : $isLoading")
+    fun setState(value: Boolean) {
+        Log.d("test100", "state : $isLoading")
         isLoading.value = value
-        Log.d("test100","state : $isLoading")
+        Log.d("test100", "state : $isLoading")
     }
 
     // 컨텐트 ID 로 api 에서 받아온  모델 가져오기
@@ -203,7 +198,7 @@ class DetailViewModel @Inject constructor(
     // 일정 리스트 가져오기
     fun getTripSchedule() {
         viewModelScope.launch {
-            val work1= async(Dispatchers.IO){
+            val work1 = async(Dispatchers.IO) {
                 tripScheduleService.gettingMyTripSchedules(tripApplication.loginUserModel.userNickName)
             }
             val result = work1.await()
@@ -295,42 +290,46 @@ class DetailViewModel @Inject constructor(
             }
             contentValue.value = work1.await()
 
-            val work2 = async(Dispatchers.IO){
+            val work2 = async(Dispatchers.IO) {
                 getReviewCount()
             }
             reviewCountValue.value = work2.await()
-            Log.d("test","content Rating : ${contentValue.value.ratingScore}")
+            Log.d("test", "content Rating : ${contentValue.value.ratingScore}")
         }
     }
 
     // 컨텐츠의 리뷰 개수 가져오기(별점을 얼마나 많은 유저가 등록했는가 알아보기 위함)
-    suspend fun getReviewCount() : Int{
+    suspend fun getReviewCount(): Int {
         return contentsReviewService.getAllReviewsCountWithContents(contentValue.value.contentId)
     }
 
-    fun addSchedule(
-
+    // 내일정에 지금 컨텐츠 추가하기
+    fun addSchedule(tripScheduleDocId: String, title: String, type: String, date: Timestamp, lat: Double, lng: Double, contentId: String
     ) {
-  /*      viewModelScope.launch {
+        viewModelScope.launch {
             val work1 = async(Dispatchers.IO) {
                 val scheduleItem = ScheduleItem(
-                    itemTitle = tripItemModel.title,
-                    itemType = when(tripItemModel.contentTypeId) {
+                    itemTitle = title,
+                    itemType = when (type) {
                         ContentTypeId.TOURIST_ATTRACTION.contentTypeCode.toString() -> "관광지"
                         ContentTypeId.RESTAURANT.contentTypeCode.toString() -> "음식점"
                         ContentTypeId.ACCOMMODATION.contentTypeCode.toString() -> "숙소"
                         else -> ""
                     },
-                    itemDate = scheduleDate.value,
-                    itemLongitude = tripItemModel.mapLong,
-                    itemLatitude = tripItemModel.mapLat,
-                    itemContentId = tripItemModel.contentId,
+                    itemDate = date,
+                    itemLatitude = lat,
+                    itemLongitude = lng,
+                    itemContentId = contentId,
                 )
 
-                tripScheduleService.addTripItemToSchedule(tripScheduleDocId.value, scheduleDate.value, scheduleItem)
-            }.await()
-            application.navHostController.popBackStack()
-        }*/
+                tripScheduleService.addTripItemToSchedule(
+                    tripScheduleDocId,
+                    date,
+                    scheduleItem
+                )
+            }.join()
+            isAddScheduleSheetOpen.value=false
+        }
     }
 
 
@@ -402,7 +401,7 @@ class DetailViewModel @Inject constructor(
     val isRatingDesc = mutableStateOf(true)
 
     // 리뷰 사진 관리 map
-    val reviewImageUrlMap = mutableStateMapOf<Int,List<Uri>>()
+    val reviewImageUrlMap = mutableStateMapOf<Int, List<Uri>>()
 
     fun getReviewList() {
         reviewList.clear()
@@ -442,7 +441,7 @@ class DetailViewModel @Inject constructor(
     }
 
     // 이미지 uri로 변경
-    fun getUri(filterReviewList : MutableList<ReviewModel>) {
+    fun getUri(filterReviewList: MutableList<ReviewModel>) {
         // url map 초기화
         reviewImageUrlMap.clear()
         // 로그 추가: 함수가 호출되었는지 확인
@@ -463,7 +462,7 @@ class DetailViewModel @Inject constructor(
 
                 // URL 맵에 추가
                 reviewImageUrlMap[index] = urlList.toMutableStateList()
-                Log.d("test100","map[$index] : $reviewImageUrlMap[$index]")
+                Log.d("test100", "map[$index] : $reviewImageUrlMap[$index]")
             }
 
             // 로그: 작업이 끝났는지 확인
@@ -513,23 +512,23 @@ class DetailViewModel @Inject constructor(
     }
 
     // 리뷰 수정 버튼 리스너
-    fun onClickIconReviewModify(contentDocID: String,contentsID :String,reviewDocID: String) {
+    fun onClickIconReviewModify(contentDocID: String, contentsID: String, reviewDocID: String) {
         tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_DETAIL_REVIEW_MODIFY.name}/${contentDocID}/${contentsID}/${reviewDocID}")
     }
 
 
     // 리뷰 삭제 버튼
-    fun deleteReview(contentDocId: String, contentsReviewDocId : String) {
-        Log.d("test100","contentDocId :$contentDocId, contentsReviewDocId:$contentsReviewDocId")
+    fun deleteReview(contentDocId: String, contentsReviewDocId: String) {
+        Log.d("test100", "contentDocId :$contentDocId, contentsReviewDocId:$contentsReviewDocId")
         viewModelScope.launch {
             // 삭제 진행
-            val work1  = async(Dispatchers.IO){
-                contentsReviewService.deleteContentsReview(contentDocId,contentsReviewDocId)
+            val work1 = async(Dispatchers.IO) {
+                contentsReviewService.deleteContentsReview(contentDocId, contentsReviewDocId)
             }
             work1.join()
             // 컨텐츠 별점 수정
-            val work2 = async(Dispatchers.IO){
-                contentsService.updateContentRating(contentDocId)
+            val work2 = async(Dispatchers.IO) {
+                contentsService.updateContentRatingAndRatingCount(contentDocId)
             }
             work2.join()
 

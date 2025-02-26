@@ -126,7 +126,7 @@ class ContentsRepository {
     }
 
     // 특정 컨텐츠의 리뷰 평점 평균을 계산하여 ContentsData 문서에 저장하고 리뷰 개수를 반환
-    suspend fun updateContentRating(contentsDocId: String): Int {
+    suspend fun updateContentRatingAndRatingCount(contentsDocId: String): Int {
          try {
             val db = FirebaseFirestore.getInstance()
             val contentsRef = db.collection("ContentsData").document(contentsDocId)
@@ -162,8 +162,7 @@ class ContentsRepository {
             // Log.d("test100", "계산된 평균 평점: $avgRating")
 
             // Firestore 문서 업데이트 (평균 평점)
-            contentsRef.update("ratingScore", avgRating).await()
-
+            contentsRef.update("ratingScore", avgRating,"getRatingCount",reviewCount).await()
             // Log.d("test100", "컨텐츠 평점 업데이트 성공: $contentsDocId, 평균 평점: $avgRating, 리뷰 개수: $reviewCount")
 
             return reviewCount

@@ -220,7 +220,7 @@ class DetailReviewModifyViewModel @Inject constructor(
 
     // 컨텐츠 의 별점 필드 수정
     suspend fun addReviewAndUpdateContents(contentDocId: String) {
-        contentsService.updateContentRating(contentDocId)
+        contentsService.updateContentRatingAndRatingCount(contentDocId)
     }
 
 
