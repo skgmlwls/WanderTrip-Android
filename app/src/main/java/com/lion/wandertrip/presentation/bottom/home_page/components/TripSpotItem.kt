@@ -20,6 +20,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,14 +37,20 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import com.lion.wandertrip.R
 import com.lion.wandertrip.model.TripItemModel
+import com.lion.wandertrip.model.UserModel
 import com.lion.wandertrip.ui.theme.NanumSquareRound
 
 @Composable
-fun TravelSpotItem(
+fun TripSpotItem(
     tripItem: TripItemModel,
-    onItemClick: (TripItemModel) -> Unit
+    userModel: UserModel,
+    onItemClick: (TripItemModel) -> Unit,
+    onFavoriteClick: (String) -> Unit
 ) {
-    var isFavorite by remember { mutableStateOf(false) }
+    // ✅ userLikeList가 변경될 때 자동 업데이트
+    val isFavorite by remember(userModel.userLikeList) {
+        derivedStateOf { userModel.userLikeList.contains(tripItem.contentId) }
+    }
 
     Row(
         modifier = Modifier
@@ -56,7 +63,7 @@ fun TravelSpotItem(
     ) {
         Box(modifier = Modifier.size(60.dp)) {
             val imagePainter = if (tripItem.firstImage.isNullOrBlank()) {
-                painterResource(R.drawable.ic_hide_image_144dp) // ✅ 기본 이미지 적용
+                painterResource(R.drawable.ic_hide_image_144dp)
             } else {
                 rememberAsyncImagePainter(tripItem.firstImage)
             }
@@ -72,12 +79,12 @@ fun TravelSpotItem(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(4.dp), // 아이콘이 너무 붙지 않도록 패딩 추가
-                contentAlignment = Alignment.TopEnd // ✅ 우측 하단 정렬
+                    .padding(4.dp),
+                contentAlignment = Alignment.TopEnd
             ) {
                 IconButton(
-                    onClick = { isFavorite = !isFavorite },
-                    modifier = Modifier.size(24.dp) // 적절한 크기 설정
+                    onClick = { onFavoriteClick(tripItem.contentId) }, // ✅ 상태 변경 콜백 실행
+                    modifier = Modifier.size(24.dp)
                 ) {
                     Icon(
                         imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
@@ -95,4 +102,3 @@ fun TravelSpotItem(
         }
     }
 }
-

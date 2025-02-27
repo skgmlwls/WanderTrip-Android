@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -30,27 +31,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.a02_boardcloneproject.component.CustomDividerComponent
+import com.lion.wandertrip.component.LottieLoadingIndicator
 import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.presentation.search_page.SearchViewModel
 import com.lion.wandertrip.presentation.search_page.component.HomeSearchBar
 import com.lion.wandertrip.presentation.search_result_page.component.MoreButton
 import com.lion.wandertrip.presentation.search_result_page.component.SearchItem
+import com.lion.wandertrip.presentation.search_result_page.component.SearchTripNoteItem
 import com.lion.wandertrip.util.ContentTypeId
-import com.lion.wandertrip.util.MainScreenName
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchResultScreen(
-        contentId: String,
-        viewModel: SearchResultViewModel = hiltViewModel(),
-        searchViewModel: SearchViewModel = hiltViewModel()
-    ) {
+    contentId: String,
+    viewModel: SearchResultViewModel = hiltViewModel(),
+    searchViewModel: SearchViewModel = hiltViewModel()
+) {
     var searchInput by remember { mutableStateOf(contentId) }
     var searchQuery by remember { mutableStateOf(contentId) }
-    var selectedCategoryCode by remember { mutableStateOf<String?>(null) }
+
+    var selectedCategoryCode by remember { mutableStateOf<String?>("추천") }
+
+    val isLoading by viewModel.isLoading.observeAsState(false) // ✅ 로딩 상태 감지
 
     // ✅ ViewModel에서 검색 결과 가져오기
     val filteredList by viewModel.searchResults.observeAsState(emptyList())
+    val filteredNoteList by viewModel.searchNoteResults.observeAsState(emptyList())
 
     // ✅ "더보기"를 눌렀을 때 표시할 개수를 저장하는 Map
     val visibleItemCounts = remember { mutableStateMapOf<String, Int>() }
@@ -62,20 +68,36 @@ fun SearchResultScreen(
         }
     }
 
-    // ✅ 카테고리 매핑 함수 (Int → Enum → String)
     fun getCategoryName(contentTypeId: String?): String {
-        return ContentTypeId.values()
-            .find { it.contentTypeCode.toString() == contentTypeId }?.contentTypeName ?: "기타"
+        return when (contentTypeId) {
+            ContentTypeId.TOURIST_ATTRACTION.contentTypeCode.toString() -> "관광지"
+            ContentTypeId.ACCOMMODATION.contentTypeCode.toString() -> "숙소"
+            ContentTypeId.RESTAURANT.contentTypeCode.toString() -> "맛집"
+            else -> "기타"
+        }
     }
 
-    // ✅ 카테고리별 분류 (Enum 값의 `contentTypeName` 기준)
-    val categorizedResults = if (selectedCategoryCode == "추천" || selectedCategoryCode == null) {
-        filteredList.groupBy { getCategoryName(it.contentTypeId) }
-    } else {
-        filteredList
-            .filter { getCategoryName(it.contentTypeId) == selectedCategoryCode }
+    val categorizedResults = when (selectedCategoryCode) {
+        "관광지" -> filteredList.filter { getCategoryName(it.contentTypeId) == "관광지" }
             .groupBy { getCategoryName(it.contentTypeId) }
+
+        "숙소" -> filteredList.filter { getCategoryName(it.contentTypeId) == "숙소" }
+            .groupBy { getCategoryName(it.contentTypeId) }
+
+        "맛집" -> filteredList.filter { getCategoryName(it.contentTypeId) == "맛집" }
+            .groupBy { getCategoryName(it.contentTypeId) }
+
+        else -> filteredList.groupBy { getCategoryName(it.contentTypeId) } // ✅ "추천" 또는 null일 경우 모든 데이터 표시
     }
+
+// ✅ 여행기 데이터는 별도로 관리
+    val categorizedNoteResults =
+        if (selectedCategoryCode == "여행기" || selectedCategoryCode == "추천") {
+            filteredNoteList
+        } else {
+            emptyList()
+        }
+
 
     Scaffold(containerColor = Color.White) { paddingValues ->
         Column(
@@ -100,68 +122,110 @@ fun SearchResultScreen(
                 onBackClicked = { viewModel.onNavigateBackToSearchScreen() }
             )
 
-
             // ✅ 카테고리 필터
             SearchItemCategoryChips(
                 selectedCategoryCode = selectedCategoryCode,
                 onCategorySelected = { selectedCategoryCode = it }
             )
 
-            // ✅ 검색 결과 리스트
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                val requiredCategories = listOf("관광지", "숙박", "음식점")
+            if (isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    LottieLoadingIndicator() // ✅ 로딩 UI
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    val requiredCategories = listOf("관광지", "숙소", "맛집")
 
-                requiredCategories.forEach { category ->
-                    val itemsForCategory = categorizedResults[category] ?: emptyList()
+                    requiredCategories.forEach { category ->
+                        val itemsForCategory = categorizedResults[category] ?: emptyList()
+                        val visibleCount = visibleItemCounts[category] ?: 3
 
-                    // ✅ 표시할 개수 (초기값: 3, "더보기" 클릭 시 증가)
-                    val visibleCount = visibleItemCounts[category] ?: 3
-
-                    item {
-                        Text(
-                            text = category,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
-                    }
-
-                    if (itemsForCategory.isNotEmpty()) {
-                        items(itemsForCategory.take(visibleCount)) { tripItem ->
-                            SearchItem(
-                                tripItem = tripItem,
-                                onItemClick = { searchViewModel.onClickToResult(tripItem.title) }
-                            )
-                            CustomDividerComponent(10.dp)
+                        if (selectedCategoryCode != "추천" && selectedCategoryCode != category) {
+                            return@forEach
                         }
-                    } else {
-                        item { NoResultsMessage(category) }
-                    }
 
-                    // ✅ "더보기" 버튼 추가 (현재 표시 개수 < 전체 개수일 때)
-                    if (visibleCount < itemsForCategory.size) {
                         item {
-                            MoreButton(category = category) {
-                                visibleItemCounts[category] = visibleCount + 3 // ✅ 3개씩 추가
+                            Text(
+                                text = category,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        }
+
+                        if (itemsForCategory.isNotEmpty()) {
+                            items(itemsForCategory.take(visibleCount)) { tripItem ->
+                                SearchItem(
+                                    tripItem = tripItem, // ✅ TripItemModel만 처리
+                                    onItemClick = { viewModel.onNavigateDetail(tripItem.contentId) }
+                                )
+                                CustomDividerComponent(10.dp)
+                            }
+                        } else {
+                            item { NoResultsMessage(category) }
+                        }
+
+                        if (visibleCount < itemsForCategory.size) {
+                            item {
+                                MoreButton(category = category) {
+                                    visibleItemCounts[category] = visibleCount + 3
+                                }
                             }
                         }
+
+                        if (selectedCategoryCode == "추천" && category != requiredCategories.last()) {
+                            item { CustomDividerComponent(16.dp) }
+                        }
                     }
 
-                    // ✅ 마지막 카테고리가 아니라면 구분선 추가
-                    if (category != requiredCategories.last()) {
-                        item { CustomDividerComponent(16.dp) }
+                    // ✅ 여행기 데이터를 별도로 처리
+                    if (selectedCategoryCode == "여행기" || selectedCategoryCode == "추천") {
+                        val visibleCount = visibleItemCounts["여행기"] ?: 3
+
+                        item {
+                            Text(
+                                text = "여행기",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        }
+
+                        if (categorizedNoteResults.isNotEmpty()) {
+                            items(categorizedNoteResults.take(visibleCount)) { tripNote ->
+                                SearchTripNoteItem( // ✅ TripNoteModel을 처리할 Compose 함수 사용
+                                    tripNote = tripNote,
+                                    onItemClick = { viewModel.onNavigateTripNote(tripNote.tripNoteDocumentId) }
+                                )
+                                CustomDividerComponent(10.dp)
+                            }
+                        } else {
+                            item { NoResultsMessage("여행기") }
+                        }
+
+                        if (visibleCount < categorizedNoteResults.size) {
+                            item {
+                                MoreButton(category = "여행기") {
+                                    visibleItemCounts["여행기"] = visibleCount + 3
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
     }
 }
+
 @Composable
 fun NoResultsMessage(category: String) {
     val message = when (category) {

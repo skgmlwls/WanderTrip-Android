@@ -58,14 +58,14 @@ class TripAreaBaseItemRepository(private val api: TripAreaBaseItemInterface) {
                 mobileOS = "ETC",
                 mobileApp = "com.lion.wandertrip",
                 type = "json",
-                numOfRows = 10000,
+                numOfRows = 3,
                 pageNo = 1
             )
 
             if (response.isSuccessful) {
                 response.body()?.let { apiResponse ->
                     val items =
-                        apiResponse.response.body.items.item // 무작위로 3개 선택
+                        apiResponse.response.body.items.item
                     items.map {
                         TripItemModel(
                             contentId = it.contentId ?: "",

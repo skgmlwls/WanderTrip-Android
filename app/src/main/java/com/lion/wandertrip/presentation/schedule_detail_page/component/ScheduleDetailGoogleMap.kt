@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
@@ -83,13 +84,15 @@ fun ScheduleDetailGoogleMap(
         ) {
             // 마커들
             scheduleItems.forEach { item ->
-                Marker(
-                    state = rememberMarkerState(
-                        position = LatLng(item.itemLatitude, item.itemLongitude)
-                    ),
-                    title = item.itemTitle,
-                    icon = ScheduleDetailCustomMarkerIcon(context, item.itemIndex)
-                )
+                key(item.itemDocId, item.itemIndex) {
+                    Marker(
+                        state = rememberMarkerState(
+                            position = LatLng(item.itemLatitude, item.itemLongitude)
+                        ),
+                        title = item.itemTitle,
+                        icon = ScheduleDetailCustomMarkerIcon(context, item.itemIndex)
+                    )
+                }
             }
         }
     }
