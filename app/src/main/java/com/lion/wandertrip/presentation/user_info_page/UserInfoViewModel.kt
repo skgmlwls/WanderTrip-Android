@@ -179,6 +179,7 @@ class UserInfoViewModel @Inject constructor(
 
         tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) {
             popUpTo(tripApplication.navHostController.graph.startDestinationId) { inclusive = true }
+            launchSingleTop = true
         }
     }
 
@@ -197,6 +198,7 @@ class UserInfoViewModel @Inject constructor(
 
         tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) {
             popUpTo(tripApplication.navHostController.graph.startDestinationId) { inclusive = true }
+            launchSingleTop = true
         }
     }
 

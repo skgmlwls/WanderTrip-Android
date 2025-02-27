@@ -34,6 +34,8 @@ import com.lion.wandertrip.ui.theme.NanumSquareRound
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+
+
     val tripItems by viewModel.randomTourItems.observeAsState(emptyList())
     val topTrips by viewModel.topScrapedTrips.observeAsState(emptyList())
     val imageUrlMap = viewModel.imageUrlMap

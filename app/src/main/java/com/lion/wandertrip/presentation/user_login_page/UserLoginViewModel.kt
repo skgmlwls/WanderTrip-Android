@@ -147,7 +147,10 @@ class UserLoginViewModel @Inject constructor(
                         MainScreenName.MAIN_SCREEN_USER_LOGIN.name,
                         true
                     )
-                    tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name)
+                    tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) {
+                        // 홈 화면은 남기고 그 이전의 화면들만 백스택에서 제거
+                        popUpTo(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) { inclusive = false }
+                    }
                 }
             }
         }
@@ -181,20 +184,24 @@ class UserLoginViewModel @Inject constructor(
             // 유저중에 kakaoToken 값에 kakaoId 를 갖고 있는 사람이 있다면 홈
             if (model != null) {
                 tripApplication.loginUserModel = model
-                tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name)
+                tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) {
+                    // 홈 화면은 남기고 그 이전의 화면들만 백스택에서 제거
+                    popUpTo(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) { inclusive = false }
+                }
 
                 // 내부 저장소에 userKakao ID 저장
                 // SharedPreference에 저장한다.
                 val pref = tripApplication.getSharedPreferences("KakaoToken", Context.MODE_PRIVATE)
                 pref.edit {
                     putString("kToken", model.kakaoId.toString())
-                    Log.d("userSingStep3","ktoken: ${ model.kakaoId.toString()}")
+                    Log.d("userSingStep3", "ktoken: ${model.kakaoId.toString()}")
                 }
 
                 // Preference에 login token이 있는지 확인한다.
-                val kakaoPref = tripApplication.getSharedPreferences("KakaoToken", Context.MODE_PRIVATE)
-                val ktToken = kakaoPref.getString("kToken",null)
-                Log.d("userSingStep3","토큰 가져오기 : $ktToken")
+                val kakaoPref =
+                    tripApplication.getSharedPreferences("KakaoToken", Context.MODE_PRIVATE)
+                val ktToken = kakaoPref.getString("kToken", null)
+                Log.d("userSingStep3", "토큰 가져오기 : $ktToken")
 
 
             } else {
