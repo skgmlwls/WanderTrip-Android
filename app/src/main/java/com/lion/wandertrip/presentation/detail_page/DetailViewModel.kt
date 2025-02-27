@@ -134,8 +134,8 @@ class DetailViewModel @Inject constructor(
     }
 
     // 앱바의 로케이션 눌렀을때 리스너
-    fun onClickIconMap() {
-        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_GOOGLE_MAP.name)
+    fun onClickIconMap(contentID: String) {
+        tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_GOOGLE_MAP.name}/$contentID")
     }
 
     // 앱바 일정 추가 눌렀을 때 리스너

@@ -52,6 +52,7 @@ fun UserSignUpStep2Screen(
     userDocId: String,
     userSignUpStep2ViewModel: UserSignUpStep2ViewModel = hiltViewModel()
 ) {
+    Log.d("test100","fromWhere : ${fromWhere}, userDocId : ${userDocId}")
     userSignUpStep2ViewModel.settingUserDocId(userDocId)
     userSignUpStep2ViewModel.gettingUserModelByUserDocId()
 
@@ -78,6 +79,7 @@ fun UserSignUpStep2Screen(
 
     val sh = userSignUpStep2ViewModel.tripApplication.screenHeight
     Scaffold(
+        containerColor = Color.White,
         topBar = {
             CustomTopAppBar(
                 menuItems = {

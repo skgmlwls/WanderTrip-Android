@@ -1,12 +1,14 @@
 package com.lion.wandertrip.presentation.my_trip_note
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -18,7 +20,7 @@ import com.lion.wandertrip.presentation.my_trip_note.components.VerticalTripNote
 
 @Composable
 fun MyTripNoteScreen(myTripNoteViewModel: MyTripNoteViewModel = hiltViewModel()) {
-    Log.d("test100","MyTripNoteScreen")
+    Log.d("test100", "MyTripNoteScreen")
     myTripNoteViewModel.getTripNoteList()
     Scaffold(
         topBar = {
@@ -31,11 +33,15 @@ fun MyTripNoteScreen(myTripNoteViewModel: MyTripNoteViewModel = hiltViewModel())
             )
         },
 
-        ){paddingValues ->
-        Column (
-            modifier = Modifier.fillMaxSize().padding(paddingValues).padding(horizontal = 10.dp)
-        ){
-            VerticalTripNoteList(myTripNoteViewModel.tripNoteList,myTripNoteViewModel)
+        ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .background(Color.White)
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 10.dp)
+        ) {
+            VerticalTripNoteList(myTripNoteViewModel.tripNoteList, myTripNoteViewModel)
         }
 
     }

@@ -50,6 +50,7 @@ import com.lion.a02_boardcloneproject.component.CustomOutlinedButton
 import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.wandertrip.R
 import com.lion.wandertrip.component.CustomRatingBar
+import com.lion.wandertrip.component.LottieLoadingIndicator
 import com.lion.wandertrip.model.DetailModel
 import com.lion.wandertrip.presentation.google_map_page.components.RowModelInfo
 import com.lion.wandertrip.util.CustomFont
@@ -59,26 +60,17 @@ import com.skydoves.landscapist.glide.GlideImage
 // 매개변수로 모델 넘겨받아야 함
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun GoogleMapScreen(googleMapViewModel: GoogleMapViewModel = hiltViewModel()) {
+fun GoogleMapScreen(contentId: String, googleMapViewModel: GoogleMapViewModel = hiltViewModel()) {
+
     val sh = googleMapViewModel.tripApplication.screenHeight
     val sw = googleMapViewModel.tripApplication.screenWidth
 
-    val detailDummyModel = DetailModel(
-        contentID = "128968",
-        detailTitle = "서울광장",
-        detailRating = 4.5f,
-        detailLat = 37.5657098894,
-        detailLong = 126.9780155330,
-        detailImage = "http://tong.visitkorea.or.kr/cms/resource/50/3116450_image2_1.jpg",
-        detailDescription = "서울광장은 서울시청 앞에 조성된 잔디밭 광장이다. ...",
-        detailAddress = "서울특별시 중구 세종대로 110",
-        detailPhoneNumber = "02-2088-4552",
-        detailHomepage = "https://plaza.seoul.go.kr/?doing_wp_cron=1701728399.7732338905334472656250",
-    )
+    Log.d("googleMap", "contentId: $contentId")
+
     // 제목 줄이기 12 자 이상이면 ... 붙임
-    val shortedTitle = googleMapViewModel.makeShortTitleText(detailDummyModel.detailTitle)
-    // 설명 줄이기 20 자 이상이면 ...붙임
-    val shortedDescription = googleMapViewModel.makeShortDescriptionText(detailDummyModel.detailDescription)
+    val shortedTitle =
+        googleMapViewModel.makeShortTitleText(googleMapViewModel.detailValue.value.detailTitle)
+
     // 위치 권한 체크
     val permissionState = rememberMultiplePermissionsState(
         permissions = listOf(
@@ -89,7 +81,7 @@ fun GoogleMapScreen(googleMapViewModel: GoogleMapViewModel = hiltViewModel()) {
 
     // 권한 요청을 확인하고 처리하는 부분
     // 컴포저블 전부 열린 후 딱 한번 실행
-    LaunchedEffect(Unit){
+    LaunchedEffect(Unit) {
         permissionState.launchMultiplePermissionRequest()
     }
 
@@ -98,9 +90,11 @@ fun GoogleMapScreen(googleMapViewModel: GoogleMapViewModel = hiltViewModel()) {
     // allPermissionsGranted로 받아야 처리가 된다.
     LaunchedEffect(permissionState.allPermissionsGranted) {
         googleMapViewModel.hasLocationPermission.value = permissionState.allPermissionsGranted
+        // 모델 가져온다.
+        googleMapViewModel.getModels(contentId)
     }
 
-    // Scaffold로 감싸서 기본 UI 구성
+
     Scaffold(
         topBar = {
             CustomTopAppBar(
@@ -126,48 +120,56 @@ fun GoogleMapScreen(googleMapViewModel: GoogleMapViewModel = hiltViewModel()) {
                 }
 
             } else {
-                // 권한이 있을 경우 GoogleMap 표시
-                val contentModel = detailDummyModel
-                val lat = contentModel.detailLat
-                val long = contentModel.detailLong
 
-                val cameraPositionState = rememberCameraPositionState {
-                    position = CameraPosition.fromLatLngZoom(LatLng(lat, long), 14f)
-                }
-                val uiSettings = remember {
-                    MapUiSettings(
-                        myLocationButtonEnabled = true, // 내위치 버튼 보이기
-                        scrollGesturesEnabled = true // 드래그로 카메라 움직임 제한 해제
-                    )
-                }
-                // 내위치 찾기 버튼 기억하는 속성
-                // 구글 맵에 주입하면 내위치로 가기 버튼이 생성
-                val properties by remember { mutableStateOf(MapProperties(isMyLocationEnabled = true)) }
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                ) {
-                    GoogleMap(
-                        modifier = Modifier.matchParentSize(), // Box 크기와 동일하게 설정
-                        cameraPositionState = cameraPositionState,
-                        properties = properties,
-                        uiSettings = uiSettings
-                    ) {
-                        Marker(state = MarkerState(position = LatLng(lat, long)))
+                if (googleMapViewModel.detailValue.value.detailLat != 0.0) {
+
+                    // 권한이 있을 경우 GoogleMap 표시
+                    val contentModel = googleMapViewModel.detailValue.value
+                    Log.d("gM", "lat : ${contentModel.detailLat}, lng : ${contentModel.detailLong}")
+                    val lat = contentModel.detailLat
+                    val long = contentModel.detailLong
+
+                    val cameraPositionState = rememberCameraPositionState {
+                        Log.d("gM", "latLng : ${LatLng(lat, long)}")
+
+                        if (lat != 0.0 && long != 0.0)
+                            position = CameraPosition.fromLatLngZoom(LatLng(lat, long), 14f)
                     }
-
-                    // 하단에 지역 정보 표시
-                    Column (
+                    val uiSettings = remember {
+                        MapUiSettings(
+                            myLocationButtonEnabled = true, // 내위치 버튼 보이기
+                            scrollGesturesEnabled = true // 드래그로 카메라 움직임 제한 해제
+                        )
+                    }
+                    // 내위치 찾기 버튼 기억하는 속성
+                    // 구글 맵에 주입하면 내위치로 가기 버튼이 생성
+                    val properties by remember { mutableStateOf(MapProperties(isMyLocationEnabled = true)) }
+                    Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height((sh/12).dp)
-                            .padding(16.dp)
-                            .align(Alignment.BottomCenter)
-                            .background(Color.White)
-                            .clip(RoundedCornerShape(16.dp))
+                            .fillMaxSize()
+                            .padding(paddingValues)
                     ) {
-                        RowModelInfo(googleMapViewModel,contentModel)
+                        GoogleMap(
+                            modifier = Modifier.matchParentSize(), // Box 크기와 동일하게 설정
+                            cameraPositionState = cameraPositionState,
+                            properties = properties,
+                            uiSettings = uiSettings
+                        ) {
+                            Marker(state = MarkerState(position = LatLng(lat, long)))
+                        }
+
+                        // 하단에 지역 정보 표시
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height((sh / 12).dp)
+                                .padding(16.dp)
+                                .align(Alignment.BottomCenter)
+                                .background(Color.White)
+                                .clip(RoundedCornerShape(16.dp))
+                        ) {
+                            RowModelInfo(googleMapViewModel, contentModel)
+                        }
                     }
                 }
             }
