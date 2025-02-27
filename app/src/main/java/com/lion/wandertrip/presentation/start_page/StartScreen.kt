@@ -21,6 +21,7 @@ fun StartScreen(startViewModel: StartViewModel = hiltViewModel()){
 
     LaunchedEffect (Unit){
         startViewModel.autoLoginProcess()
+        Log.d("te","시작화면")
     }
 
     if(startViewModel.showLoginMessageState.value) {

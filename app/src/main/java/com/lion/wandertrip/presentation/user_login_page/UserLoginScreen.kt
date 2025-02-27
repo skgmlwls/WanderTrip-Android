@@ -55,6 +55,8 @@ import com.lion.wandertrip.util.CustomFont
 
 @Composable
 fun UserLoginScreen(userLoginViewModel: UserLoginViewModel = hiltViewModel()) {
+    Log.d("te","로그화면")
+
     val sW = userLoginViewModel.tripApplication.screenWidth
     val sH = userLoginViewModel.tripApplication.screenHeight
     val sR = userLoginViewModel.tripApplication.screenRatio

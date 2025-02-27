@@ -18,6 +18,8 @@ import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.model.UserModel
 import com.lion.wandertrip.service.TripAreaBaseItemService
+import com.lion.wandertrip.service.TripScheduleService
+import com.lion.wandertrip.util.BotNavScreenName
 import com.lion.wandertrip.service.UserService
 import com.lion.wandertrip.util.MainScreenName
 import com.lion.wandertrip.util.TripNoteScreenName
@@ -197,4 +199,5 @@ class HomeViewModel @Inject constructor(
     fun onClickTripNote(documentId : String) {
         tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_DETAIL.name}/${documentId}")
     }
+
 }

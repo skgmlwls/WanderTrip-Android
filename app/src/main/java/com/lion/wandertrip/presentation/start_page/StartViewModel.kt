@@ -37,8 +37,11 @@ class StartViewModel @Inject constructor(
     // 자동 로그인 처리
     fun autoLoginProcess() {
 
-        // 로그인 화면으로 이동한다.
-        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name)
+        // 로그인 화면으로 이동
+        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) {
+            // 이미 로그인 화면이 백스택에 있을 경우 중복 생성 방지
+            launchSingleTop = true
+        }
 
         // Preference에 login token이 있는지 확인한다.
         val pref = tripApplication.getSharedPreferences("LoginToken", Context.MODE_PRIVATE)
@@ -47,7 +50,7 @@ class StartViewModel @Inject constructor(
 
         // Preference에 login token이 있는지 확인한다.
         val kakaoPref = tripApplication.getSharedPreferences("KakaoToken", Context.MODE_PRIVATE)
-        val kToken = kakaoPref.getString("kToken",null)
+        val kToken = kakaoPref.getString("kToken", null)
 
         Log.d("test100", "kToken : $kToken")
 
@@ -70,10 +73,16 @@ class StartViewModel @Inject constructor(
                         MainScreenName.MAIN_SCREEN_START.name,
                         true
                     )
-                    tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name)
+                    tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name){
+                        // 이미 로그인 화면이 백스택에 있으면 중복 생성 방지
+                        launchSingleTop = true
+                    }
                 } else {
                     // 로그인 화면으로 이동한다.
-                    tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name)
+                    tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name){
+                        // 이미 로그인 화면이 백스택에 있으면 중복 생성 방지
+                        launchSingleTop = true
+                    }
                 }
             } else if (kToken != null) {
 
@@ -93,14 +102,23 @@ class StartViewModel @Inject constructor(
                         MainScreenName.MAIN_SCREEN_START.name,
                         true
                     )
-                    tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name)
+                    tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name){
+                        // 이미 로그인 화면이 백스택에 있으면 중복 생성 방지
+                        launchSingleTop = true
+                    }
                 } else {
                     // 로그인 화면으로 이동한다.
-                    tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name)
+                    tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name){
+                        // 이미 로그인 화면이 백스택에 있으면 중복 생성 방지
+                        launchSingleTop = true
+                    }
                 }
             } else {
                 // 로그인 화면으로 이동한다.
-                tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name)
+                tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) {
+                    // 이미 로그인 화면이 백스택에 있으면 중복 생성 방지
+                    launchSingleTop = true
+                }
             }
         }
     }
