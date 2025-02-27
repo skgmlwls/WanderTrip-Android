@@ -125,6 +125,9 @@ class UserService (val userRepository: UserRepository) {
         userRepository.updateUserData(userVO)
     }
 
+    suspend fun updateUserLikeList(userDocId: String, userLikeList: List<String>) {
+        userRepository.updateUserLikeList(userDocId, userLikeList)
+    }
     // 사용자의 상태를 변경하는 메서드
     suspend fun updateUserState(userDocumentId:String, newState:UserState){
         userRepository.updateUserState(userDocumentId, newState)
@@ -180,5 +183,4 @@ class UserService (val userRepository: UserRepository) {
 
         return result
     }
-
 }

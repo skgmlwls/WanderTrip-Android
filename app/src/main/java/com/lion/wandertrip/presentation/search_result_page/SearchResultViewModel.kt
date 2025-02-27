@@ -13,7 +13,9 @@ import com.lion.wandertrip.repository.TripAreaBaseItemRepository
 import com.lion.wandertrip.service.TripAreaBaseItemService
 import com.lion.wandertrip.service.TripNoteService
 import com.lion.wandertrip.util.BotNavScreenName
+import com.lion.wandertrip.util.ContentTypeId
 import com.lion.wandertrip.util.MainScreenName
+import com.lion.wandertrip.util.TripNoteScreenName
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
@@ -58,6 +60,14 @@ class SearchResultViewModel @Inject constructor(
             _searchNoteResults.value = filteredNoteItems
             _isLoading.value = false // ✅ 검색 완료 후 로딩 종료
         }
+    }
+
+    fun onNavigateDetail(contentId: String) {
+        tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_DETAIL.name}/$contentId")
+    }
+
+    fun onNavigateTripNote(documentId: String) {
+        tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_DETAIL.name}/$documentId")
     }
 
     fun onNavigateBackToSearchScreen() {

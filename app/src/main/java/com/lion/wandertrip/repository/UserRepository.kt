@@ -163,6 +163,20 @@ class UserRepository {
         }
     }
 
+    suspend fun updateUserLikeList(userDocumentId: String, userLikeList: List<String>) {
+        val firestore = FirebaseFirestore.getInstance()
+        val collectionReference = firestore.collection("UserData")
+        val documentReference = collectionReference.document(userDocumentId)
+
+        try {
+            // ✅ Firestore의 특정 필드(userLikeList)만 업데이트
+            documentReference.update("userLikeList", userLikeList).await()
+            Log.d("Firestore", "사용자 관심 목록 업데이트 성공")
+        } catch (e: Exception) {
+            Log.e("Firestore", "사용자 관심 목록 업데이트 실패", e)
+        }
+    }
+
     // 사용자의 상태를 변경하는 메서드
     suspend fun updateUserState(userDocumentId: String, newState: UserState) {
         val firestore = FirebaseFirestore.getInstance()
