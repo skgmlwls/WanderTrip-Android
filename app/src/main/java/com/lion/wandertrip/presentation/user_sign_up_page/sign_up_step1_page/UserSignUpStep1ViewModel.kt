@@ -157,10 +157,10 @@ class UserSignUpStep1ViewModel @Inject constructor(
                 userService.checkJoinUserId(userId)
             }
             isCheckUserId.value = work1.await()
-            textFieldUserJoinStep1IdReadOnly.value=true
             if(isCheckUserId.value){
                 textFieldUserJoinStep1IdIsError.value = false
                 textFieldUserJoinStep1IdErrorText.value = "사용 가능한 아이디 입니다"
+                textFieldUserJoinStep1IdReadOnly.value=true
             } else {
                 textFieldUserJoinStep1IdIsError.value = true
                 textFieldUserJoinStep1IdErrorText.value = "이미 존재하는 아이디입니다"
