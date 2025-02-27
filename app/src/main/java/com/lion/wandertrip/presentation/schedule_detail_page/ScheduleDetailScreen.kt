@@ -56,7 +56,7 @@ fun ScheduleDetailScreen(
         
         // 공공데이터 포털에서 받아온 여행지 목록 데이터 초기화
         SharedTripItemList.sharedTripItemList.clear()
-        // ✅ 선택된 여행지 목록 (룰렛 항목) 초기화
+        // 선택된 여행지 목록 (룰렛 항목) 초기화
         SharedTripItemList.rouletteItemList.clear()
     }
 

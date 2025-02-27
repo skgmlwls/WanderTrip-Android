@@ -303,6 +303,8 @@ fun ScheduleDetailDateList(
                                 )
                             }
 
+                            Spacer(modifier = Modifier.width(16.dp))
+
                             // 변경 완료 버튼
                             OutlinedButton(
                                 onClick = {
