@@ -11,11 +11,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,41 +35,47 @@ import com.lion.wandertrip.presentation.search_page.SearchViewModel
 import com.lion.wandertrip.presentation.search_page.component.HomeSearchBar
 import com.lion.wandertrip.presentation.search_result_page.component.MoreButton
 import com.lion.wandertrip.presentation.search_result_page.component.SearchItem
+import com.lion.wandertrip.util.ContentTypeId
+import com.lion.wandertrip.util.MainScreenName
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchResultScreen(
-    contentId: String,
-    viewModel: SearchResultViewModel = hiltViewModel(),
-    searchViewModel: SearchViewModel = hiltViewModel()
-) {
-    // 초기값을 contentId로 설정
+        contentId: String,
+        viewModel: SearchResultViewModel = hiltViewModel(),
+        searchViewModel: SearchViewModel = hiltViewModel()
+    ) {
     var searchInput by remember { mutableStateOf(contentId) }
     var searchQuery by remember { mutableStateOf(contentId) }
     var selectedCategoryCode by remember { mutableStateOf<String?>(null) }
 
-    val dummyTripList = remember { getDummyTripItems() }
+    // ✅ ViewModel에서 검색 결과 가져오기
+    val filteredList by viewModel.searchResults.observeAsState(emptyList())
 
-    // filteredList는 searchQuery 기준으로 업데이트됨.
-    var filteredList by remember { mutableStateOf<List<TripItemModel>>(emptyList()) }
+    // ✅ "더보기"를 눌렀을 때 표시할 개수를 저장하는 Map
+    val visibleItemCounts = remember { mutableStateMapOf<String, Int>() }
 
+    // ✅ 검색어 변경 시 검색 실행
     LaunchedEffect(searchQuery) {
         if (searchQuery.isNotBlank()) {
-            filteredList = dummyTripList.filter {
-                it.title.contains(searchQuery, ignoreCase = true)
-            }
+            viewModel.searchTrip(searchQuery)
         }
-        // searchQuery가 비어 있으면 이전 결과를 유지 (업데이트하지 않음)
     }
 
-    // 카테고리별 분류
+    // ✅ 카테고리 매핑 함수 (Int → Enum → String)
+    fun getCategoryName(contentTypeId: String?): String {
+        return ContentTypeId.values()
+            .find { it.contentTypeCode.toString() == contentTypeId }?.contentTypeName ?: "기타"
+    }
+
+    // ✅ 카테고리별 분류 (Enum 값의 `contentTypeName` 기준)
     val categorizedResults = if (selectedCategoryCode == "추천" || selectedCategoryCode == null) {
-        filteredList.groupBy { it.cat2 }
+        filteredList.groupBy { getCategoryName(it.contentTypeId) }
     } else {
-        filteredList.filter { it.cat2 == selectedCategoryCode }.groupBy { it.cat2 }
+        filteredList
+            .filter { getCategoryName(it.contentTypeId) == selectedCategoryCode }
+            .groupBy { getCategoryName(it.contentTypeId) }
     }
-
-    // 표시할 카테고리 리스트 (순서 유지)
-    val requiredCategories = listOf("관광지", "숙소", "맛집", "여행기")
 
     Scaffold(containerColor = Color.White) { paddingValues ->
         Column(
@@ -75,38 +84,30 @@ fun SearchResultScreen(
                 .background(Color.White)
                 .padding(paddingValues)
         ) {
-            // 검색 바: 화면에는 searchInput을 표시함.
+            // ✅ 검색 바
             HomeSearchBar(
                 query = searchInput,
-                onSearchQueryChanged = { newValue ->
-                    searchInput = newValue
-                },
+                onSearchQueryChanged = { newValue -> searchInput = newValue },
                 onSearchClicked = {
                     if (searchInput.isNotBlank()) {
-                        // 검색 아이콘을 눌렀을 때만 실제 필터링에 사용할 searchQuery를 업데이트
                         searchQuery = searchInput
                         val searchItem = TripItemModel(title = searchInput)
                         searchViewModel.addSearchToRecent(searchItem)
                         searchViewModel.onClickToResult(searchInput)
                     }
                 },
-                onClearQuery = {
-                    // 검색어 입력란은 지워지지만, 이전 검색 결과는 유지됨.
-                    searchInput = ""
-                },
-                onBackClicked = { viewModel.onClickNavIconBack() }
+                onClearQuery = { searchInput = "" },
+                onBackClicked = { viewModel.onNavigateBackToSearchScreen() }
             )
 
-            // 카테고리 칩
+
+            // ✅ 카테고리 필터
             SearchItemCategoryChips(
                 selectedCategoryCode = selectedCategoryCode,
                 onCategorySelected = { selectedCategoryCode = it }
             )
 
-            // 최대 표시할 항목 수
-            val maxDisplayCount = 3
-
-            // 검색 결과 리스트
+            // ✅ 검색 결과 리스트
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -114,9 +115,15 @@ fun SearchResultScreen(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                val requiredCategories = listOf("관광지", "숙박", "음식점")
+
                 requiredCategories.forEach { category ->
+                    val itemsForCategory = categorizedResults[category] ?: emptyList()
+
+                    // ✅ 표시할 개수 (초기값: 3, "더보기" 클릭 시 증가)
+                    val visibleCount = visibleItemCounts[category] ?: 3
+
                     item {
-                        // 카테고리 제목
                         Text(
                             text = category,
                             fontSize = 20.sp,
@@ -125,12 +132,8 @@ fun SearchResultScreen(
                         )
                     }
 
-                    val itemsForCategory = categorizedResults[category] ?: emptyList()
-
                     if (itemsForCategory.isNotEmpty()) {
-                        // 최대 maxDisplayCount 개의 항목만 표시
-                        val visibleItems = itemsForCategory.take(maxDisplayCount)
-                        items(visibleItems) { tripItem ->
+                        items(itemsForCategory.take(visibleCount)) { tripItem ->
                             SearchItem(
                                 tripItem = tripItem,
                                 onItemClick = { searchViewModel.onClickToResult(tripItem.title) }
@@ -138,34 +141,27 @@ fun SearchResultScreen(
                             CustomDividerComponent(10.dp)
                         }
                     } else {
-                        // 해당 카테고리에 데이터가 없으면 "없음" 메시지 표시
+                        item { NoResultsMessage(category) }
+                    }
+
+                    // ✅ "더보기" 버튼 추가 (현재 표시 개수 < 전체 개수일 때)
+                    if (visibleCount < itemsForCategory.size) {
                         item {
-                            NoResultsMessage(category)
+                            MoreButton(category = category) {
+                                visibleItemCounts[category] = visibleCount + 3 // ✅ 3개씩 추가
+                            }
                         }
                     }
 
-                    // 항목이 많을 경우 "더보기" 버튼 표시
-                    if (itemsForCategory.size > maxDisplayCount) {
-                        item {
-                            MoreButton(category = category)
-                        }
-                    }
-
-                    // 마지막 카테고리가 아니라면 구분선 추가
+                    // ✅ 마지막 카테고리가 아니라면 구분선 추가
                     if (category != requiredCategories.last()) {
-                        item {
-                            CustomDividerComponent(16.dp)
-                        }
+                        item { CustomDividerComponent(16.dp) }
                     }
                 }
             }
         }
     }
 }
-
-
-
-
 @Composable
 fun NoResultsMessage(category: String) {
     val message = when (category) {
@@ -188,19 +184,4 @@ fun NoResultsMessage(category: String) {
             color = Color.Gray
         )
     }
-}
-
-fun getDummyTripItems(): List<TripItemModel> {
-    return listOf(
-        TripItemModel(title = "서울 남산타워", cat2 = "관광지", cat3 = "랜드마크"),
-        TripItemModel(title = "제주 성산일출봉", cat2 = "관광지", cat3 = "자연경관"),
-        TripItemModel(title = "부산 해운대 해수욕장", cat2 = "관광지", cat3 = "해변"),
-        TripItemModel(title = "인천 차이나타운", cat2 = "맛집", cat3 = "중식"),
-        TripItemModel(title = "경주 불국사", cat2 = "관광지", cat3 = "사찰"),
-        TripItemModel(title = "강릉 안목해변 카페거리", cat2 = "맛집", cat3 = "카페"),
-        TripItemModel(title = "서울 롯데월드 호텔", cat2 = "숙소", cat3 = "호텔"),
-        TripItemModel(title = "전주 한옥마을", cat2 = "관광지", cat3 = "전통문화"),
-        TripItemModel(title = "속초 대포항 수산시장", cat2 = "맛집", cat3 = "해산물"),
-        TripItemModel(title = "남해 독일마을", cat2 = "관광지", cat3 = "문화마을")
-    )
 }

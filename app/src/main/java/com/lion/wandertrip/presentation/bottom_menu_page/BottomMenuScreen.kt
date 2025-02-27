@@ -55,6 +55,7 @@ fun BottomMenuScreen(bottomMenuViewModel: BottomMenuViewModel = hiltViewModel())
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround
+
                 ) {
                     navMenus.forEachIndexed { index, menu ->
                         Column(

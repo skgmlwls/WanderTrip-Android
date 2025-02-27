@@ -2,6 +2,7 @@ package com.lion.wandertrip.presentation.user_info_page
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -162,11 +163,13 @@ fun UserInfoScreen(userInfoViewModel: UserInfoViewModel = hiltViewModel()) {
                     CustomDividerComponent()
                     BlueButton(text = "로그아웃") {
                        // 로그아웃
-
                         // 일반 로그아웃
                         when (tripApplication.loginUserModel.userId) {
                             // 카카오 로그인
-                            ""->{}
+                            ""->{
+                                // 카카오 로그아웃
+                                userInfoViewModel.KakaoLogOut()
+                            }
                             // 일반 로그인
                             else->{
                                 // 자동 로그인 토큰 지우기

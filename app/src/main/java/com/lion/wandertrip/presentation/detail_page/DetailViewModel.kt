@@ -13,6 +13,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.Timestamp
 import com.lion.wandertrip.TripApplication
 import com.lion.wandertrip.model.ContentsModel
+import com.lion.wandertrip.model.RecentTripItemModel
 import com.lion.wandertrip.model.ReviewModel
 import com.lion.wandertrip.model.ScheduleItem
 import com.lion.wandertrip.model.TripCommonItem
@@ -103,6 +104,14 @@ class DetailViewModel @Inject constructor(
             gettingCityName(
                 tripCommonContentModelValue.value.areaCode ?: "",
                 tripCommonContentModelValue.value.siGunGuCode ?: "",
+            )
+
+            // 최근 본 목록에 추가하기
+            addRecentItem(
+                contentID = tripCommonContentModelValue.value.contentId!!,
+                contentType =tripCommonContentModelValue.value.contentTypeId!!,
+                imageUri =tripCommonContentModelValue.value.firstImage.toString(),
+                title =tripCommonContentModelValue.value.title!!
             )
 
         }
@@ -272,6 +281,24 @@ class DetailViewModel @Inject constructor(
             else -> "알 수 없음"
         }
     }
+
+    // 최근 본 목록에 추가하기
+    fun addRecentItem(
+        contentID: String,
+        contentType: String,
+        title: String,
+        imageUri: String,
+    ) {
+        val recentModel = RecentTripItemModel(
+            title = title,
+            contentTypeID = contentType,
+            imageUri = imageUri,
+            contentID = contentID,
+        )
+        Tools.addRecentItemList(tripApplication, recentModel)
+
+    }
+
 // --------------------------------------------------------------------------------------------
     // 소개관련
 
@@ -296,21 +323,36 @@ class DetailViewModel @Inject constructor(
     // 좋아요 목록에 해당 글이 있는가?
     fun isLikeContent(contentId: String) {
         viewModelScope.launch {
-            val work1=async(Dispatchers.IO){
-                userService.isLikeContent(tripApplication.loginUserModel.userDocId,contentId)
+            val work1 = async(Dispatchers.IO) {
+                userService.isLikeContent(tripApplication.loginUserModel.userDocId, contentId)
             }
             isLikeContentValue.value = work1.await()
         }
     }
 
     // 좋아요 버튼 누를때 리스너 메서드
-    fun onClickIconIsLikeContent(contentId:String) {
+    fun onClickIconIsLikeContent(contentId: String) {
         viewModelScope.launch {
             // 좋아요상태를 변경한다.
-            val work1= async(Dispatchers.IO){
+            val work1 = async(Dispatchers.IO) {
                 when (isLikeContentValue.value) {
-                    true -> userService.removeLikeItem(tripApplication.loginUserModel.userDocId,contentId)
-                    false -> userService.addLikeItem(tripApplication.loginUserModel.userDocId,contentId)
+                    // 좋아요 취소
+                    true -> {
+                        userService.removeLikeItem(
+                            tripApplication.loginUserModel.userDocId,
+                            contentId
+                        )
+                        userService.removeLikeCnt(contentId)
+                    }
+                    // 좋아요 추가
+                    false -> {
+                        userService.addLikeItem(
+                            tripApplication.loginUserModel.userDocId,
+                            contentId
+                        )
+
+                        userService.addLikeCnt(contentId)
+                    }
                 }
             }
             work1.join()
