@@ -40,8 +40,16 @@ class HomeViewModel @Inject constructor(
 
     val userLikeList = mutableStateOf(tripApplication.loginUserModel.userLikeList)
 
-    private val _tripItemList = MutableLiveData<List<TripItemModel>>()
-    val tripItemList: LiveData<List<TripItemModel>> get() = _tripItemList
+    // ✅ 사용자 정보 (LiveData로 관리하여 UI에서 감지할 수 있도록 변경)
+    private val _userModel = MutableLiveData<UserModel>()
+    val userModel: LiveData<UserModel> get() = _userModel
+
+    // ✅ 좋아요 리스트 (Compose에서 감지 가능하도록 관리)
+    val userLikeListCompose = mutableStateOf(listOf<String>())
+
+    init {
+        fetchUserData() // ✅ ViewModel 초기화 시 사용자 데이터 로드
+    }
 
     private val _topScrapedTrips = MutableLiveData<List<TripNoteModel>>()
     val topScrapedTrips: LiveData<List<TripNoteModel>> get() = _topScrapedTrips
@@ -60,6 +68,17 @@ class HomeViewModel @Inject constructor(
 
     private var isFetched = false // 🔥 데이터가 로드되었는지 여부를 저장
 
+    // 🔥 Firestore에서 사용자 정보 가져오기
+    private fun fetchUserData() {
+        viewModelScope.launch {
+            val userDocId = tripApplication.loginUserModel.userDocId
+            val userLikeListFromFirestore = userService.gettingUserLikeList(userDocId)
+
+            _userModel.value = UserModel(userDocId = userDocId, userLikeList = userLikeListFromFirestore)
+            userLikeList.value = userLikeListFromFirestore // ✅ 좋아요 리스트 초기화
+        }
+    }
+
     // 🔥 무작위 관광지 데이터를 가져오는 함수
     fun fetchRandomTourItems() {
         if (isFetched) return // 이미 데이터가 로드되었다면 다시 호출하지 않음
@@ -75,20 +94,30 @@ class HomeViewModel @Inject constructor(
 
     fun toggleFavorite(contentId: String) {
         viewModelScope.launch {
-            val userDocId = tripApplication.loginUserModel.userDocId
+            val userDocId = _userModel.value?.userDocId ?: return@launch // ✅ userModel이 null이면 실행하지 않음
 
             val isLiked = userLikeList.value.contains(contentId)
+
+            // ✅ 기존 리스트를 변경하지 않고 새로운 리스트 객체 생성
             val updatedList = if (isLiked) {
-                userLikeList.value - contentId // ✅ 리스트에서 제거
+                userLikeList.value.filter { it != contentId } // ✅ 리스트에서 제거
             } else {
                 userLikeList.value + contentId // ✅ 리스트에 추가
             }
 
             // ✅ UI 상태 즉시 반영 (새로운 리스트 객체 할당)
-            userLikeList.value = updatedList.toList()
+            userLikeList.value = updatedList
 
             // ✅ Firestore에 업데이트 (비동기적으로 수행)
             userService.updateUserLikeList(userDocId, updatedList)
+
+            // ✅ _userModel의 값을 변경하여 Compose가 감지하도록 설정
+            _userModel.value = _userModel.value?.let { userModel ->
+                UserModel(
+                    userDocId = userModel.userDocId,
+                    userLikeList = updatedList // ✅ 새로운 리스트 객체 할당
+                )
+            }
         }
     }
 

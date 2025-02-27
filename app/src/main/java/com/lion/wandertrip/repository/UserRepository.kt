@@ -226,6 +226,33 @@ class UserRepository {
         }
     }
 
+    // userDocID로 Firestore에서 userLikeList 필드만 가져오는 함수
+    suspend fun getUserLikeList(userDocId: String): List<String> {
+        val firestore = FirebaseFirestore.getInstance()
+        val collectionReference = firestore.collection("UserData")
+
+        return try {
+            val documentSnapshot = collectionReference.document(userDocId).get().await()
+
+            if (documentSnapshot.exists()) {
+                Log.d("Firestore", "문서 존재함 - userDocId: $userDocId")
+
+                // ✅ userLikeList 필드만 가져오기
+                val userLikeList = documentSnapshot.get("userLikeList") as? List<String> ?: emptyList()
+                Log.d("Firestore", "가져온 userLikeList: $userLikeList")
+                userLikeList
+            } else {
+                Log.d("Firestore", "문서 없음 - userDocId: $userDocId")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e("Firestore", "오류 발생 - userDocId: $userDocId", e)
+            e.printStackTrace()
+            emptyList()
+        }
+    }
+
+
     // 이미지 데이터를 서버로 업로드 하는 메서드
     suspend fun uploadImage(sourceFilePath: String, serverFilePath: String) {
         // 저장되어 있는 이미지의 경로

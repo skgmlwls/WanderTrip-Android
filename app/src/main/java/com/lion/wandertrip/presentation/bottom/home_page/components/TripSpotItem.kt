@@ -47,9 +47,9 @@ fun TripSpotItem(
     onItemClick: (TripItemModel) -> Unit,
     onFavoriteClick: (String) -> Unit
 ) {
-    // ✅ userModel.userLikeList가 변경될 때 UI 자동 업데이트
+    // ✅ userLikeList가 변경될 때 자동 업데이트
     val isFavorite by remember(userModel.userLikeList) {
-        mutableStateOf(userModel.userLikeList.contains(tripItem.contentId))
+        derivedStateOf { userModel.userLikeList.contains(tripItem.contentId) }
     }
 
     Row(

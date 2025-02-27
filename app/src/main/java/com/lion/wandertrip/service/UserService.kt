@@ -150,6 +150,10 @@ class UserService (val userRepository: UserRepository) {
         return imageUri
     }
 
+    suspend fun gettingUserLikeList(userDocId: String): List<String> {
+        return userRepository.getUserLikeList(userDocId)
+    }
+
     // 사용자의 관심 콘텐츠 ID 리스트를 가져오는 함수
     suspend fun gettingUserInterestingContentIdList(userDocId: String): List<String> {
         return userRepository.gettingUserInterestingContentIdList(userDocId)
