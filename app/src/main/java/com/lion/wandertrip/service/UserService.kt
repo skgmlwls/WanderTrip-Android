@@ -125,6 +125,9 @@ class UserService (val userRepository: UserRepository) {
         userRepository.updateUserData(userVO)
     }
 
+    suspend fun updateUserLikeList(userDocId: String, userLikeList: List<String>) {
+        userRepository.updateUserLikeList(userDocId, userLikeList)
+    }
     // 사용자의 상태를 변경하는 메서드
     suspend fun updateUserState(userDocumentId:String, newState:UserState){
         userRepository.updateUserState(userDocumentId, newState)
@@ -145,6 +148,10 @@ class UserService (val userRepository: UserRepository) {
     suspend fun gettingImage(imageFileName:String) : Uri {
         val imageUri = userRepository.gettingImage(imageFileName)
         return imageUri
+    }
+
+    suspend fun gettingUserLikeList(userDocId: String): List<String> {
+        return userRepository.getUserLikeList(userDocId)
     }
 
     // 사용자의 관심 콘텐츠 ID 리스트를 가져오는 함수
@@ -181,5 +188,4 @@ class UserService (val userRepository: UserRepository) {
 
         return result
     }
-
 }

@@ -25,8 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.wandertrip.component.LottieLoadingIndicator
+import com.lion.wandertrip.model.UserModel
 import com.lion.wandertrip.presentation.bottom.home_page.components.PopularTripItem
-import com.lion.wandertrip.presentation.bottom.home_page.components.TravelSpotItem
+import com.lion.wandertrip.presentation.bottom.home_page.components.TripSpotItem
 import com.lion.wandertrip.ui.theme.NanumSquareRound
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,14 +38,13 @@ fun HomeScreen(
     val tripItems by viewModel.randomTourItems.observeAsState(emptyList())
     val topTrips by viewModel.topScrapedTrips.observeAsState(emptyList())
     val imageUrlMap = viewModel.imageUrlMap
-    var isLoading by remember { mutableStateOf(true) } // ✅ 로딩 상태 추가
+    val isLoading by viewModel.isLoading.observeAsState(false) // ✅ 로딩 상태 감지
+    val userModel by viewModel.userModel.observeAsState(UserModel(userDocId = "", userLikeList = emptyList()))
 
     LaunchedEffect(Unit) {
         viewModel.fetchTripNotes()
         viewModel.getTopScrapedTrips()
-        viewModel.fetchRandomTourItems {
-            isLoading = false // ✅ 로딩 완료 후 화면 표시
-        }
+        viewModel.fetchRandomTourItems()
     }
 
     if (isLoading) {
@@ -101,9 +101,11 @@ fun HomeScreen(
                         )
                     }
                     items(tripItems) { tripItem ->
-                        TravelSpotItem(
+                        TripSpotItem(
                             tripItem = tripItem,
-                            onItemClick = { viewModel.onClickTrip(tripItem.contentId) }
+                            onItemClick = { viewModel.onClickTrip(tripItem.contentId) },
+                            userModel = userModel,
+                            onFavoriteClick = { contentId -> viewModel.toggleFavorite(contentId) }
                         )
                     }
 
