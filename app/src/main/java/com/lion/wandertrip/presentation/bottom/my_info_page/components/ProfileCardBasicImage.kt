@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.bottom.my_info_page.components
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +38,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lion.wandertrip.R
 import com.lion.wandertrip.presentation.bottom.my_info_page.MyInfoViewModel
+import com.lion.wandertrip.ui.theme.PastelBlue
+import com.lion.wandertrip.ui.theme.PastelLightBlue
+import com.lion.wandertrip.ui.theme.PastelSkyBlue
+import com.lion.wandertrip.ui.theme.pastelColors
 import com.lion.wandertrip.util.CustomFont
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
@@ -45,6 +52,10 @@ fun ProfileCardBasicImage(
     userNickName: String,
     viewModel: MyInfoViewModel
 ) {
+
+    LaunchedEffect (viewModel.userModelValue.value.userProfileImageURL){
+
+    }
     // 카드뷰
     Card(
         modifier = Modifier
@@ -52,7 +63,7 @@ fun ProfileCardBasicImage(
             .padding(16.dp),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-       // colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = PastelSkyBlue)
     ) {
         Column(
             modifier = Modifier.padding(20.dp)
@@ -94,9 +105,12 @@ fun ProfileCardBasicImage(
 
                     }
                 }
-                // 프로필 이미지 (우측 상단)
                 GlideImage(
-                    imageModel = R.drawable.img_basic_profile_image,
+                    imageModel = if (viewModel.showImageUri.value != null) {
+                        viewModel.showImageUri.value
+                    } else {
+                        R.drawable.img_basic_profile_image
+                    },
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .width(60.dp)

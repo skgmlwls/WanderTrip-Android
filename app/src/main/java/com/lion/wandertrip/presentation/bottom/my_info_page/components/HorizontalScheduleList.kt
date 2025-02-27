@@ -22,7 +22,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.presentation.bottom.my_info_page.MyInfoViewModel
+import com.lion.wandertrip.ui.theme.pastelColors
+import com.lion.wandertrip.ui.theme.randomColor
 import com.lion.wandertrip.util.Tools
+import kotlin.random.Random
 
 @Composable
 fun HorizontalScheduleList(viewModel : MyInfoViewModel,schedules: List<TripScheduleModel>) {
@@ -47,7 +50,7 @@ fun ScheduleItemView(viewModel :MyInfoViewModel, scheduleItem: TripScheduleModel
         }
             .width(330.dp)
             .height(50.dp) // 아이템 높이 조정
-            .background(Color.LightGray, shape = RoundedCornerShape(10.dp)) // 배경 추가
+            .background(pastelColors[Random.nextInt(pastelColors.size)], shape = RoundedCornerShape(10.dp)) // 배경 추가
             .padding(horizontal = 16.dp, vertical = 8.dp), // 내부 여백
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween // 일정 이름과 남은 날짜를 좌우 정렬

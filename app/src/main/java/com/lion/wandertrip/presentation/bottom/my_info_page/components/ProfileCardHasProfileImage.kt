@@ -34,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lion.wandertrip.R
 import com.lion.wandertrip.presentation.bottom.my_info_page.MyInfoViewModel
+import com.lion.wandertrip.ui.theme.PastelBlue
+import com.lion.wandertrip.ui.theme.PastelSkyBlue
 import com.lion.wandertrip.util.CustomFont
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
@@ -42,7 +44,7 @@ import com.skydoves.landscapist.glide.GlideImage
 fun ProfileCardHasProfileImage(
     userNickName: String,
     viewModel: MyInfoViewModel,
-    imageUri : Uri
+    imageUri: Uri
 ) {
     // 카드뷰
     Card(
@@ -51,7 +53,7 @@ fun ProfileCardHasProfileImage(
             .padding(16.dp),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-       // colors = CardDefaults.cardColors(containerColor = Color(0xFFE0F7FA)) //
+        colors = CardDefaults.cardColors(containerColor = PastelSkyBlue)
 
     ) {
         Column(
