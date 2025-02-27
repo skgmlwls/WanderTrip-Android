@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.bottom.my_info_page
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,7 @@ import com.lion.wandertrip.util.Tools
 
 @Composable
 fun MyInfoScreen(myInfoViewModel: MyInfoViewModel = hiltViewModel()) {
+    Log.d("myScreen","마이페이지")
     LaunchedEffect (Unit){
         myInfoViewModel.gettingUserModel()
         // 화면 열때 리스트 가져오기

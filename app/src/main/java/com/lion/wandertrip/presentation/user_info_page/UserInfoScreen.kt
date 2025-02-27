@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -86,9 +87,25 @@ fun UserInfoScreen(userInfoViewModel: UserInfoViewModel = hiltViewModel()) {
         LottieLoadingIndicator()
     } else {
         Scaffold(
+            containerColor = Color.White,
             modifier = Modifier.fillMaxSize(),
             //containerColor = Color.Blue
+            topBar = {
+                CustomTopAppBar(
+                    title = "정보 변경",
+                    navigationIconImage = Icons.Filled.ArrowBack,
+                    navigationIconOnClick = { userInfoViewModel.onClickNavIconBack() },
+                    menuItems = {
+                        if(userInfoViewModel.textFieldUserNicknameValue.value!= userInfoViewModel.tripApplication.loginUserModel.userNickName || userInfoViewModel.isImagePicked.value)
+                        CustomIconButton(
+                            ImageVector.vectorResource(R.drawable.ic_check_24px),
+                            iconButtonOnClick = { userInfoViewModel.onClickIconCheck() }
+                        )
+                    }
+                )
+            },
         ) {
+
             Column(
                 modifier = Modifier
                     .padding(it)
