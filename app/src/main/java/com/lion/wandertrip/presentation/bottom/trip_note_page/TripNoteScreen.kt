@@ -25,6 +25,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -66,6 +69,7 @@ fun TripNoteScreen(
 
 
     Scaffold(
+        containerColor = Color.White,
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { tripNoteViewModel.addButtonOnClick() },
@@ -99,34 +103,67 @@ fun TripNoteScreen(
                 )
             }
 
-            // 리사이클러뷰
+//            // 리사이클러뷰
+//            LazyColumn(
+//                modifier = Modifier
+//                    .fillMaxSize()
+//                    .padding(horizontal = 10.dp)
+//            ) {
+//                Log.d("TripNoteScreen", "ImageUrisMap: ${tripNoteViewModel.imageUrisMap}")
+//                itemsIndexed(tripNoteViewModel.tripNoteList) { index,tripNote ->
+//                    // 로그로 각 인덱스의 imageUris 확인
+//                    Log.d("TripNoteScreen", "Index: $index, imageUris: ${tripNoteViewModel.imageUrisMap[index]}")
+//
+//                    TripNoteItem(
+//                        tripNote = tripNote,
+//                        onClick = { tripNoteViewModel.listItemOnClick(tripNote.tripNoteDocumentId) },
+//                        modifier = Modifier
+//                            .fillMaxWidth() // 항목이 화면 너비를 가득 차게
+//                            .padding(vertical = 8.dp) // 항목 사이에 간격 추가
+//                            .background(
+//                                color = Color.White, // 배경색
+//                                shape = RoundedCornerShape(12.dp) // 둥근 모서리
+//                            )
+//                            .padding(0.dp),
+//                        //imageUris = tripNoteViewModel.imageUrisMap[index]?: emptyList()
+//                        imageUris = tripNoteViewModel.imageUrisMap[index]?.filterNotNull() ?: emptyList()
+//
+//                    )
+//                }
+//            }
+
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 10.dp)
             ) {
                 Log.d("TripNoteScreen", "ImageUrisMap: ${tripNoteViewModel.imageUrisMap}")
-                itemsIndexed(tripNoteViewModel.tripNoteList) { index,tripNote ->
+
+                itemsIndexed(tripNoteViewModel.tripNoteList) { index, tripNote ->
                     // 로그로 각 인덱스의 imageUris 확인
                     Log.d("TripNoteScreen", "Index: $index, imageUris: ${tripNoteViewModel.imageUrisMap[index]}")
 
-                    TripNoteItem(
-                        tripNote = tripNote,
-                        onClick = { tripNoteViewModel.listItemOnClick(tripNote.tripNoteDocumentId) },
+                    Card(
                         modifier = Modifier
-                            .fillMaxWidth() // 항목이 화면 너비를 가득 차게
-                            .padding(vertical = 8.dp) // 항목 사이에 간격 추가
-                            .background(
-                                color = Color.White, // 배경색
-                                shape = RoundedCornerShape(6.dp) // 둥근 모서리
-                            )
-                            .padding(0.dp),
-                        //imageUris = tripNoteViewModel.imageUrisMap[index]?: emptyList()
-                        imageUris = tripNoteViewModel.imageUrisMap[index]?.filterNotNull() ?: emptyList()
-
-                    )
+                            .fillMaxWidth()
+                            .padding(vertical = 10.dp), // 항목 사이 간격 추가
+                        shape = RoundedCornerShape(14.dp), // 모서리 둥글게
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp) // 카드의 그림자 설정
+                    ) {
+                        TripNoteItem(
+                            tripNote = tripNote,
+                            onClick = { tripNoteViewModel.listItemOnClick(tripNote.tripNoteDocumentId) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.White, shape = RoundedCornerShape(12.dp))
+                                .padding(0.dp),
+                            imageUris = tripNoteViewModel.imageUrisMap[index]?.filterNotNull() ?: emptyList()
+                        )
+                    }
                 }
             }
+
+
         }
     }
 }

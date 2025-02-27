@@ -33,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -123,9 +124,13 @@ fun TripNoteDetailScreen(
 
 
     Scaffold(
-        // containerColor = Color.White,
+        containerColor = Color.White,
         topBar = {
             TopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = Color.White, // 배경색을 흰색으로 설정
+                titleContentColor = Color.Black // 제목 색상을 검은색으로 설정 (가독성)
+            ),
                 navigationIcon = {
                     IconButton(onClick = { tripNoteDetailViewModel.navigationButtonClick() }) {
                         Icon(

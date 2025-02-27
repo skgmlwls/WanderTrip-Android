@@ -3,6 +3,7 @@ package com.lion.wandertrip.repository
 import android.net.Uri
 import android.util.Log
 import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -117,17 +118,58 @@ class TripNoteRepository@Inject constructor() {
         return resultList
     }
 
+//    // 닉네임을 통해 유저의 일정 리스트를 가져오는 메서드
+//    suspend fun gettingUserScheduleList(userNickName : String): MutableList<Map<String, *>> {
+//        val firestore = FirebaseFirestore.getInstance()
+//        val collectionReference = firestore.collection("TripSchedule")
+//        // 데이터를 가져온다.
+//        val result =
+//            collectionReference
+//                .whereEqualTo("userNickName", userNickName)
+//                //.orderBy("scheduleTimeStamp", Query.Direction.DESCENDING)
+//                .get()
+//                .await()
+//        // 반환할 리스트
+//        val resultList = mutableListOf<Map<String, *>>()
+//        // 데이터의 수 만큼 반환한다.
+//        result.forEach {
+//            val tripScheduleVO = it.toObject(TripScheduleVO::class.java) // TripNoteVO 객체 가져오기
+//            val map = mapOf(
+//                // 문서의 id
+//                "documentId" to it.id,
+//                // 데이터를 가지고 있는 객체
+//                "tripScheduleVO" to tripScheduleVO,
+//            )
+//            resultList.add(map)
+//        }
+//        return resultList
+//    }
+
     // 닉네임을 통해 유저의 일정 리스트를 가져오는 메서드
-    suspend fun gettingUserScheduleList(userNickName : String): MutableList<Map<String, *>> {
+    suspend fun gettingUserScheduleList(userNickName: String): MutableList<Map<String, *>>  {
         val firestore = FirebaseFirestore.getInstance()
-        val collectionReference = firestore.collection("TripSchedule")
-        // 데이터를 가져온다.
-        val result =
-            collectionReference
-                .whereEqualTo("userNickName", userNickName)
-                //.orderBy("scheduleTimeStamp", Query.Direction.DESCENDING)
-                .get()
-                .await()
+
+        // 1️⃣ UserData 컬렉션에서 userNickName이 일치하는 문서 찾기
+        val userDocumentSnapshot = firestore.collection("UserData")
+            .whereEqualTo("userNickName", userNickName)
+            .get()
+            .await()
+            .documents
+            .firstOrNull() // 닉네임이 일치하는 첫 번째 문서 가져오기
+
+        // userScheduleList 필드에서 여행 일정 ID 리스트 가져오기
+        val scheduleIdList = userDocumentSnapshot?.get("userScheduleList") as? List<String> ?: emptyList()
+
+        if (scheduleIdList.isEmpty()) return mutableListOf() // 일정이 없으면 빈 리스트 반환
+
+        // 2️⃣ TripSchedule 컬렉션에서 해당 documentId를 가진 문서들 조회
+        val result = firestore.collection("TripSchedule")
+            .whereIn(FieldPath.documentId(), scheduleIdList)
+            .get()
+            .await()
+
+
+
         // 반환할 리스트
         val resultList = mutableListOf<Map<String, *>>()
         // 데이터의 수 만큼 반환한다.
@@ -144,6 +186,92 @@ class TripNoteRepository@Inject constructor() {
         return resultList
     }
 
+
+
+    // 닉네임을 통해 유저의 다가오는 일정 리스트를 가져오는 메서드
+//    suspend fun gettingUpcomingScheduleList(userNickName: String): MutableList<Map<String, *>> {
+//        val firestore = FirebaseFirestore.getInstance()
+//        val collectionReference = firestore.collection("TripSchedule")
+//
+//        // 현재 시간 가져오기
+//        val currentTime = Timestamp.now()
+//
+//        // 닉네임 필터링으로 데이터 가져오기
+//        val nicknameFilteredResult =
+//            collectionReference
+//                .whereEqualTo("userNickName", userNickName)
+//                .get()
+//                .await()
+//
+//        // 반환할 리스트
+//        val resultList = mutableListOf<Map<String, *>>()
+//
+//        // 닉네임 필터링된 데이터 중에서 날짜 조건을 만족하는 데이터만 추가
+//        nicknameFilteredResult.forEach {
+//            val tripScheduleVO = it.toObject(TripScheduleVO::class.java)
+//
+//            // scheduleStartDate가 현재 시간보다 큰 경우만 추가
+//            if (tripScheduleVO.scheduleStartDate > currentTime) {
+//                val map = mapOf(
+//                    // 문서의 id
+//                    "documentId" to it.id,
+//                    // 데이터를 가지고 있는 객체
+//                    "tripScheduleVO" to tripScheduleVO,
+//                )
+//                resultList.add(map)
+//            }
+//        }
+//
+//        return resultList
+//    }
+
+    // 닉네임을 통해 유저의 다가오는 일정 리스트를 가져오는 메서드
+    suspend fun gettingUpcomingScheduleList(userNickName: String): MutableList<Map<String, *>> {
+        val firestore = FirebaseFirestore.getInstance()
+
+        // 현재 시간 가져오기
+        val currentTime = Timestamp.now()
+
+        // 유저 데이터 가져오기
+        val userDataSnapshot = firestore.collection("UserData")
+            .whereEqualTo("userNickName", userNickName)
+            .get()
+            .await()
+
+        if (userDataSnapshot.isEmpty) return mutableListOf() // 유저 데이터가 없으면 빈 리스트 반환
+
+        // userScheduleList 필드 가져오기
+        val userScheduleList = userDataSnapshot.documents.first()
+            .get("userScheduleList") as? List<String> ?: return mutableListOf()
+
+        // 반환할 리스트
+        val resultList = mutableListOf<Map<String, *>>()
+
+        // TripSchedule 컬렉션에서 일정 문서 가져오기
+        val tripScheduleSnapshot = firestore.collection("TripSchedule")
+            .whereIn(FieldPath.documentId(), userScheduleList)
+            .get()
+            .await()
+
+        tripScheduleSnapshot.forEach { document ->
+            val tripScheduleVO = document.toObject(TripScheduleVO::class.java)
+
+            // scheduleStartDate가 현재 시간보다 큰 경우만 추가
+            if (tripScheduleVO.scheduleStartDate > currentTime) {
+                val map = mapOf(
+                    "documentId" to document.id,
+                    "tripScheduleVO" to tripScheduleVO
+                )
+                resultList.add(map)
+            }
+        }
+
+        return resultList
+    }
+
+
+
+
     // 일정 담아가면 그 카운트 증가시키기
     suspend fun addTripNoteScrapCount(documentId: String){
         // documentId에 해당하는 여행기 문서 찾기
@@ -154,43 +282,6 @@ class TripNoteRepository@Inject constructor() {
         // 카운트 1씩 증가시키기
         documentReference.update("tripNoteScrapCount", FieldValue.increment(1))
             .await()
-    }
-
-    // 닉네임을 통해 유저의 다가오는 일정 리스트를 가져오는 메서드
-    suspend fun gettingUpcomingScheduleList(userNickName: String): MutableList<Map<String, *>> {
-        val firestore = FirebaseFirestore.getInstance()
-        val collectionReference = firestore.collection("TripSchedule")
-
-        // 현재 시간 가져오기
-        val currentTime = Timestamp.now()
-
-        // 닉네임 필터링으로 데이터 가져오기
-        val nicknameFilteredResult =
-            collectionReference
-                .whereEqualTo("userNickName", userNickName)
-                .get()
-                .await()
-
-        // 반환할 리스트
-        val resultList = mutableListOf<Map<String, *>>()
-
-        // 닉네임 필터링된 데이터 중에서 날짜 조건을 만족하는 데이터만 추가
-        nicknameFilteredResult.forEach {
-            val tripScheduleVO = it.toObject(TripScheduleVO::class.java)
-
-            // scheduleStartDate가 현재 시간보다 큰 경우만 추가
-            if (tripScheduleVO.scheduleStartDate > currentTime) {
-                val map = mapOf(
-                    // 문서의 id
-                    "documentId" to it.id,
-                    // 데이터를 가지고 있는 객체
-                    "tripScheduleVO" to tripScheduleVO,
-                )
-                resultList.add(map)
-            }
-        }
-
-        return resultList
     }
 
     suspend fun gettingTripScrapeCount(): MutableList<Map<String, *>> {
