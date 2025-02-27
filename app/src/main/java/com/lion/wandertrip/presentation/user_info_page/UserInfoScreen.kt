@@ -7,6 +7,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
@@ -81,32 +82,15 @@ fun UserInfoScreen(userInfoViewModel: UserInfoViewModel = hiltViewModel()) {
             }
         }
 
-    if(userInfoViewModel.isLoading.value){
+    if (userInfoViewModel.isLoading.value) {
         LottieLoadingIndicator()
-    }else{
+    } else {
         Scaffold(
-            topBar = {
-                CustomTopAppBar(
-                    menuItems = {
-                        // 변경사항 저장 아이콘
-                        CustomIconButton(
-                            ImageVector.vectorResource(R.drawable.ic_check_24px),
-                            iconButtonOnClick = {
-                                userInfoViewModel.onClickIconCheck()
-                            }
-                        )
-                    },
-                    // 뒤로가기 아이콘
-                    navigationIconImage = Icons.AutoMirrored.Filled.ArrowBack,
-                    navigationIconOnClick = {
-                        userInfoViewModel.onClickNavIconBack()
-                    }
-                )
-            }
+            modifier = Modifier.fillMaxSize(),
+            //containerColor = Color.Blue
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
                     .padding(it)
                     .padding(horizontal = 30.dp),
                 horizontalAlignment = Alignment.CenterHorizontally // 가로 정렬 중앙
@@ -114,7 +98,7 @@ fun UserInfoScreen(userInfoViewModel: UserInfoViewModel = hiltViewModel()) {
                 Spacer(modifier = Modifier.height(40.dp)) // 상단 여백
 
                 Row(
-                    modifier = Modifier.fillMaxWidth(),  // Row를 가로 전체 차지하도록 설정
+                    modifier = Modifier.fillMaxWidth(), // Row를 가로 전체 차지하도록 설정
                     horizontalArrangement = Arrangement.Center // 가로 중앙 정렬
                 ) {
                     GlideImage(
@@ -162,16 +146,16 @@ fun UserInfoScreen(userInfoViewModel: UserInfoViewModel = hiltViewModel()) {
                     }
                     CustomDividerComponent()
                     BlueButton(text = "로그아웃") {
-                       // 로그아웃
+                        // 로그아웃
                         // 일반 로그아웃
                         when (tripApplication.loginUserModel.userId) {
                             // 카카오 로그인
-                            ""->{
+                            "" -> {
                                 // 카카오 로그아웃
                                 userInfoViewModel.KakaoLogOut()
                             }
                             // 일반 로그인
-                            else->{
+                            else -> {
                                 // 자동 로그인 토큰 지우기
                                 userInfoViewModel.logOut()
                             }

@@ -1,6 +1,7 @@
 package com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step3_page
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
@@ -102,7 +103,13 @@ class UserSignUpStep3ViewModel @Inject constructor(
                 val pref = tripApplication.getSharedPreferences("KakaoToken", Context.MODE_PRIVATE)
                 pref.edit {
                     putString("kToken", kakaoToken.toString())
+                    Log.d("userSingStep3","ktoken: $kakaoToken")
                 }
+
+           /*     // Preference에 login token이 있는지 확인한다.
+                val kakaoPref = tripApplication.getSharedPreferences("KakaoToken", Context.MODE_PRIVATE)
+                val kToken = kakaoPref.getString("kToken",null)
+                Log.d("userSingStep3","토큰 가져오기 : $kToken")*/
 
                 // 프로필사진 설정 화면으로 이동, userDocId 값을 경로에 포함시켜 전달
                 tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name}/$userDocId/${"KakaoLogin"}")

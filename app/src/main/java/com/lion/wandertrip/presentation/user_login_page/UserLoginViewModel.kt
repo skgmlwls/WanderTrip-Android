@@ -22,6 +22,7 @@ import java.security.NoSuchAlgorithmException
 import javax.inject.Inject
 import kotlin.io.encoding.ExperimentalEncodingApi
 import android.util.Base64
+import androidx.core.content.edit
 import androidx.lifecycle.viewModelScope
 import com.lion.wandertrip.util.LoginResult
 import kotlinx.coroutines.CoroutineScope
@@ -183,7 +184,17 @@ class UserLoginViewModel @Inject constructor(
                 tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name)
 
                 // 내부 저장소에 userKakao ID 저장
+                // SharedPreference에 저장한다.
+                val pref = tripApplication.getSharedPreferences("KakaoToken", Context.MODE_PRIVATE)
+                pref.edit {
+                    putString("kToken", model.kakaoId.toString())
+                    Log.d("userSingStep3","ktoken: ${ model.kakaoId.toString()}")
+                }
 
+                // Preference에 login token이 있는지 확인한다.
+                val kakaoPref = tripApplication.getSharedPreferences("KakaoToken", Context.MODE_PRIVATE)
+                val ktToken = kakaoPref.getString("kToken",null)
+                Log.d("userSingStep3","토큰 가져오기 : $ktToken")
 
 
             } else {

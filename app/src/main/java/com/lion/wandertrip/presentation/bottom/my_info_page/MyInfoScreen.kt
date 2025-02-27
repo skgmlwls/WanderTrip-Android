@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.bottom.my_info_page
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.wandertrip.presentation.bottom.my_info_page.components.HorizontalRecentPostsList
@@ -30,9 +32,10 @@ fun MyInfoScreen(myInfoViewModel: MyInfoViewModel = hiltViewModel()) {
         myInfoViewModel.getRecentTripItemList()
     }
     val userModel = myInfoViewModel.userModelValue.value
-    Scaffold { paddingValues ->
+    Scaffold(
+    ) { paddingValues ->
         Column(
-            modifier = Modifier
+            modifier = Modifier.background(Color.White)
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp),

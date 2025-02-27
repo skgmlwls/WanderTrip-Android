@@ -13,6 +13,8 @@ class DetailModel(
     var detailAddress: String = "",         // 상세페이지 주소
     var detailPhoneNumber: String = "",     // 상세페이지 전화번호 (0으로 시작하는 문제 방지)
     var detailHomepage: String = "" ,       // 상세페이지 홈페이지
+    var likeCnt : Int = 0,
+    var ratingCount : Int = 0,
 ) {
     fun toDetailVO(): DetailVO {
         val detailVO = DetailVO()
@@ -26,6 +28,9 @@ class DetailModel(
         detailVO.detailAddress = detailAddress
         detailVO.detailPhoneNumber = detailPhoneNumber
         detailVO.detailHomepage = detailHomepage
+        detailVO.likeCnt=likeCnt
+        detailVO.ratingCount=ratingCount
+
         return detailVO
     }
 }

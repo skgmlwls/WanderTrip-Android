@@ -7,6 +7,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,8 +20,10 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lion.a02_boardcloneproject.component.CustomIconButton
@@ -34,10 +40,6 @@ fun RowModelInfo(googleMapViewModel: GoogleMapViewModel, contentModel : DetailMo
     val sh = googleMapViewModel.tripApplication.screenHeight
     val sw = googleMapViewModel.tripApplication.screenWidth
 
-    // 제목 줄이기 12 자 이상이면 ... 붙임
-    val shortedTitle = googleMapViewModel.makeShortTitleText(contentModel.detailTitle)
-    // 설명 줄이기 20 자 이상이면 ...붙임
-    val shortedDescription = googleMapViewModel.makeShortDescriptionText(contentModel.detailDescription)
     // 하단에 지역 정보 표시
     Row(modifier = Modifier.padding(8.dp)) {
         // 좌측 이미지
@@ -61,44 +63,52 @@ fun RowModelInfo(googleMapViewModel: GoogleMapViewModel, contentModel : DetailMo
         ) {
             // 관광지 타이틀
             Text(
-                text = shortedTitle,
+                text = contentModel.detailTitle,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                fontFamily = CustomFont.customFontBold
+                fontFamily = CustomFont.customFontBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis // 넘칠 경우 "..." 표시
             )
+
 
             // 관광지 설명
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = shortedDescription,
+                text = contentModel.detailDescription,
                 fontSize = 14.sp,
                 color = Color.Gray,
-                fontFamily = CustomFont.customFontRegular
-
+                fontFamily = CustomFont.customFontRegular,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis // 넘칠 경우 "..." 표시
             )
 
+            Spacer(modifier = Modifier.height(8.dp))
             // 별점 아이콘, 좋아요 수, 별점 수
-            Spacer(modifier = Modifier.height(16.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 // 별점 아이콘
                 CustomRatingBar(contentModel.detailRating)
                 Spacer(modifier = Modifier.width(4.dp))
                 // 별점 수
                 Text(
-                    text = "7",
+                    text = "${contentModel.ratingCount}",
                     fontSize = 14.sp,
                     fontFamily = CustomFont.customFontRegular
 
                 )
 
                 Spacer(modifier = Modifier.width(16.dp))
-                CustomIconButton(
-                    icon = ImageVector.vectorResource(R.drawable.ic_heart_empty_24px)
+                Icon(
+                    imageVector = Icons.Filled.Favorite,
+                    contentDescription = "Like",
+                    tint = Color.Red
                 )
+                Spacer(modifier = Modifier.width(4.dp))
+
 
                 // 좋아요 수
                 Text(
-                    text = "200",
+                    text = "${contentModel.likeCnt}",
                     fontSize = 14.sp,
                     fontFamily = CustomFont.customFontRegular,
                 )

@@ -1,6 +1,7 @@
 package com.lion.wandertrip.presentation.my_interesting_page
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -68,6 +70,7 @@ fun MyInterestingScreen(myInterestingViewModel: MyInterestingViewModel = hiltVie
         ) { paddingValues ->
             Column(
                 modifier = Modifier
+                    .background(Color.White)
                     .fillMaxSize()
                     .padding(paddingValues)
                     .padding(horizontal = 10.dp)

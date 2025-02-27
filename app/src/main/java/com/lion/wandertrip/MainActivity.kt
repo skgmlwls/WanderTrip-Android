@@ -201,7 +201,9 @@ fun MyApp() {
         }
 
         // 구글 맵 화면
-        composable(MainScreenName.MAIN_SCREEN_GOOGLE_MAP.name) { GoogleMapScreen() }
+        composable("${MainScreenName.MAIN_SCREEN_GOOGLE_MAP.name}/{contentId}") {backStackEntry ->
+            val contentId = backStackEntry.arguments?.getString("contentId") ?: "default_id"
+            GoogleMapScreen(contentId) }
 
 
         // 일정 도시 선택 화면

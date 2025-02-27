@@ -78,6 +78,7 @@ fun UserSignUpStep2Screen(
 
     val sh = userSignUpStep2ViewModel.tripApplication.screenHeight
     Scaffold(
+        containerColor = Color.White,
         topBar = {
             CustomTopAppBar(
                 menuItems = {
