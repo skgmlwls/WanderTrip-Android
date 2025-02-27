@@ -62,7 +62,7 @@ fun RecentItem(searchViewModel: SearchViewModel) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { searchViewModel.onClickToResult(search.title) }
+                            .clickable { searchViewModel.selectRecentSearch(search) } // ✅ 수정
                             .padding(vertical = 12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {

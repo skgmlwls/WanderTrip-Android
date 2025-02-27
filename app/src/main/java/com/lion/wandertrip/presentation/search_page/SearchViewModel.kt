@@ -76,9 +76,10 @@ class SearchViewModel @Inject constructor(
     }
 
     fun selectRecentSearch(tripItemModel: TripItemModel) {
-        // 선택한 검색어를 현재 검색 필드에 반영 (UI에서 처리 필요)
-        // 예: searchText.value = tripItemModel.title
+        searchQuery = tripItemModel.title // ✅ 검색어 상태 업데이트
+        onClickToResult(searchQuery) // ✅ 검색 실행
     }
+
 
     fun removeRecentSearch(tripItemModel: TripItemModel) {
         recentSearches.remove(tripItemModel)
