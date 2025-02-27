@@ -16,6 +16,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +36,11 @@ fun HomeSearchBar(
     onBackClicked: () -> Unit // 🔙 뒤로 가기 콜백 추가
 ) {
     var searchText by remember { mutableStateOf(query) }
+
+    // ✅ 최근 검색어 클릭 시 searchQuery가 변경되면 반영
+    LaunchedEffect(query) {
+        searchText = query
+    }
 
     OutlinedTextField(
         value = searchText,

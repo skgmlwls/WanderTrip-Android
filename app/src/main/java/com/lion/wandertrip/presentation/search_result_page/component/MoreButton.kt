@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -14,19 +15,16 @@ import androidx.compose.ui.unit.sp
 import com.lion.wandertrip.ui.theme.NanumSquareRound
 
 @Composable
-fun MoreButton(category: String) {
+fun MoreButton(category: String, onClick: () -> Unit) {
     Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .clickable { /* TODO: 더보기 기능 구현 */ },
+        modifier = Modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = "$category 검색결과 더보기",
-            color = Color.Gray,
-            fontSize = 14.sp,
-            fontFamily = NanumSquareRound
-        )
+        Button(
+            onClick = onClick,
+            modifier = Modifier.padding(8.dp)
+        ) {
+            Text(text = "더보기")
+        }
     }
 }
