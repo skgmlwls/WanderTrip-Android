@@ -13,7 +13,8 @@ class DetailVO {
     var detailPhoneNumber: String = ""
     var detailHomepage: String = ""
     var contentID: String = ""  // contentID 추가, 저장하기, 리뷰 남길때 사용해야함
-
+    var likeCnt : Int = 0
+    var ratingCount : Int = 0
 
     fun toDetailModel(): DetailModel {
         val detailModel = DetailModel()
@@ -27,6 +28,8 @@ class DetailVO {
         detailModel.detailAddress = detailAddress
         detailModel.detailPhoneNumber = detailPhoneNumber
         detailModel.detailHomepage = detailHomepage
+        detailModel.likeCnt = likeCnt
+        detailModel.ratingCount = ratingCount
         return detailModel
     }
 }

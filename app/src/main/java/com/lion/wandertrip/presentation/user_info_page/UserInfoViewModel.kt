@@ -148,6 +148,11 @@ class UserInfoViewModel @Inject constructor(
             clear() // 모든 키 삭제
             apply() // 비동기 적용
         }
+        val kakaoPrf = tripApplication.getSharedPreferences("KakaoToken", Context.MODE_PRIVATE)
+        kakaoPrf.edit {
+            clear() // 모든 키 삭제
+            apply() // 비동기 적용
+        }
     }
 
     // 내장 메모리에 있는 최근 본 아이템 목록 삭제

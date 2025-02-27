@@ -10,6 +10,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.a02_boardcloneproject.component.CustomOutlinedTextField
@@ -26,6 +27,7 @@ fun UserSignUpStep3Screen(
 ) {
     Log.d("test","UserSignUpStep3Screen -> kakaoTk $kakaoToken")
     Scaffold(
+        containerColor = Color.White,
         topBar = {
             CustomTopAppBar(
                 title = "카카오 회원 가입",

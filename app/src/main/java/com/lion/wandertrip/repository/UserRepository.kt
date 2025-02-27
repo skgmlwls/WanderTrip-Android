@@ -39,16 +39,26 @@ class UserRepository {
         return userVoList
     }
 
-    // 사용자 정보를 추가하는 메서드
     fun addUserData(userVO: UserVO): String {
         val firestore = FirebaseFirestore.getInstance()
         val collectionReference = firestore.collection("UserData")
         val documentReference = collectionReference.document()
-        val addUserVO = userVO
-        addUserVO.userDocId = documentReference.id
-        documentReference.set(addUserVO)
+        userVO.userDocId= documentReference.id
+
+        Log.d("Firestore", "생성된 문서 ID: ${documentReference.id}")
+        Log.d("Firestore", "추가할 유저 데이터: $userVO")
+
+        documentReference.set(userVO)
+            .addOnSuccessListener {
+                Log.d("Firestore", "유저 데이터 추가 성공! 문서 ID: ${documentReference.id}")
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firestore", "유저 데이터 추가 실패: ${e.message}", e)
+            }
+
         return documentReference.id
     }
+
 
     // 사용자 아이디와 동일한 사용자의 정보 하나를 반환하는 메서드
     suspend fun selectUserDataByUserIdOne(userId: String): MutableMap<String, *> {

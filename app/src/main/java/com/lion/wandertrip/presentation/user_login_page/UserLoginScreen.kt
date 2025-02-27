@@ -58,9 +58,15 @@ fun UserLoginScreen(userLoginViewModel: UserLoginViewModel = hiltViewModel()) {
     val sW = userLoginViewModel.tripApplication.screenWidth
     val sH = userLoginViewModel.tripApplication.screenHeight
     val sR = userLoginViewModel.tripApplication.screenRatio
-    Scaffold() {
+    Scaffold(
+        modifier = Modifier
+    ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(it).padding(horizontal = 20.dp), // Row가 화면의 전체 너비를 차지하도록 설정
+            modifier = Modifier
+                .background(Color.White)
+                .fillMaxWidth()
+                .padding(it)
+                .padding(horizontal = 20.dp), // Row가 화면의 전체 너비를 차지하도록 설정
             horizontalArrangement = Arrangement.Center // Column을 수평 가운데 정렬
         ) {
             Column(
@@ -77,21 +83,28 @@ fun UserLoginScreen(userLoginViewModel: UserLoginViewModel = hiltViewModel()) {
                         painter = painterResource(id = R.drawable.img_plane),
                         contentDescription = null,
                         modifier = Modifier
-                            .heightIn((sH/6).dp).fillMaxWidth() // 최소 높이 300dp로 설정
+                            .heightIn((sH / 6).dp)
+                            .fillMaxWidth() // 최소 높이 300dp로 설정
                             .align(Alignment.Center) // 이미지를 중앙에 배치
-                            .offset(y = (-(sH/40)).dp) // 이미지를 위로 50dp만큼 이동시켜서 하단 자르기
+                            .offset(y = (-(sH / 40)).dp) // 이미지를 위로 50dp만큼 이동시켜서 하단 자르기
                     )
-                    Text(modifier = Modifier.align(Alignment.Center).offset(y=(sH/50).dp),
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .offset(y = (sH / 50).dp),
                         text = "WanderTrip",
                         fontWeight = FontWeight.Bold, // 진한 글씨로 설정
                         color = Color(0xFF0077B6), // 파란색으로 설정
-                        style = TextStyle(fontSize = 35.sp, fontFamily = CustomFont.customFontBold) // 필요에 따라 글자 크기 설정
+                        style = TextStyle(
+                            fontSize = 35.sp,
+                            fontFamily = CustomFont.customFontBold
+                        ) // 필요에 따라 글자 크기 설정
                     )
                 }
 
-                Column (
+                Column(
                     modifier = Modifier.padding(horizontal = 50.dp)
-                ){
+                ) {
                     // 아이디 입력 요소
                     CustomOutlinedTextField(
                         textFieldValue = userLoginViewModel.textFieldUserLoginIdValue,

@@ -51,9 +51,6 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
     LaunchedEffect(Unit) {
         detailViewModel.getCommonTripContentModel(contentID)
 
-
-
-
     }
     Scaffold(
         //containerColor = Color.White,
@@ -65,7 +62,7 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
                     CustomIconButton(
                         ImageVector.vectorResource(R.drawable.ic_location_on_24px),
                         iconButtonOnClick = {
-                            detailViewModel.onClickIconMap()
+                            detailViewModel.onClickIconMap(contentID)
                         }
                     )
                     /*// 일정 추가 아이콘
@@ -85,6 +82,7 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
     ) {
         LazyColumn(
             modifier = Modifier
+                .background(Color.White)
                 .fillMaxSize()
                 .padding(it)
                 .padding(horizontal = 12.dp),
@@ -127,7 +125,7 @@ fun DetailScreen(contentID: String, detailViewModel: DetailViewModel = hiltViewM
             // 뷰페이저 항목
             if (detailViewModel.isClickIntroState.value)
             // 소개 페이지
-                item { IntroColumn(detailViewModel,contentID) }
+                item { IntroColumn(detailViewModel, contentID) }
             if (detailViewModel.isClickBasicInfoState.value)
                 item {
                     // 기본 정보 페이지

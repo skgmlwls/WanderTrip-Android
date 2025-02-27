@@ -140,6 +140,7 @@ class UserService (val userRepository: UserRepository) {
     // 유저Model 가져오는 메서드
     suspend fun getUserByUserDocId(userDocId: String): UserModel {
         val result = userRepository.getUserByUserDocId(userDocId)
+        Log.d("getUserByUserDocId","result : $result")
         return result!!.toUserModel()
     }
 
