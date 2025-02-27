@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lion.wandertrip.TripApplication
+import com.lion.wandertrip.model.ContentsModel
 import com.lion.wandertrip.model.UserInterestingModel
 import com.lion.wandertrip.presentation.my_interesting_page.used_dummy_data.InterestingDummyData
 import com.lion.wandertrip.service.ContentsService
@@ -63,32 +64,62 @@ class MyInterestingViewModel @Inject constructor(
     val isLikeContentValue = mutableStateOf(false)
 
     // 리스트 좋아요 상태 저장하는 맵
-    val likeMap = mutableStateMapOf<Int,Boolean>()
+    val likeMap = mutableStateMapOf<Int, Boolean>()
 
     // 하트 변경 메서드
-    fun onClickIconHeart(contentId : String ,pos : Int) {
-        likeMap[pos] = !likeMap[pos]!!
-        onClickIconIsLikeContent(contentId)
+    fun onClickIconHeart(contentId: String, pos: Int) {
+        Log.d("test100", "contentId : contentId")
+        onClickIconIsLikeContent(contentId, pos)
     }
 
     // 좋아요 목록에 해당 글이 있는가?
     fun isLikeContent(contentId: String) {
         viewModelScope.launch {
-            val work1=async(Dispatchers.IO){
-                userService.isLikeContent(tripApplication.loginUserModel.userDocId,contentId)
+            val work1 = async(Dispatchers.IO) {
+                userService.isLikeContent(tripApplication.loginUserModel.userDocId, contentId)
             }
             isLikeContentValue.value = work1.await()
         }
     }
 
     // 좋아요 버튼 누를때 리스너 메서드
-    fun onClickIconIsLikeContent(contentId:String) {
+    fun onClickIconIsLikeContent(contentId: String, pos: Int) {
+        likeMap[pos] = !likeMap[pos]!!
+        Log.d("onClickIconIsLikeContent", "map : $likeMap")
+        Log.d("onClickIconIsLikeContent", "contentId : $contentId")
         viewModelScope.launch {
             // 좋아요상태를 변경한다.
-            val work1= async(Dispatchers.IO){
-                when (isLikeContentValue.value) {
-                    true -> userService.removeLikeItem(tripApplication.loginUserModel.userDocId,contentId)
-                    false -> userService.addLikeItem(tripApplication.loginUserModel.userDocId,contentId)
+            val work1 = async(Dispatchers.IO) {
+                when (likeMap[pos]) {
+                    true -> {
+                        userService.addLikeItem(
+                            tripApplication.loginUserModel.userDocId,
+                            contentId
+                        )
+                        userService.addLikeCnt(contentId)
+                    }
+
+                    false -> {
+                        userService.removeLikeItem(
+                            tripApplication.loginUserModel.userDocId,
+                            contentId
+                        )
+
+                        userService.removeLikeCnt(contentId)
+                        // 전체 리스트에서도 삭제
+                        interestingListAll.remove(interestingListFilterByCity[pos])
+                        // 필터된 리스트에서도 삭제
+                        interestingListFilterByCity.removeAt(pos)
+                        // 새로 수정된 필터 리스트에서 맵 초기화
+                        interestingListFilterByCity.forEachIndexed { index, userInterestingModel ->
+                            likeMap[index] = true
+                        }
+
+                    }
+
+                    null -> {
+                        Log.d("onClickIconIsLikeContent", "null")
+                    }
                 }
             }
             work1.join()
@@ -103,9 +134,15 @@ class MyInterestingViewModel @Inject constructor(
         tripApplication.navHostController.popBackStack()
     }
 
+    fun setState(value : Boolean){
+        isLoading.value= value
+        Log.d("setState","setState : $value")
+    }
+
     // 리스트 가져오기
     fun getInterestingList() {
-        isLoading.value = true
+        Log.d("test", "getInterestingList 메서드 진입")
+        setState(true)
         viewModelScope.launch {
             // 내 유저에서, 좋아요 한 contentID 다 방아오기
             val work1 = async(Dispatchers.IO) {
@@ -125,24 +162,25 @@ class MyInterestingViewModel @Inject constructor(
 
             // 컨텐츠 model을 가져와야 함
             userInterestingModelList.forEach {
-                val work3 = async(Dispatchers.IO){
+                val work3 = async(Dispatchers.IO) {
                     contentsService.getContentByContentsId(it.contentID)
                 }
                 val contentModel = work3.await()
                 it.ratingScore = contentModel.ratingScore
                 it.starRatingCount = contentModel.getRatingCount
+                it.saveCount = contentModel.interestingCount
             }
 
-           /* userInterestingModelList.forEach {
-                Log.d("test100", "item : $it")
-            }*/
+            /* userInterestingModelList.forEach {
+                 Log.d("test100", "item : $it")
+             }*/
             interestingListAll.addAll(userInterestingModelList)
             getInterestingFilter(filteredCityName.value)
-            val work4 = async(Dispatchers.Main){
+            val work4 = async(Dispatchers.Main) {
                 getLocalList()
             }
             work4.join()
-            isLoading.value = false
+            setState(false)
         }
     }
 
@@ -161,7 +199,7 @@ class MyInterestingViewModel @Inject constructor(
                 // 필터 리스트 클리어
                 interestingListFilterByCity.clear()
                 val filteredList = interestingListAll.filter {
-                    val city = Tools.getAreaDetails(it.areacode,it.sigungucode)
+                    val city = Tools.getAreaDetails(it.areacode, it.sigungucode)
                     city == cityName
                 }
                 Log.d("test100", "filteredList ${filteredList}")
@@ -202,17 +240,18 @@ class MyInterestingViewModel @Inject constructor(
 
     // 관심 지역 가져오기
     fun getLocalList() {
-        Log.d("test100","interListAll $interestingListAll")
+        Log.d("test100", "interListAll $interestingListAll")
+        localList.clear()
         localList.add("전체")
         interestingListAll.forEach {
-            Log.d("test100","interListItem $it")
+            Log.d("test100", "interListItem $it")
 
-            val cityName = Tools.getAreaDetails(it.areacode,it.sigungucode)
+            val cityName = Tools.getAreaDetails(it.areacode, it.sigungucode)
             if (!localList.contains(cityName)) {
                 localList.add(cityName)
             }
         }
-        Log.d("test100","LocalList $localList")
+        Log.d("test100", "LocalList $localList")
 
     }
 
@@ -237,7 +276,7 @@ class MyInterestingViewModel @Inject constructor(
     }
 
     // 디테일 페이지로 이동
-    fun onClickListItemToDetailScreen(contentId : String) {
+    fun onClickListItemToDetailScreen(contentId: String) {
         tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_DETAIL}/$contentId")
     }
 

@@ -106,7 +106,7 @@ fun MyApp() {
         // 카카오 가입
         composable("${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name}/{kakaoToken}") {
                 backStackEntry ->
-            val kakaoToken = backStackEntry.arguments?.getString("kakaoToken")?:""
+            val kakaoToken : String = backStackEntry.arguments?.getString("kakaoToken")?:""
             UserSignUpStep3Screen(kakaoToken = kakaoToken)
         }
 

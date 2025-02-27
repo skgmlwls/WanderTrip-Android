@@ -21,10 +21,6 @@ fun StartScreen(startViewModel: StartViewModel = hiltViewModel()){
 
     LaunchedEffect (Unit){
         startViewModel.autoLoginProcess()
-        RecentDummyData.recentItemDummyDataList.forEach {
-            Log.d("test100","it: $it")
-            Tools.addRecentItemList(startViewModel.tripApplication,it)
-        }
     }
 
     if(startViewModel.showLoginMessageState.value) {

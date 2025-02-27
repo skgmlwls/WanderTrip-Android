@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
@@ -49,7 +50,9 @@ fun ProfileCardHasProfileImage(
             .fillMaxWidth()
             .padding(16.dp),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+       // colors = CardDefaults.cardColors(containerColor = Color(0xFFE0F7FA)) //
+
     ) {
         Column(
             modifier = Modifier.padding(16.dp)

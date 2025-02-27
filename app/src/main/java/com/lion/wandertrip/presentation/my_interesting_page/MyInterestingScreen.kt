@@ -36,7 +36,12 @@ fun MyInterestingScreen(myInterestingViewModel: MyInterestingViewModel = hiltVie
     // ✅ 최초 실행 시 데이터 불러오기 (한 번만 실행)
     // 매개변수 Unit 전달 시 최초 1회만 생성
     LaunchedEffect(Unit) {
-        myInterestingViewModel.getInterestingList()
+        Log.d("asd","LaunchedEffect")
+        myInterestingViewModel.interestingListAll.clear()
+        if(myInterestingViewModel.isLoading.value== false){
+            myInterestingViewModel.getInterestingList()
+
+        }
     }
 
     // ✅ filteredCityName이 변경될 때만 실행 (무한 루프 방지)
@@ -46,8 +51,10 @@ fun MyInterestingScreen(myInterestingViewModel: MyInterestingViewModel = hiltVie
     }
 
     if(myInterestingViewModel.isLoading.value){
+        Log.d("test","로딩중")
         LottieLoadingIndicator()
     }else{
+        Log.d("test","로딩중아님")
         Scaffold(
             topBar = {
                 CustomTopAppBar(

@@ -95,13 +95,13 @@ class UserRepository {
     }
 
     // 카카오 로그인 토큰 값으로 사용자 정보를 가져오는 메서드
-    suspend fun selectUserDataByKakaoLoginToken(kToken: String): UserVO? {
+    suspend fun selectUserDataByKakaoLoginToken(kToken: Long): UserVO? {
         val firestore = FirebaseFirestore.getInstance()
         val collectionReference = firestore.collection("UserData")
 
         return try {
             // Firestore에서 데이터를 조회
-            val result = collectionReference.whereEqualTo("userKakaoToken", kToken).get().await()
+            val result = collectionReference.whereEqualTo("kakaoId", kToken).get().await()
 
             // 데이터를 객체로 변환하여 반환
             val userVo = result.toObjects(UserVO::class.java).firstOrNull()
@@ -237,6 +237,7 @@ class UserRepository {
 
     // 사용자의 관심 콘텐츠 ID 리스트를 가져오는 함수
     suspend fun gettingUserInterestingContentIdList(userDocId: String): List<String> {
+        Log.d("UserRepo","gettingUserInterestingContentIdList")
         return try {
             val firebase = FirebaseFirestore.getInstance()
             val contentIdList = mutableListOf<String>()

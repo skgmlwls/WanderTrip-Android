@@ -6,7 +6,7 @@ import com.lion.wandertrip.util.ContentTypeId
 import java.util.Calendar
 
 class RecentDummyData {
-    companion object{
+   /* companion object{
         // 12: 관광지, 32: 숙박, 39: 음식점
         val recentItemDummyDataList = mutableListOf<RecentTripItemModel>(
             RecentTripItemModel(
@@ -39,5 +39,5 @@ class RecentDummyData {
                 imageUri = "https://lh3.googleusercontent.com/p/AF1QipMW_jX2TFUAY5VEtjHv7wIwzPKUc3nJ2Fakwpn4=s680-w680-h510"
             ),
         )
-    }
+    }*/
 }

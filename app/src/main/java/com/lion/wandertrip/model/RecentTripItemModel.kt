@@ -7,7 +7,7 @@ import com.lion.wandertrip.vo.RecentTripItemVO
 
 data class RecentTripItemModel(
     val contentID :String = "",
-    val contentTypeID: ContentTypeId =ContentTypeId.TOURIST_ATTRACTION,
+    val contentTypeID: String = "",
     val title : String = "",
     val imageUri : String ="",
     val clickedTimeStamp : Timestamp = Timestamp.now()
@@ -15,7 +15,7 @@ data class RecentTripItemModel(
     fun toRecentTripItemVO(recentTripItemModel: RecentTripItemModel): RecentTripItemVO {
         return RecentTripItemVO(
             contentID = recentTripItemModel.contentID,
-            contentTypeID = recentTripItemModel.contentTypeID.contentTypeCode, // Enum을 Int로 변환
+            contentTypeID = recentTripItemModel.contentTypeID,
             title = recentTripItemModel.title,
             imageUri = recentTripItemModel.imageUri,
             clickedTimeStamp = recentTripItemModel.clickedTimeStamp

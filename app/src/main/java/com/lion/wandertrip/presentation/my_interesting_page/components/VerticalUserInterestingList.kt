@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,9 +67,16 @@ fun UserInterestingItem(
     pos: Int
 ) {
 
+    // contentId를 기억하도록 합니다
     val contentId = interestingItem.contentID
-    viewModel.isLikeContent(contentId)
-    val isLike = viewModel.likeMap[pos]
+
+    // 'LaunchedEffect'로 contentId 변경 시에만 호출되도록 처리
+    LaunchedEffect(contentId) {
+        viewModel.isLikeContent(contentId)
+    }
+
+    // isLike 상태를 가져옵니다
+    val isLike = viewModel.likeMap[pos] // 이 부분은 viewModel에서 상태를 미리 처리하도록 수정
 
 
 

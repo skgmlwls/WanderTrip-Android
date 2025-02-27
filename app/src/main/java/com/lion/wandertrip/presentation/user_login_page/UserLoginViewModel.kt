@@ -42,43 +42,53 @@ class UserLoginViewModel @Inject constructor(
 
     // 아이디 입력 요소
     val textFieldUserLoginIdValue = mutableStateOf("")
+
     // 비밀번호 입력 요소
     val textFieldUserLoginPasswordValue = mutableStateOf("")
+
     // 자동 로그인 입력 요소
     val checkBoxAutoLoginValue = mutableStateOf(false)
 
     // 아이디 입력요소 포커스
     val textFieldUserLoginIdFocusRequester = mutableStateOf(FocusRequester())
+
     // 비밀번호 입력 요소 포커스
     val textFieldUserLoginPasswordFocusRequester = mutableStateOf(FocusRequester())
 
     // 아이디 입력 오류 다이얼로그 상태변수
     val alertDialogUserIdState = mutableStateOf(false)
+
     // 비밀번호 입력 오류 다이얼로그 상태변수
     val alertDialogUserPwState = mutableStateOf(false)
+
     // 존재하지 않는 아이디 오류 다이얼로그 상태변수
     val alertDialogLoginFail1State = mutableStateOf(false)
+
     // 잘못된 비밀번호 다이얼로그 상태변수
     val alertDialogLoginFail2State = mutableStateOf(false)
+
     // 탈퇴한 회원 다이얼로그 상태변수
     val alertDialogLoginFail3State = mutableStateOf(false)
 
     // 회원 가입 버튼 click
-    fun buttonUserJoinClick(){
+    fun buttonUserJoinClick() {
         tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP1.name)
     }
 
     // 로그인 버튼 click
-    fun buttonUserLoginOnClick(){
-        Log.d("test100","클릭")
-        tripApplication.navHostController.popBackStack(MainScreenName.MAIN_SCREEN_USER_LOGIN.name, true)
+    fun buttonUserLoginOnClick() {
+        Log.d("test100", "클릭")
+        tripApplication.navHostController.popBackStack(
+            MainScreenName.MAIN_SCREEN_USER_LOGIN.name,
+            true
+        )
 
-        if(textFieldUserLoginIdValue.value.isEmpty()){
+        if (textFieldUserLoginIdValue.value.isEmpty()) {
             alertDialogUserIdState.value = true
             return
         }
 
-        if(textFieldUserLoginPasswordValue.value.isEmpty()){
+        if (textFieldUserLoginPasswordValue.value.isEmpty()) {
             alertDialogUserPwState.value = true
             return
         }
@@ -88,36 +98,41 @@ class UserLoginViewModel @Inject constructor(
         val loginUserPw = textFieldUserLoginPasswordValue.value
 
         CoroutineScope(Dispatchers.Main).launch {
-            val work1 = async(Dispatchers.IO){
+            val work1 = async(Dispatchers.IO) {
                 userService.checkLogin(loginUserId, loginUserPw)
             }
             // 로그인 결과를 가져온다.
             val loginResult = work1.await()
 
             // 로그인 결과로 분기한다.
-            when(loginResult){
+            when (loginResult) {
                 LoginResult.LOGIN_RESULT_ID_NOT_EXIST -> {
                     alertDialogLoginFail1State.value = true
                 }
+
                 LoginResult.LOGIN_RESULT_PASSWORD_INCORRECT -> {
                     alertDialogLoginFail2State.value = true
                 }
+
                 LoginResult.LOGIN_RESULT_SIGN_OUT_MEMBER -> {
                     alertDialogLoginFail3State.value = true
                 }
                 // 로그인 성공시
                 LoginResult.LOGIN_RESULT_SUCCESS -> {
                     // 로그인한 사용자 정보를 가져온다.
-                    val work2 = async(Dispatchers.IO){
+                    val work2 = async(Dispatchers.IO) {
                         userService.selectUserDataByUserIdOne(loginUserId)
                     }
                     val loginUserModel = work2.await()
 
                     // 만약 자동로그인이 체크되어 있다면
-                    if(checkBoxAutoLoginValue.value){
-                        CoroutineScope(Dispatchers.Main).launch{
-                            val work3 = async(Dispatchers.IO){
-                                userService.updateUserAutoLoginToken(tripApplication, loginUserModel.userDocId)
+                    if (checkBoxAutoLoginValue.value) {
+                        CoroutineScope(Dispatchers.Main).launch {
+                            val work3 = async(Dispatchers.IO) {
+                                userService.updateUserAutoLoginToken(
+                                    tripApplication,
+                                    loginUserModel.userDocId
+                                )
                             }
                             work3.join()
                         }
@@ -127,7 +142,10 @@ class UserLoginViewModel @Inject constructor(
                     tripApplication.loginUserModel = loginUserModel
 
 
-                    tripApplication.navHostController.popBackStack(MainScreenName.MAIN_SCREEN_USER_LOGIN.name, true)
+                    tripApplication.navHostController.popBackStack(
+                        MainScreenName.MAIN_SCREEN_USER_LOGIN.name,
+                        true
+                    )
                     tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name)
                 }
             }
@@ -150,9 +168,29 @@ class UserLoginViewModel @Inject constructor(
                 createKakaoToken()
             }
             val kToken = work1.await()
-            Log.d("test100", "kToken: $kToken")
-            if(kToken!=""){
-                tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name}/$kToken")
+
+            // 카카오 아이디 받아오기
+            val work2 = async(Dispatchers.IO) {
+                getKakaoUserId()
+            }
+            // 카카오 아이디
+            val kakaoId = work2.await()
+            // 등록된 회원인지 유저 탐색
+            val model = userService.selectUserDataByKakaoLoginToken(kakaoId ?: 0)
+            // 유저중에 kakaoToken 값에 kakaoId 를 갖고 있는 사람이 있다면 홈
+            if (model != null) {
+                tripApplication.loginUserModel = model
+                tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name)
+
+                // 내부 저장소에 userKakao ID 저장
+
+
+
+            } else {
+                // 등록된 회원이 아니라면
+                if (kToken != "") {
+                    tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name}/${kakaoId.toString()}")
+                }
             }
 
         }
@@ -182,7 +220,10 @@ class UserLoginViewModel @Inject constructor(
                     }
 
                     // 카카오 계정 로그인 시도
-                    UserApiClient.instance.loginWithKakaoAccount(tripApplication, callback = callback)
+                    UserApiClient.instance.loginWithKakaoAccount(
+                        tripApplication,
+                        callback = callback
+                    )
                 } else if (token != null) {
                     Log.i("test100", "카카오톡으로 로그인 성공 ${token.accessToken}")
                     continuation.resume(token.accessToken) // 성공 시 토큰 반환
@@ -193,12 +234,29 @@ class UserLoginViewModel @Inject constructor(
         }
     }
 
+    // 카카오 ID를 가져오는 함수
+    suspend fun getKakaoUserId(): Long? = suspendCoroutine { continuation ->
+        UserApiClient.instance.me { user, error ->
+            if (error != null) {
+                Log.e("KakaoUserInfo", "사용자 정보 요청 실패", error)
+                continuation.resume(null) // 실패 시 null 반환
+            } else if (user != null) {
+                val kakaoId = user.id // 카카오 계정 ID
+                Log.i("KakaoUserInfo", "카카오 ID: $kakaoId")
+                continuation.resume(kakaoId) // 카카오 ID 반환
+            }
+        }
+    }
+
     // 키해시 받아오는 메서드
     @OptIn(ExperimentalEncodingApi::class)
     private fun getHashKey() {
         var packageInfo: PackageInfo? = null
         try {
-            packageInfo = tripApplication.packageManager.getPackageInfo(tripApplication.packageName, PackageManager.GET_SIGNATURES)
+            packageInfo = tripApplication.packageManager.getPackageInfo(
+                tripApplication.packageName,
+                PackageManager.GET_SIGNATURES
+            )
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
         }

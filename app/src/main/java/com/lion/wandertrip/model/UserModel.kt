@@ -17,6 +17,7 @@ class UserModel(
     var userKakaoToken : String = "",               // 카카오토큰
     var userScheduleList : List<String> = emptyList(), // 유저가 만든 일정 리스트
     var invitedScheduleList : List<String> = emptyList(), // 초대 받은 일정 리스트
+    var kakaoId : Long = 0
 ) {
     fun toUserVO(): UserVO {
         val userVO = UserVO()
@@ -33,6 +34,7 @@ class UserModel(
         userVO.userKakaoToken=userKakaoToken
         userVO.userScheduleList = userScheduleList
         userVO.invitedScheduleList = invitedScheduleList
+        userVO.kakaoId=kakaoId
         return userVO
     }
 }
