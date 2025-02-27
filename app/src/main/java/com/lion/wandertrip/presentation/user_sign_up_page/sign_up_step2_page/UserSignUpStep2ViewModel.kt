@@ -72,7 +72,7 @@ class UserSignUpStep2ViewModel @Inject constructor(
 
     // 건너뛰기 버튼
     fun onClickButtonPass(fromWhere: String) {
-        if(fromWhere==""){
+        if(fromWhere=="normal"){
             tripApplication.navHostController.popBackStack(MainScreenName.MAIN_SCREEN_USER_LOGIN.name, false)
 
         }else{
@@ -90,10 +90,13 @@ class UserSignUpStep2ViewModel @Inject constructor(
 
     // userModel 가져오기
     fun gettingUserModelByUserDocId() {
+        Log.d("gettingUserModelByUserDocId","uStep2")
         CoroutineScope(Dispatchers.Main).launch {
             val work1= async(Dispatchers.IO){
                 userModel = userService.getUserByUserDocId(userDocIdState.value)
             }
+            Log.d("gettingUserModelByUserDocId","uStep2ENd")
+
             work1.join()
         }
 

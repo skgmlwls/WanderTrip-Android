@@ -95,10 +95,10 @@ fun MyApp() {
         composable(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) { MainScreen() }
         composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP1.name) { UserSignUpStep1Screen() }
         composable(
-            route = "${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name}/{userDocId}/{fromWhere}"
+            route = "${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name}/{fromWhere}/{userDocId}"
         ) { backStackEntry ->
-            val userDocId = backStackEntry.arguments?.getString("userDocId") ?: ""
             val fromWhere = backStackEntry.arguments?.getString("fromWhere") ?: ""
+            val userDocId = backStackEntry.arguments?.getString("userDocId") ?: ""
             UserSignUpStep2Screen(userDocId = userDocId, fromWhere = fromWhere)
         }
         composable(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP3.name) { UserSignUpStep1Screen() }
