@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.sp
 import com.lion.wandertrip.model.TripScheduleModel
 import com.lion.wandertrip.presentation.bottom.my_info_page.MyInfoViewModel
 import com.lion.wandertrip.ui.theme.pastelColors
-import com.lion.wandertrip.ui.theme.randomColor
 import com.lion.wandertrip.util.Tools
 import kotlin.random.Random
 

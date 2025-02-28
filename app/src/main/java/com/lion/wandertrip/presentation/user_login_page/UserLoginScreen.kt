@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.user_login_page
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -52,10 +54,29 @@ import com.lion.wandertrip.R
 import com.lion.wandertrip.presentation.bottom.schedule_page.ScheduleScreen
 import com.lion.wandertrip.presentation.user_login_page.components.KakaoButton
 import com.lion.wandertrip.util.CustomFont
+import com.lion.wandertrip.util.MainScreenName
+import kotlinx.coroutines.flow.forEach
 
+@SuppressLint("RestrictedApi")
 @Composable
 fun UserLoginScreen(userLoginViewModel: UserLoginViewModel = hiltViewModel()) {
     Log.d("te","로그화면")
+
+    val navController = userLoginViewModel.tripApplication.navHostController
+    val backStackEntries = navController.currentBackStack
+
+    LaunchedEffect(Unit) {
+        val navController = userLoginViewModel.tripApplication.navHostController
+        val backStackSize = navController.currentBackStack.value.size
+        Log.d("BackStack", "현재 백스택 개수: $backStackSize")
+
+        // 로그인 화면이 열리면 백스택을 다 지우고 로그인 화면만 남기기
+        navController.popBackStack(MainScreenName.MAIN_SCREEN_USER_LOGIN.name, false)
+        // 로그인 -> 마이 -> 마이 -> 유저인포 -> 로그
+
+        // 로그 -> 마이 -> 로그
+    }
+
 
     val sW = userLoginViewModel.tripApplication.screenWidth
     val sH = userLoginViewModel.tripApplication.screenHeight

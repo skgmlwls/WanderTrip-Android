@@ -37,6 +37,11 @@ import com.lion.wandertrip.R
 import com.lion.wandertrip.component.CustomRatingBar
 import com.lion.wandertrip.model.ReviewModel
 import com.lion.wandertrip.presentation.my_review_page.MyReviewViewModel
+import com.lion.wandertrip.ui.theme.Gray1
+import com.lion.wandertrip.ui.theme.Gray2
+import com.lion.wandertrip.ui.theme.Gray4
+import com.lion.wandertrip.ui.theme.LightGray2
+import com.lion.wandertrip.ui.theme.LightGray3
 import com.lion.wandertrip.util.CustomFont
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
@@ -57,11 +62,6 @@ fun VerticalMyReviewList(myReviewViewModel: MyReviewViewModel) {
 
 @Composable
 fun ReviewItem(review: ReviewModel, pos: Int, myReviewViewModel: MyReviewViewModel) {
-
-    Log.d("test100","sssssssssscDID : ${review.contentsDocId}")
-    Log.d("test100","sssssssssssscID : ${review.contentsId}")
-    Log.d("test100","sssssssssssssssrDI : ${review.reviewDocId}")
-
     val sh = myReviewViewModel.tripApplication.screenHeight
     // 글자 줄이기
     val shortedContent = if (review.reviewContent.length > 20) {
@@ -74,7 +74,7 @@ fun ReviewItem(review: ReviewModel, pos: Int, myReviewViewModel: MyReviewViewMod
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = LightGray2)
     ) {
         Column(
             modifier = Modifier.padding(10.dp)

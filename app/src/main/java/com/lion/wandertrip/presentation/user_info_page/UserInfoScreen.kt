@@ -54,7 +54,7 @@ import com.skydoves.landscapist.glide.GlideImage
 
 @Composable
 fun UserInfoScreen(userInfoViewModel: UserInfoViewModel = hiltViewModel()) {
-
+Log.d("test100","UserInfoScreenUserInfoScreenUserInfoScreenUserInfoScreen")
     LaunchedEffect(Unit) {
         userInfoViewModel.hasImageInApplication()
     }

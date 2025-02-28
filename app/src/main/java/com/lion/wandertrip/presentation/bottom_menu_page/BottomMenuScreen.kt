@@ -2,6 +2,7 @@ package com.lion.wandertrip.presentation.bottom_menu_page
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -51,11 +52,11 @@ fun BottomMenuScreen(bottomMenuViewModel: BottomMenuViewModel = hiltViewModel())
     /*var selectedItem by remember { mutableStateOf(0) }*/
 
     Scaffold(
-        containerColor = Color.Gray,
             bottomBar = {
                 BottomAppBar(
                     modifier = Modifier
-                        .border(1.dp, Color.LightGray,)
+                        .border(1.dp, Color.White)  // 테두리를 흰색으로 설정
+                        .background(Color.White),   // BottomAppBar 배경색을 흰색으로 설정
                 ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),

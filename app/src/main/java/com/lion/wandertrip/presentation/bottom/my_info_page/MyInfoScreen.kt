@@ -24,13 +24,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.lion.a02_boardcloneproject.component.CustomDividerComponent
 import com.lion.wandertrip.presentation.bottom.my_info_page.components.HorizontalRecentPostsList
 import com.lion.wandertrip.presentation.bottom.my_info_page.components.HorizontalScheduleList
 import com.lion.wandertrip.presentation.bottom.my_info_page.components.ProfileCardBasicImage
-import com.lion.wandertrip.presentation.bottom.my_info_page.components.ProfileCardHasProfileImage
-import com.lion.wandertrip.presentation.bottom.my_info_page.used_dummy_data.RecentPostsDummyData
 import com.lion.wandertrip.ui.theme.pastelBlueColors
-import com.lion.wandertrip.util.Tools
+import com.lion.wandertrip.util.CustomFont
 
 @Composable
 fun MyInfoScreen(myInfoViewModel: MyInfoViewModel = hiltViewModel()) {
@@ -59,38 +58,20 @@ fun MyInfoScreen(myInfoViewModel: MyInfoViewModel = hiltViewModel()) {
                 viewModel = myInfoViewModel
             )
 
-
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp) // 카드 간격
-            ) {
-                items(pastelBlueColors.size) { index ->
-                    Card(
-                        modifier = Modifier
-                            .width(120.dp)  // 카드 너비
-                            .height(80.dp), // 카드 높이
-                        colors = CardDefaults.cardColors(containerColor = pastelBlueColors[index])
-                    ) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = "Card ${index + 1}", fontSize = 16.sp, color = Color.Black)
-                        }
-                    }
-                }
-            }
-
             Spacer(modifier = Modifier.height(16.dp))  // 프로필 카드와 일정 리스트 사이 간격
 
             // 일정 리스트
             HorizontalScheduleList(myInfoViewModel, myInfoViewModel.recentScheduleList)
 
-            // 최근 게시글 리스트
-            HorizontalRecentPostsList(
-                myInfoViewModel.recentTripItemList,
-                myInfoViewModel
-            )
+            Column {
+                Text("최근 본 항목", fontFamily = CustomFont.customFontBold)
+                // 최근 게시글 리스트
+                HorizontalRecentPostsList(
+                    myInfoViewModel.recentTripItemList,
+                    myInfoViewModel
+                )
+            }
+
 
 
         }
