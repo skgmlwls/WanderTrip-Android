@@ -116,12 +116,6 @@ fun TripNoteItem(tripNote: TripNoteModel, pos: Int, myTripNoteViewModel: MyTripN
                             fontFamily = CustomFont.customFontRegular
                         )
                         Spacer(modifier = Modifier.width(16.dp))
-                        Icon(Icons.Default.ChatBubble, contentDescription = "ChatCount")
-                        Text(
-                            text = "${tripNote.tripNoteScrapCount}개",
-                            modifier = Modifier.padding(start = 8.dp),
-                            fontFamily = CustomFont.customFontRegular
-                        )
                     }
 
                     // 우측 날짜와 팝업 메뉴

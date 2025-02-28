@@ -112,7 +112,7 @@ class UserSignUpStep3ViewModel @Inject constructor(
                 Log.d("userSingStep3","토큰 가져오기 : $kToken")*/
 
                 // 프로필사진 설정 화면으로 이동, userDocId 값을 경로에 포함시켜 전달
-                tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name}/$userDocId/${"KakaoLogin"}")
+                tripApplication.navHostController.navigate("${MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name}/${"KakaoLogin"}/$userDocId")
             }
         }
     }

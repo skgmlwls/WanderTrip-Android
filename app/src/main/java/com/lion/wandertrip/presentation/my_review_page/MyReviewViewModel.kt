@@ -27,7 +27,7 @@ import javax.inject.Inject
 class MyReviewViewModel @Inject constructor(
     @ApplicationContext context: Context,
     val contentsReviewService: ContentsReviewService,
-    val contentsService : ContentsService,
+    val contentsService: ContentsService,
 ) : ViewModel() {
     val reviewList = mutableStateListOf<ReviewModel>()
 
@@ -41,6 +41,8 @@ class MyReviewViewModel @Inject constructor(
     var isMenuOpened = mutableStateOf(false)
     val tripApplication = context as TripApplication
 
+    val isLoading = mutableStateOf(false)
+
     // 리뷰 가져오는 메서드
     fun getReviewList() {
         reviewList.clear()
@@ -51,6 +53,7 @@ class MyReviewViewModel @Inject constructor(
             val result = work1.await()
             reviewList.addAll(result)
             addMap()
+            isLoading.value = false
 
         }
     }
@@ -69,14 +72,14 @@ class MyReviewViewModel @Inject constructor(
     }
 
     // 삭제 버튼 리스너 메서드
-    fun onClickIconDeleteReview(contentDocId: String, contentsReviewDocId : String) {
+    fun onClickIconDeleteReview(contentDocId: String, contentsReviewDocId: String) {
         viewModelScope.launch {
-            val work1  = async(Dispatchers.IO){
-                contentsReviewService.deleteContentsReview(contentDocId,contentsReviewDocId)
+            val work1 = async(Dispatchers.IO) {
+                contentsReviewService.deleteContentsReview(contentDocId, contentsReviewDocId)
             }
             work1.join()
             // 컨텐츠 별점 수정
-            val work2 = async(Dispatchers.IO){
+            val work2 = async(Dispatchers.IO) {
                 contentsService.updateContentRatingAndRatingCount(contentDocId)
             }
             work2.join()

@@ -52,7 +52,6 @@ fun UserSignUpStep3Screen(
                     label = "닉네임",
                     placeHolder = "닉네임을 입력해주세요",
                     inputCondition = "[^가-힣a-zA-Z0-9_]",
-                    trailingIconMode = LikeLionOutlinedTextFieldEndIconMode.PASSWORD,
                     singleLine = true,
                     paddingTop = 10.dp,
                     inputType = LikeLionOutlinedTextFieldInputType.TEXT,

@@ -73,13 +73,17 @@ class UserSignUpStep2ViewModel @Inject constructor(
     // 건너뛰기 버튼
     fun onClickButtonPass(fromWhere: String) {
         if(fromWhere=="normal"){
-            tripApplication.navHostController.popBackStack(MainScreenName.MAIN_SCREEN_USER_LOGIN.name, false)
-
+            // 카카오 로그인 시 로그인 화면으로 바로 이동
+            tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) {
+                // 이미 로그인 화면이 백스택에 있으면 중복 생성 방지
+                launchSingleTop = true
+            }
         }else{
-            //백스택 싹 지우기
-            tripApplication.navHostController.popBackStack(MainScreenName.MAIN_SCREEN_USER_SIGN_UP_STEP2.name,true)
             // 카카오 로그인 시 홈으로 바로 이동
-            tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name)
+            tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name){
+                launchSingleTop=true
+            }
+
         }
     }
 

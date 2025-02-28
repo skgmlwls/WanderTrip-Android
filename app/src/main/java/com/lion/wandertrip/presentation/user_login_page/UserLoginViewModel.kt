@@ -79,10 +79,6 @@ class UserLoginViewModel @Inject constructor(
     // 로그인 버튼 click
     fun buttonUserLoginOnClick() {
         Log.d("test100", "클릭")
-        tripApplication.navHostController.popBackStack(
-            MainScreenName.MAIN_SCREEN_USER_LOGIN.name,
-            true
-        )
 
         if (textFieldUserLoginIdValue.value.isEmpty()) {
             alertDialogUserIdState.value = true
@@ -142,12 +138,10 @@ class UserLoginViewModel @Inject constructor(
                     // Application 객체에 로그인한 사용자의 정보를 담고 게시판 메인 화면으로 이동한다.
                     tripApplication.loginUserModel = loginUserModel
 
-
-                    tripApplication.navHostController.popBackStack(
-                        MainScreenName.MAIN_SCREEN_USER_LOGIN.name,
-                        true
-                    )
-                    tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name)
+                    tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) {
+                        // 홈 화면은 남기고 그 이전의 화면들만 백스택에서 제거
+                        popUpTo(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) { inclusive = true }
+                    }
                 }
             }
         }
@@ -181,20 +175,25 @@ class UserLoginViewModel @Inject constructor(
             // 유저중에 kakaoToken 값에 kakaoId 를 갖고 있는 사람이 있다면 홈
             if (model != null) {
                 tripApplication.loginUserModel = model
-                tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name)
+
+                tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) {
+                    // 홈 화면은 남기고 그 이전의 화면들만 백스택에서 제거
+                    popUpTo(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) { inclusive = true }
+                }
 
                 // 내부 저장소에 userKakao ID 저장
                 // SharedPreference에 저장한다.
                 val pref = tripApplication.getSharedPreferences("KakaoToken", Context.MODE_PRIVATE)
                 pref.edit {
                     putString("kToken", model.kakaoId.toString())
-                    Log.d("userSingStep3","ktoken: ${ model.kakaoId.toString()}")
+                    Log.d("userSingStep3", "ktoken: ${model.kakaoId.toString()}")
                 }
 
                 // Preference에 login token이 있는지 확인한다.
-                val kakaoPref = tripApplication.getSharedPreferences("KakaoToken", Context.MODE_PRIVATE)
-                val ktToken = kakaoPref.getString("kToken",null)
-                Log.d("userSingStep3","토큰 가져오기 : $ktToken")
+                val kakaoPref =
+                    tripApplication.getSharedPreferences("KakaoToken", Context.MODE_PRIVATE)
+                val ktToken = kakaoPref.getString("kToken", null)
+                Log.d("userSingStep3", "토큰 가져오기 : $ktToken")
 
 
             } else {

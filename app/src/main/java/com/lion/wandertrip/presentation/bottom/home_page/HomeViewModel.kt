@@ -20,6 +20,8 @@ import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.model.UserModel
 import com.lion.wandertrip.service.ContentsService
 import com.lion.wandertrip.service.TripAreaBaseItemService
+import com.lion.wandertrip.service.TripScheduleService
+import com.lion.wandertrip.util.BotNavScreenName
 import com.lion.wandertrip.service.UserService
 import com.lion.wandertrip.util.AreaCode
 import com.lion.wandertrip.util.MainScreenName
@@ -235,9 +237,5 @@ class HomeViewModel @Inject constructor(
 
     fun onClickTripNote(documentId : String) {
         tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_DETAIL.name}/${documentId}")
-    }
-
-    fun Int.toAreaName(): String {
-        return AreaCode.values().find { it.areaCode == this }?.areaName ?: "알 수 없음"
     }
 }

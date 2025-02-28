@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.user_info_page
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.util.Log
@@ -24,9 +25,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,15 +53,41 @@ import com.lion.a02_boardcloneproject.component.CustomTopAppBar
 import com.lion.wandertrip.R
 import com.lion.wandertrip.component.BlueButton
 import com.lion.wandertrip.component.LottieLoadingIndicator
+import com.lion.wandertrip.util.MainScreenName
 import com.lion.wandertrip.util.Tools
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
+import kotlinx.coroutines.flow.collectLatest
 
+@SuppressLint("RestrictedApi")
 @Composable
 fun UserInfoScreen(userInfoViewModel: UserInfoViewModel = hiltViewModel()) {
+Log.d("test100","UserInfoScreenUserInfoScreenUserInfoScreenUserInfoScreen")
+
 
     LaunchedEffect(Unit) {
         userInfoViewModel.hasImageInApplication()
+    }
+
+    val navController = userInfoViewModel.tripApplication.navHostController
+    var backStackRoutes by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    LaunchedEffect(navController) {
+        navController.currentBackStackEntryFlow.collectLatest { backStackEntry ->
+            // 현재 백스택을 안전하게 가져옴
+            val backStackList = navController.currentBackStack.value.mapNotNull { it.destination.route }
+
+            backStackRoutes = backStackList // 최신 백스택 반영
+        }
+    }
+
+    // 백스택 로그 출력
+    LaunchedEffect(backStackRoutes) {
+        Log.d("BackStack", "===== Current BackStack =====")
+        backStackRoutes.forEach { route ->
+            Log.d("BackStack", "Route: $route")
+        }
+        Log.d("BackStack", "=============================")
     }
 
     val sh = userInfoViewModel.tripApplication.screenHeight
@@ -86,9 +118,25 @@ fun UserInfoScreen(userInfoViewModel: UserInfoViewModel = hiltViewModel()) {
         LottieLoadingIndicator()
     } else {
         Scaffold(
+            containerColor = Color.White,
             modifier = Modifier.fillMaxSize(),
             //containerColor = Color.Blue
+            topBar = {
+                CustomTopAppBar(
+                    title = "정보 변경",
+                    navigationIconImage = Icons.Filled.ArrowBack,
+                    navigationIconOnClick = { userInfoViewModel.onClickNavIconBack() },
+                    menuItems = {
+                        if(userInfoViewModel.textFieldUserNicknameValue.value!= userInfoViewModel.tripApplication.loginUserModel.userNickName || userInfoViewModel.isImagePicked.value)
+                        CustomIconButton(
+                            ImageVector.vectorResource(R.drawable.ic_check_24px),
+                            iconButtonOnClick = { userInfoViewModel.onClickIconCheck() }
+                        )
+                    }
+                )
+            },
         ) {
+
             Column(
                 modifier = Modifier
                     .padding(it)

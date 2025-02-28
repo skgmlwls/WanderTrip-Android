@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.start_page
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -16,11 +17,18 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.lion.wandertrip.presentation.start_page.used_dummy_data.RecentDummyData
 import com.lion.wandertrip.util.Tools
 
+@SuppressLint("RestrictedApi")
 @Composable
 fun StartScreen(startViewModel: StartViewModel = hiltViewModel()){
 
     LaunchedEffect (Unit){
         startViewModel.autoLoginProcess()
+        Log.d("te","시작화면")
+        val navController = startViewModel.tripApplication.navHostController
+        val backStackSize = navController.currentBackStack.value.size
+
+        Log.d("BackStack", "현재 백스택 개수: $backStackSize")
+
     }
 
     if(startViewModel.showLoginMessageState.value) {

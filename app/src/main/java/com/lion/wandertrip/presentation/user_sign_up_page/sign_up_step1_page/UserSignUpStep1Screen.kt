@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.user_sign_up_page.sign_up_step1_page
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -50,7 +52,6 @@ fun UserSignUpStep1Screen(userSignUpStep1ViewModel: UserSignUpStep1ViewModel = h
                     placeHolder = "아이디를 입력해주세요",
                     inputCondition = "[^a-zA-Z0-9_]",
                     leadingIcon = ImageVector.vectorResource(R.drawable.ic_person_24px),
-                    trailingIconMode = LikeLionOutlinedTextFieldEndIconMode.TEXT,
                     singleLine = true,
                     supportText = userSignUpStep1ViewModel.textFieldUserJoinStep1IdErrorText,
                     isError = userSignUpStep1ViewModel.textFieldUserJoinStep1IdIsError,
@@ -104,7 +105,6 @@ fun UserSignUpStep1Screen(userSignUpStep1ViewModel: UserSignUpStep1ViewModel = h
                     label = "닉네임",
                     placeHolder = "닉네임을 입력해주세요",
                     inputCondition = "[^가-힣a-zA-Z0-9_]",
-                    trailingIconMode = LikeLionOutlinedTextFieldEndIconMode.PASSWORD,
                     singleLine = true,
                     paddingTop = 10.dp,
                     inputType = LikeLionOutlinedTextFieldInputType.TEXT,

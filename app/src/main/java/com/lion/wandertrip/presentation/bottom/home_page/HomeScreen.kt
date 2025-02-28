@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.bottom.home_page
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,12 +30,16 @@ import com.lion.wandertrip.model.UserModel
 import com.lion.wandertrip.presentation.bottom.home_page.components.PopularTripItem
 import com.lion.wandertrip.presentation.bottom.home_page.components.TripSpotItem
 import com.lion.wandertrip.ui.theme.NanumSquareRound
+import kotlinx.coroutines.flow.collectLatest
 
+@SuppressLint("RestrictedApi")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel()
 ) {
+
+
     val tripItems by viewModel.randomTourItems.observeAsState(emptyList())
     val topTrips by viewModel.topScrapedTrips.observeAsState(emptyList())
     val imageUrlMap = viewModel.imageUrlMap
@@ -46,6 +51,27 @@ fun HomeScreen(
         viewModel.fetchTripNotes()
         viewModel.getTopScrapedTrips()
         viewModel.fetchRandomTourItems()
+    }
+
+    val navController = viewModel.tripApplication.navHostController
+    var backStackRoutes by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    LaunchedEffect(navController) {
+        navController.currentBackStackEntryFlow.collectLatest { backStackEntry ->
+            // 현재 백스택을 안전하게 가져옴
+            val backStackList = navController.currentBackStack.value.mapNotNull { it.destination.route }
+
+            backStackRoutes = backStackList // 최신 백스택 반영
+        }
+    }
+
+    // 백스택 로그 출력
+    LaunchedEffect(backStackRoutes) {
+        Log.d("BackStack", "===== Current BackStack =====")
+        backStackRoutes.forEach { route ->
+            Log.d("BackStack", "Route: $route")
+        }
+        Log.d("BackStack", "=============================")
     }
 
     if (isLoading) {

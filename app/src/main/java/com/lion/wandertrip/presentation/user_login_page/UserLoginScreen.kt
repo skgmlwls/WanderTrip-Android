@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.user_login_page
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,8 +22,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,9 +56,46 @@ import com.lion.wandertrip.R
 import com.lion.wandertrip.presentation.bottom.schedule_page.ScheduleScreen
 import com.lion.wandertrip.presentation.user_login_page.components.KakaoButton
 import com.lion.wandertrip.util.CustomFont
+import com.lion.wandertrip.util.MainScreenName
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.forEach
 
+@SuppressLint("RestrictedApi")
 @Composable
 fun UserLoginScreen(userLoginViewModel: UserLoginViewModel = hiltViewModel()) {
+    Log.d("te","로그화면")
+
+    val navController = userLoginViewModel.tripApplication.navHostController
+    val backStackEntries = navController.currentBackStack
+
+    LaunchedEffect(Unit) {
+        val navController = userLoginViewModel.tripApplication.navHostController
+
+        // 로그인 화면이 열리면 백스택을 다 지우고 로그인 화면만 남기기
+        navController.popBackStack(MainScreenName.MAIN_SCREEN_USER_LOGIN.name, false)
+    }
+
+         var backStackRoutes by remember { mutableStateOf<List<String>>(emptyList()) }
+
+         LaunchedEffect(navController) {
+             navController.currentBackStackEntryFlow.collectLatest { backStackEntry ->
+                 // 현재 백스택을 안전하게 가져옴
+                 val backStackList = navController.currentBackStack.value.mapNotNull { it.destination.route }
+
+                 backStackRoutes = backStackList // 최신 백스택 반영
+             }
+         }
+
+         // 백스택 로그 출력
+         LaunchedEffect(backStackRoutes) {
+             Log.d("BackStack", "===== Current BackStack =====")
+             backStackRoutes.forEach { route ->
+                 Log.d("BackStack", "Route: $route")
+             }
+             Log.d("BackStack", "=============================")
+         }
+
+
     val sW = userLoginViewModel.tripApplication.screenWidth
     val sH = userLoginViewModel.tripApplication.screenHeight
     val sR = userLoginViewModel.tripApplication.screenRatio

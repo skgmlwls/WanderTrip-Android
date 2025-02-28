@@ -2,6 +2,8 @@ package com.lion.wandertrip.presentation.bottom_menu_page
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -49,9 +52,12 @@ fun BottomMenuScreen(bottomMenuViewModel: BottomMenuViewModel = hiltViewModel())
     /*var selectedItem by remember { mutableStateOf(0) }*/
 
     Scaffold(
-        containerColor = Color.White,
-        bottomBar = {
-            BottomAppBar {
+            bottomBar = {
+                BottomAppBar(
+                    modifier = Modifier
+                        .border(1.dp, Color.White)  // 테두리를 흰색으로 설정
+                        .background(Color.White),   // BottomAppBar 배경색을 흰색으로 설정
+                ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround
