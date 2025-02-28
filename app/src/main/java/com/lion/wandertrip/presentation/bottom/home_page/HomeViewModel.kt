@@ -26,6 +26,8 @@ import com.lion.wandertrip.util.TripNoteScreenName
 import com.lion.wandertrip.vo.TripNoteVO
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -94,24 +96,52 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    // 관심 지역 추가, 관심 지역 카운트 증가
+    fun addLikeItem(likeItemContentId: String) {
+        viewModelScope.launch {
+            val work1 = async(Dispatchers.IO) {
+                userService.addLikeItem(tripApplication.loginUserModel.userDocId, likeItemContentId)
+            }
+
+            val work2 = async(Dispatchers.IO) {
+                userService.addLikeCnt(likeItemContentId)
+            }
+        }
+    }
+
+    // 관심 지역 삭제, 관심 지역 카운트 감소
+    fun removeLikeItem(likeItemContentId: String) {
+        viewModelScope.launch {
+            val work1 = async(Dispatchers.IO) {
+                userService.removeLikeItem(tripApplication.loginUserModel.userDocId, likeItemContentId)
+            }
+
+            val work2 = async(Dispatchers.IO) {
+                userService.removeLikeCnt(likeItemContentId)
+            }
+        }
+    }
+
     fun toggleFavorite(contentId: String) {
         viewModelScope.launch {
             val userDocId = _userModel.value?.userDocId ?: return@launch // ✅ userModel이 null이면 실행하지 않음
 
             val isLiked = userLikeList.value.contains(contentId)
 
-            // ✅ 기존 리스트를 변경하지 않고 새로운 리스트 객체 생성
+            if (isLiked) {
+                removeLikeItem(contentId) // ✅ 기존 관심 목록에서 제거
+            } else {
+                addLikeItem(contentId) // ✅ 관심 목록에 추가
+            }
+
+            // ✅ UI 상태 즉시 반영 (새로운 리스트 객체 할당)
             val updatedList = if (isLiked) {
                 userLikeList.value.filter { it != contentId } // ✅ 리스트에서 제거
             } else {
                 userLikeList.value + contentId // ✅ 리스트에 추가
             }
 
-            // ✅ UI 상태 즉시 반영 (새로운 리스트 객체 할당)
             userLikeList.value = updatedList
-
-            // ✅ Firestore에 업데이트 (비동기적으로 수행)
-            userService.updateUserLikeList(userDocId, updatedList)
 
             // ✅ _userModel의 값을 변경하여 Compose가 감지하도록 설정
             _userModel.value = _userModel.value?.let { userModel ->
@@ -122,6 +152,7 @@ class HomeViewModel @Inject constructor(
             }
         }
     }
+
 
     fun fetchTripNotes() {
         viewModelScope.launch {
