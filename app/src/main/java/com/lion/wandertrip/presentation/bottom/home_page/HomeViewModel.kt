@@ -205,13 +205,6 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun fetchTripNoteListWithScrapCount() {
-        viewModelScope.launch {
-            val tripNotes = tripNoteService.gettingTripNoteListWithScrapCount()
-            _tripNoteList.value = tripNotes
-        }
-    }
-
     fun backScreen() {
         tripApplication.navHostController.popBackStack()
     }
