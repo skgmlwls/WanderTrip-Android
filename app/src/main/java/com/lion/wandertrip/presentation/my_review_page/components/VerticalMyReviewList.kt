@@ -71,10 +71,12 @@ fun ReviewItem(review: ReviewModel, pos: Int, myReviewViewModel: MyReviewViewMod
     }
     val sH = myReviewViewModel.tripApplication.screenHeight
     Card(
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp),
-        colors = CardDefaults.cardColors(containerColor = LightGray2)
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(
             modifier = Modifier.padding(10.dp)
