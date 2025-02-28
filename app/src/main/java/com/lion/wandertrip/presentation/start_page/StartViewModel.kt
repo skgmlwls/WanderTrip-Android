@@ -66,26 +66,32 @@ class StartViewModel @Inject constructor(
                 val loginUserModel = work1.await()
                 // 가져온 사용자 데이터가 있다면
                 if (loginUserModel != null) {
-
                     tripApplication.loginUserModel = loginUserModel
 
-                    tripApplication.navHostController.popBackStack(
+                /*    tripApplication.navHostController.popBackStack(
                         MainScreenName.MAIN_SCREEN_START.name,
                         true
-                    )
-                    tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name){
-                        // 이미 로그인 화면이 백스택에 있으면 중복 생성 방지
+                    )*/
+                    // 일반 자동 로그인
+                    tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) {
+                        Log.d("backStack","일반 자동 로그인1")
+                        popUpTo(MainScreenName.MAIN_SCREEN_START.name) { inclusive = true }
                         launchSingleTop = true
                     }
+
                 } else {
+                    // 일반 자동 로그인 실패
                     // 로그인 화면으로 이동한다.
                     tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name){
+                        Log.d("backStack","일반 자동 로그인2")
+
                         // 이미 로그인 화면이 백스택에 있으면 중복 생성 방지
+                        popUpTo(MainScreenName.MAIN_SCREEN_START.name) { inclusive = true }
                         launchSingleTop = true
                     }
                 }
             } else if (kToken != null) {
-
+                // 카카오 로그인
                 showKakaoLoginMessageState.value = true
 
                 // 카카오토큰으로 사용자 정보를 가져온다.
@@ -95,28 +101,40 @@ class StartViewModel @Inject constructor(
                 val loginUserModel = work1.await()
                 // 가져온 사용자 데이터가 있다면
                 if (loginUserModel != null) {
-
                     tripApplication.loginUserModel = loginUserModel
-
-                    tripApplication.navHostController.popBackStack(
+                    /*tripApplication.navHostController.popBackStack(
                         MainScreenName.MAIN_SCREEN_START.name,
                         true
                     )
+                    // 카카오 로그인으로 홈 화면 이동
                     tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name){
                         // 이미 로그인 화면이 백스택에 있으면 중복 생성 방지
                         launchSingleTop = true
+                    }*/
+
+                    tripApplication.navHostController.navigate(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) {
+                        Log.d("backStack","카톡 자동 로그인1")
+
+                        popUpTo(MainScreenName.MAIN_SCREEN_START.name) { inclusive = true }
+                        launchSingleTop = true
                     }
+
                 } else {
+                    // 카카오 로그인 실패 시 로그인 화면으로 이동
                     // 로그인 화면으로 이동한다.
                     tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name){
+                        Log.d("backStack","카톡 자동 로그인2")
                         // 이미 로그인 화면이 백스택에 있으면 중복 생성 방지
+                        popUpTo(MainScreenName.MAIN_SCREEN_START.name) { inclusive = true }
                         launchSingleTop = true
                     }
                 }
             } else {
                 // 로그인 화면으로 이동한다.
-                tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) {
+                tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name){
+                    Log.d("backStack"," 로그인1")
                     // 이미 로그인 화면이 백스택에 있으면 중복 생성 방지
+                    popUpTo(MainScreenName.MAIN_SCREEN_START.name) { inclusive = true }
                     launchSingleTop = true
                 }
             }

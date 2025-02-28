@@ -188,6 +188,7 @@ class MyInterestingViewModel @Inject constructor(
     // 필터로 리스트 가져오기
     fun getInterestingFilter(cityName: String) {
         Log.d("test100", "getInterestingFilterByCityList-> cityName : $cityName")
+        Log.d("getInterestingFilter","filterList : ${interestingListFilterByCity}")
         when (cityName) {
             "전체" -> {
                 // 필터 리스트 클리어

@@ -1,5 +1,6 @@
 package com.lion.wandertrip.presentation.user_info_page
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
@@ -13,6 +14,7 @@ import com.lion.wandertrip.service.ContentsReviewService
 import com.lion.wandertrip.service.TripNoteService
 import com.lion.wandertrip.service.TripScheduleService
 import com.lion.wandertrip.service.UserService
+import com.lion.wandertrip.util.BotNavScreenName
 import com.lion.wandertrip.util.MainScreenName
 import com.lion.wandertrip.util.Tools
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -165,6 +167,7 @@ class UserInfoViewModel @Inject constructor(
     }
 
     // 백스텍 지우고 로그인 화면으로 이동
+    @SuppressLint("RestrictedApi")
     fun logOut() {
         clearLoginToken()
        /* // Preference에 login token이 있는지 확인한다.
@@ -176,9 +179,13 @@ class UserInfoViewModel @Inject constructor(
        /* val prefItem = tripApplication.getSharedPreferences("RecentItem", Context.MODE_PRIVATE)
         val item = prefItem.getString("recentItemList", null)
         Log.d("test100", "item: $item")*/
+        val backStack = tripApplication.navHostController.currentBackStack
+        // 로그인 화면으로 이동한다.
+        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name){
+            Log.d("backStack"," 일반 로그아웃 화면 전환")
+            Log.d("backStack"," backStack :${backStack.value}")
 
-        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) {
-            popUpTo(tripApplication.navHostController.graph.startDestinationId) { inclusive = true }
+            popUpTo(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) { inclusive = true }
             launchSingleTop = true
         }
     }
@@ -196,10 +203,14 @@ class UserInfoViewModel @Inject constructor(
          val item = prefItem.getString("recentItemList", null)
          Log.d("test100", "item: $item")
 
-        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name) {
-            popUpTo(tripApplication.navHostController.graph.startDestinationId) { inclusive = true }
+        // 로그인 화면으로 이동한다.
+        tripApplication.navHostController.navigate(MainScreenName.MAIN_SCREEN_USER_LOGIN.name){
+            Log.d("backStack"," 카카오 로그아웃 화면 전환")
+            // 이미 로그인 화면이 백스택에 있으면 중복 생성 방지
+            popUpTo(BotNavScreenName.BOT_NAV_SCREEN_HOME.name) { inclusive = true }
             launchSingleTop = true
         }
+
     }
 
 

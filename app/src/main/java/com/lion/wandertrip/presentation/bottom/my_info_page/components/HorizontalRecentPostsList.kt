@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.imageResource
@@ -19,6 +20,10 @@ import com.lion.wandertrip.R
 import com.lion.wandertrip.model.RecentTripItemModel
 import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.presentation.bottom.my_info_page.MyInfoViewModel
+import com.lion.wandertrip.ui.theme.LightGray1
+import com.lion.wandertrip.ui.theme.LightGray2
+import com.lion.wandertrip.ui.theme.LightGray3
+import com.lion.wandertrip.ui.theme.LightGray4
 import com.lion.wandertrip.util.ContentTypeId
 import com.skydoves.landscapist.CircularReveal
 import com.skydoves.landscapist.glide.GlideImage
@@ -54,8 +59,8 @@ fun TouristItem(tripItem: RecentTripItemModel,myInfoViewModel: MyInfoViewModel) 
         "${ContentTypeId.ACCOMMODATION.contentTypeCode}"->{"숙박시설"}
         else -> {"식당"}
     }
-
     Card(
+        colors = CardDefaults.cardColors(containerColor = LightGray3),
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()

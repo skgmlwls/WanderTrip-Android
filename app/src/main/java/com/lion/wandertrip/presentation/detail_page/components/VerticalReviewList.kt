@@ -51,6 +51,7 @@ fun VerticalReviewList(detailViewModel: DetailViewModel) {
                 .height((sh).dp)
         ) {
             items(detailViewModel.filteredReviewList) {
+                CustomDividerComponent(3.dp)
                 Log.d("test100"," it : ${it.contentsDocId}")
                 ReviewItem(
                     it,
