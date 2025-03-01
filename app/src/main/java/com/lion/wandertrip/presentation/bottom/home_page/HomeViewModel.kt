@@ -14,13 +14,16 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.lion.wandertrip.service.TripNoteService
 import com.lion.wandertrip.TripApplication
+import com.lion.wandertrip.model.ContentsModel
 import com.lion.wandertrip.model.TripItemModel
 import com.lion.wandertrip.model.TripNoteModel
 import com.lion.wandertrip.model.UserModel
+import com.lion.wandertrip.service.ContentsService
 import com.lion.wandertrip.service.TripAreaBaseItemService
 import com.lion.wandertrip.service.TripScheduleService
 import com.lion.wandertrip.util.BotNavScreenName
 import com.lion.wandertrip.service.UserService
+import com.lion.wandertrip.util.AreaCode
 import com.lion.wandertrip.util.MainScreenName
 import com.lion.wandertrip.util.TripNoteScreenName
 import com.lion.wandertrip.vo.TripNoteVO
@@ -37,6 +40,7 @@ class HomeViewModel @Inject constructor(
     @ApplicationContext context: Context,
     val tripNoteService: TripNoteService,
     val tripAreaBaseItemService: TripAreaBaseItemService,
+    val contentsService: ContentsService,
     val userService: UserService
 ) : ViewModel(){
 
@@ -71,6 +75,17 @@ class HomeViewModel @Inject constructor(
     val isLoading: LiveData<Boolean> get() = _isLoading
 
     private var isFetched = false // 🔥 데이터가 로드되었는지 여부를 저장
+
+    private val _contentsModelMap = MutableLiveData<Map<String, ContentsModel>>() // ✅ 여러 개 관리 가능
+    val contentsModelMap: LiveData<Map<String, ContentsModel>> get() = _contentsModelMap
+
+    fun fetchContentsModel(contentDocId: String) {
+        viewModelScope.launch {
+            val contentsData = contentsService.getContentByDocId(contentDocId)
+            _contentsModelMap.value = _contentsModelMap.value.orEmpty() + (contentDocId to contentsData)
+            // ✅ 기존 데이터 유지하면서 새로운 값 추가
+        }
+    }
 
     // 🔥 Firestore에서 사용자 정보 가져오기
     private fun fetchUserData() {
@@ -223,5 +238,4 @@ class HomeViewModel @Inject constructor(
     fun onClickTripNote(documentId : String) {
         tripApplication.navHostController.navigate("${TripNoteScreenName.TRIP_NOTE_DETAIL.name}/${documentId}")
     }
-
 }
