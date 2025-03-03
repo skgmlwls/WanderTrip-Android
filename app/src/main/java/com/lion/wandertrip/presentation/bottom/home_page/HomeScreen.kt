@@ -45,6 +45,7 @@ fun HomeScreen(
     val imageUrlMap = viewModel.imageUrlMap
     val isLoading by viewModel.isLoading.observeAsState(false) // ✅ 로딩 상태 감지
     val userModel by viewModel.userModel.observeAsState(UserModel(userDocId = "", userLikeList = emptyList()))
+    val contentsModelMap by viewModel.contentsModelMap.observeAsState(emptyMap())
 
     LaunchedEffect(Unit) {
         viewModel.fetchTripNotes()
@@ -131,6 +132,7 @@ fun HomeScreen(
                             tripItem = tripItem,
                             onItemClick = { viewModel.onClickTrip(tripItem.contentId) },
                             userModel = userModel,
+                            contentsModel = contentsModelMap[tripItem.contentId],
                             onFavoriteClick = { contentId -> viewModel.toggleFavorite(contentId) }
                         )
                     }
