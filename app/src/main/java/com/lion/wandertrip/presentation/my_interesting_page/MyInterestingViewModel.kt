@@ -244,10 +244,8 @@ class MyInterestingViewModel @Inject constructor(
     fun getLocalList() {
         Log.d("test100", "interListAll $interestingListAll")
         localList.clear()
-        localList.add("전체")
         interestingListAll.forEach {
             Log.d("test100", "interListItem $it")
-
             val cityName = Tools.getAreaDetails(it.areacode, it.sigungucode)
             if (!localList.contains(cityName)) {
                 localList.add(cityName)
@@ -255,6 +253,9 @@ class MyInterestingViewModel @Inject constructor(
         }
         Log.d("test100", "LocalList $localList")
 
+        localList.sort() // 리스트를 이름순 정렬
+
+        localList.add(0,"전체")
     }
 
     // 관광지 클릭 리스너

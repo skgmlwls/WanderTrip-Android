@@ -89,9 +89,9 @@ fun ReviewItem(review: ReviewModel, pos: Int, myReviewViewModel: MyReviewViewMod
                 modifier = Modifier
                     .padding(bottom = 10.dp, top = 15.dp)
                     .padding(horizontal = 10.dp),
-                text = "제목 : ${review.reviewTitle}",
+                text = review.reviewTitle,
                 fontFamily = CustomFont.customFontBold,
-                fontSize = 30.sp // 글씨 크기 설정
+                fontSize = 24.sp // 글씨 크기 설정
             )
             Row(
                 modifier = Modifier.padding(horizontal = 10.dp)
