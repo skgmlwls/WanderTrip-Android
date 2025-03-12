@@ -63,7 +63,7 @@ WanderTrip은 여행 계획을 손쉽게 세우고, 추천 여행지를 확인�
 - **📝 언어**: Kotlin
 - **🏗️ 아키텍처**: MVVM, Hilt
 - **🎨 UI**: Jetpack Compose, Material Design
-- **🌐 네트워크**: Retrofit, OkHttp, Moshi
+- **🌐 네트워크**: Retrofit, OkHttp, Moshi, kotlinx.serialization
 - **⚡ 비동기 처리**: Coroutines, Flow
 - **🖼️ 이미지 처리**: Glide, Coil, Shimmer
 - **📌 네비게이션**: Jetpack Navigation, SafeArgs
