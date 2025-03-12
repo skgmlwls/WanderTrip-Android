@@ -71,7 +71,7 @@ WanderTrip은 여행 계획을 손쉽게 세우고, 추천 여행지를 확인�
 - **🎞️ 애니메이션**: Lottie Compose
 
 ### **Backend & API**
-- **🔑 인증**: Firebase Authentication (카카오 로그인 포함)
+- **🔑 인증**: Kakao Login API
 - **📂 데이터베이스**: Firebase Firestore, Room Database
 - **🖼️ 파일 및 이미지 관리**: Firebase Storage
 - **🔗 API 연동**:
