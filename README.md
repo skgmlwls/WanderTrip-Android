@@ -15,6 +15,7 @@ WanderTrip은 여행 계획을 손쉽게 세우고, 추천 여행지를 확인�
   - ⭐ 여행지 추천 및 리뷰 시스템
   - 🔑 Kakao Login을 통한 간편 로그인
   - 🗺️ Google Maps 기반 위치 서비스 제공
+  - 🎞️ Lottie 애니메이션을 활용한 로딩 및 UI 개선
 
 ---
 
@@ -67,6 +68,7 @@ WanderTrip은 여행 계획을 손쉽게 세우고, 추천 여행지를 확인�
 - **⚡ 비동기 처리**: Coroutines, Flow
 - **🖼️ 이미지 처리**: Glide, Coil, Shimmer
 - **📌 네비게이션**: Jetpack Navigation, SafeArgs
+- **🎞️ 애니메이션**: Lottie Compose
 
 ### **Backend & API**
 - **🔑 인증**: Firebase Authentication (카카오 로그인 포함)
