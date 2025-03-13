@@ -115,6 +115,13 @@ WanderTrip은 여행 계획을 손쉽게 세우고, 추천 여행지를 확인�
 
 ---
 
+## 📱 화면 구조도
+
+![1 화면](https://firebasestorage.googleapis.com/v0/b/projectimage-bafe9.firebasestorage.app/o/WanderTrip_Image%2F%EC%A3%BC%EC%9A%94%ED%99%94%EB%A9%B41.png?alt=media&token=394a4325-46f1-4b94-b494-9ce99b009c23)
+![1 화면](https://firebasestorage.googleapis.com/v0/b/projectimage-bafe9.firebasestorage.app/o/WanderTrip_Image%2F%EC%A3%BC%EC%9A%94%ED%99%94%EB%A9%B42.png?alt=media&token=fb956cba-21d7-4314-affe-3069a2ad835b)
+
+---
+
 ## 🔥 기대 효과
 ✅ **국내 여행 활성화**: 여행지 정보를 쉽게 공유하고, 지역 경제 활성화에 기여  
 ✅ **새로운 여행 경험 제공**: 룰렛 기능을 통해 색다른 여행 기획 가능  
