@@ -114,7 +114,7 @@ WanderTrip은 여행 계획을 손쉽게 세우고, 추천 여행지를 확인�
 
 ## 📽️ 시연 영상
 ▶️ [시연 영상 보기](https://youtu.be/haoWCNh6BZw)
-[![시연 영상 보기](https://img.youtube.com/vi/haoWCNh6BZw/0.jpg)](https://youtu.be/haoWCNh6BZw)
+
 ---
 
 ## 📱 주요 화면
