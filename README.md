@@ -3,6 +3,8 @@
 **✨ 당신만의 특별한 국내 여행을 설계하세요! ✨**<br>
 WanderTrip은 여행 계획을 손쉽게 세우고, 추천 여행지를 확인하며, 여행 일정을 공유할 수 있는 국내 여행 일정 관리 애플리케이션입니다. 또한, 룰렛 기능을 통해 랜덤으로 여행지를 선택하여 새로운 여행 경험을 제공합니다. 🏕️
 
+![1 화면](https://firebasestorage.googleapis.com/v0/b/projectimage-bafe9.firebasestorage.app/o/WanderTrip_Image%2F%EB%A9%94%EC%9D%B8%ED%99%94%EB%A9%B4.png?alt=media&token=a09b7016-f1e1-4792-a757-5e7338338cc0)
+
 ---
 
 ## 📌 프로젝트 개요
